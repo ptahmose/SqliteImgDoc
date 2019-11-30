@@ -3,6 +3,9 @@
 #include <string>
 #include <unordered_set>
 #include "ImportExport.h"
+#include "SubBlkCoordinate.h"
+#include "LogicalPositionInfo.h"
+#include "IDataObj.h"
 
 namespace SlImgDoc
 {
@@ -17,6 +20,10 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite
     {
     public:
+        virtual void BeginTransaction()=0;
+        virtual void CommitTransaction()=0;
+        virtual void AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+
         virtual ~IDbWrite() {};
     };
 
@@ -27,5 +34,5 @@ namespace SlImgDoc
         static IDbWrite* CreateNew(const CreateOptions& opts);
     };
 
-    
+
 }

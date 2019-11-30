@@ -5,6 +5,66 @@
 #include "../SqliteImgDoc/Interface.h"
 
 using namespace SlImgDoc;
+using namespace std;
+
+class CSimpleCoord : public ISubBlkCoordinate
+{
+public:
+    int c, z, t, m;
+
+public:
+    virtual bool TryGetCoordinate(char dim, int* coordVal) const
+    {
+        int v;
+        switch (tolower(dim))
+        {
+        case 'c':v = this->c; break;
+        case 'z':v = this->z; break;
+        case 't':v = this->t; break;
+        case 'm':v = this->m; break;
+        default:return false;
+        }
+
+        if (coordVal != nullptr)
+        {
+            *coordVal = v;
+        }
+
+        return true;
+    }
+};
+
+class CSimpleDataObjUncmp : public IDataObjUncompressedBitmap
+{
+private:
+    BinHdrUncompressedBitmap hdr;
+    uint8_t* data;
+    size_t size;
+public:
+    CSimpleDataObjUncmp(int w, int h)
+    {
+        this->size = w * h;
+        this->data = (uint8_t*)malloc(this->size);
+        this->hdr.width = w;
+        this->hdr.height = h;
+        this->hdr.pixeltype = PixelType::RGB24;
+        this->hdr.stride = w;
+
+        for (int i = 0; i < this->size; ++i)
+        {
+            this->data[i] = (uint8_t)i;
+        }
+    }
+    virtual void GetData(const void** p, size_t* s) const
+    {
+        if (p != nullptr) { *p = this->data; }
+        if (s != nullptr) { *s = this->size; }
+    }
+    virtual const BinHdrUncompressedBitmap& GetBinHdr() const
+    {
+        return hdr;
+    }
+};
 
 int main()
 {
@@ -13,7 +73,24 @@ int main()
 
     auto dbw = IDbFactory::CreateNew(opts);
 
+    CSimpleCoord simpleCoord = {};
+    LogicalPositionInfo posInfo;
+    posInfo.posX = posInfo.posY = 0;
+    posInfo.width = posInfo.height = 100;
+    posInfo.pyrLvl = 0;
+    CSimpleDataObjUncmp dataObj(4000, 4000);
+
+    dbw->BeginTransaction();
+    for (int i = 0; i < 1000; ++i)
+    {
+        simpleCoord.t = i;
+        dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
+    }
+    dbw->CommitTransaction();
+
     std::cout << "Hello World!\n";
+
+    delete dbw;
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

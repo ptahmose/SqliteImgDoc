@@ -36,6 +36,21 @@
     <ClInclude Include="ImportExport.h">
       <Filter>Header Files\External</Filter>
     </ClInclude>
+    <ClInclude Include="DataBinHdr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DbWrite.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SubBlkCoordinate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LogicalPositionInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IDataObj.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -45,6 +60,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DbCreation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DbWrite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DbBase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

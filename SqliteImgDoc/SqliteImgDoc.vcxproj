@@ -159,15 +159,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataBinHdr.h" />
+    <ClInclude Include="IDataObj.h" />
     <ClInclude Include="DbBase.h" />
     <ClInclude Include="DbCreation.h" />
+    <ClInclude Include="DbWrite.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="ImportExport.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="LogicalPositionInfo.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SubBlkCoordinate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DbBase.cpp" />
     <ClCompile Include="DbCreation.cpp" />
+    <ClCompile Include="DbWrite.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

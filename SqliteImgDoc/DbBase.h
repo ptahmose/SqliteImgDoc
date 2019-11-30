@@ -15,16 +15,10 @@ public:
 
     virtual ~CDbBase()
     {}
+
+protected:
+    SQLite::Database& GetDb() { return *this->db.get(); }
+
+    static const char* TableName_TileTable;
 };
 
-class CDbWrite : CDbBase, public SlImgDoc::IDbWrite
-{
-private:
-public:
-    CDbWrite(SQLite::Database* db) : CDbBase(db)
-    {
-    }
-
-    virtual ~CDbWrite()
-    {}
-};

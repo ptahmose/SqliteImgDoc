@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 16.0.29519.87
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SqliteImgDocTest", "ConsoleApplication1\ConsoleApplication1.vcxproj", "{8732355F-542E-4A60-BE70-1CC96A61DF85}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9879175A-6DDE-4281-A03D-339EF867D6FB} = {9879175A-6DDE-4281-A03D-339EF867D6FB}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SqliteImgDoc", "SqliteImgDoc\SqliteImgDoc.vcxproj", "{9879175A-6DDE-4281-A03D-339EF867D6FB}"
 EndProject

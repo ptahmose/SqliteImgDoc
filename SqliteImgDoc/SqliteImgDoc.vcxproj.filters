@@ -33,6 +33,9 @@
     <ClInclude Include="DbBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ImportExport.h">
+      <Filter>Header Files\External</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

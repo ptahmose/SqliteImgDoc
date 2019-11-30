@@ -2,6 +2,7 @@
 
 #include <string>
 #include <unordered_set>
+#include "ImportExport.h"
 
 namespace SlImgDoc
 {
@@ -13,14 +14,14 @@ namespace SlImgDoc
         std::unordered_set<char> dimensions;
     };
 
-    class IDbWrite
+    class SQLITEIMGDOC_API IDbWrite
     {
     public:
-        virtual ~IDbWrite()=0;
+        virtual ~IDbWrite() {};
     };
 
 
-    class IDbFactory
+    class SQLITEIMGDOC_API IDbFactory
     {
     public:
         static IDbWrite* CreateNew(const CreateOptions& opts);

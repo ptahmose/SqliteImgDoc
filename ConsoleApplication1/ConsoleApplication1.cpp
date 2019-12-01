@@ -66,20 +66,51 @@ public:
     }
 };
 
+static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int sizeY)
+{
+    CSimpleCoord simpleCoord = {};
+    LogicalPositionInfo posInfo;
+    posInfo.posX = posInfo.posY = 0;
+    posInfo.width = sizeX;
+    posInfo.height = sizeY;
+    posInfo.pyrLvl = 0;
+    CSimpleDataObjUncmp dataObj(sizeX, sizeY);
+
+    dbw->BeginTransaction();
+   // for (int i = 0; i < 1000; ++i)
+    {
+        //simpleCoord.t = i;
+        for (int r = 0; r < rows;++r)
+        {
+            for (int c = 0; c < columns; ++c)
+            {
+                posInfo.posX = c * sizeX;
+                posInfo.posY = r * sizeY;
+
+                dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
+            }
+        }
+    }
+
+    dbw->CommitTransaction();
+}
+
 int main()
 {
     CreateOptions opts;
-    //opts.dbFilename = "D:\\test.db";
-    opts.dbFilename = "C:\\temp\\test.db";
+    opts.dbFilename = "D:\\test.db";
+    //opts.dbFilename = "C:\\temp\\test.db";
 
     auto dbw = IDbFactory::CreateNew(opts);
+    WriteMosaic(dbw, 50, 50, 256, 256);
 
+    /*
     CSimpleCoord simpleCoord = {};
     LogicalPositionInfo posInfo;
     posInfo.posX = posInfo.posY = 0;
     posInfo.width = posInfo.height = 100;
     posInfo.pyrLvl = 0;
-    CSimpleDataObjUncmp dataObj(4000, 4000);
+    CSimpleDataObjUncmp dataObj(1000, 1000);
 
     dbw->BeginTransaction();
     for (int i = 0; i < 1000; ++i)
@@ -89,7 +120,7 @@ int main()
     }
 
     dbw->CommitTransaction();
-
+    */
     std::cout << "Hello World!\n";
 
     delete dbw;

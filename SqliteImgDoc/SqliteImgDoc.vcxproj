@@ -160,6 +160,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DataBinHdr.h" />
+    <ClInclude Include="DbGlobalInfo.h" />
     <ClInclude Include="IDataObj.h" />
     <ClInclude Include="DbBase.h" />
     <ClInclude Include="DbCreation.h" />

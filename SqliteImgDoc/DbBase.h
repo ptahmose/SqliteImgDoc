@@ -19,6 +19,9 @@ public:
 protected:
     SQLite::Database& GetDb() { return *this->db.get(); }
 
+public:
     static const char* TableName_TileTable;
+    static const char* TableName_TileData;
+    static const char* VTableName_SpatialTable;
 };
 

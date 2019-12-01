@@ -25,4 +25,5 @@ public:
 
 private:
     std::int64_t AddSubBlk(const IDataObjUncompressedBitmap* data);
+    void AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo* info);
 };

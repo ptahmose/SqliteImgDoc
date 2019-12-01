@@ -4,13 +4,19 @@
 #include <SQLiteCpp/Transaction.h>
 
 #include <iostream>
+#include <sstream>
+
+using namespace std;
 
 void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
     try {
         auto idSbBlk = this->AddSubBlk(data);
 
-        SQLite::Statement query(this->GetDb(), "INSERT INTO TILETABLE (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);");
+        stringstream ss;
+        ss << "INSERT INTO " << CDbBase::TableName_TileTable << " (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);";
+
+        SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO TILETABLE (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);"*/);
         //query.bind(1+0, CDbBase::TableName_TileTable);
         int i;
         coord->TryGetCoordinate('C', &i);
@@ -31,6 +37,9 @@ void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPosition
         query.bind(11, idSbBlk);
 
         query.exec();
+
+        auto id = this->GetDb().getLastInsertRowid();
+        this->AddToSpatialIndexTable(id, info);
     }
     catch (SQLite::Exception & excp)
     {
@@ -54,7 +63,9 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
 {
     try
     {
-        SQLite::Statement query(this->GetDb(), "INSERT INTO SUBBLKTABLE (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);");
+        stringstream ss;
+        ss << "INSERT INTO " << CDbBase::TableName_TileData << " (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);";
+        SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO SUBBLKTABLE (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);"*/);
         const auto hdr = data->GetBinHdr();
 
         std::uint8_t binhdr[32];
@@ -72,6 +83,27 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
         query.exec();
 
         return this->GetDb().getLastInsertRowid();
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+    }
+}
+
+void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo* info)
+{
+    try
+    {
+        stringstream ss;
+        ss << "INSERT INTO " << CDbBase::VTableName_SpatialTable << " VALUES(?1,?2,?3,?4,?5);";
+
+        SQLite::Statement query(this->GetDb(), ss.str());
+        query.bind(1, id);
+        query.bind(2, info->posX);
+        query.bind(3, info->posX + info->width);
+        query.bind(4, info->posY);
+        query.bind(5, info->posY + info->height);
+        query.exec();
     }
     catch (SQLite::Exception & excp)
     {

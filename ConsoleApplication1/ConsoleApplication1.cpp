@@ -69,7 +69,8 @@ public:
 int main()
 {
     CreateOptions opts;
-    opts.dbFilename = "D:\\test.db";
+    //opts.dbFilename = "D:\\test.db";
+    opts.dbFilename = "C:\\temp\\test.db";
 
     auto dbw = IDbFactory::CreateNew(opts);
 
@@ -86,6 +87,7 @@ int main()
         simpleCoord.t = i;
         dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
     }
+
     dbw->CommitTransaction();
 
     std::cout << "Hello World!\n";

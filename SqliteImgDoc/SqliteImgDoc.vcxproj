@@ -168,13 +168,16 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="ImportExport.h" />
     <ClInclude Include="Interface.h" />
+    <ClInclude Include="ITileCoordinate.h" />
     <ClInclude Include="LogicalPositionInfo.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SubBlkCoordinate.h" />
+    <ClInclude Include="TileCoordinate.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DbBase.cpp" />
     <ClCompile Include="DbCreation.cpp" />
+    <ClCompile Include="DbGlobalInfo.cpp" />
     <ClCompile Include="DbWrite.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">

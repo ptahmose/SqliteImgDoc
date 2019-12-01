@@ -6,6 +6,8 @@
 #include "SubBlkCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"
+#include "ITileCoordinate.h"
+#include "TileCoordinate.h"
 
 namespace SlImgDoc
 {

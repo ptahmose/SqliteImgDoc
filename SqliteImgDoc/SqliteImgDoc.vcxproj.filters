@@ -16,6 +16,9 @@
     <Filter Include="Header Files\External">
       <UniqueIdentifier>{1766a099-7f13-4a8c-ac6f-e0d7259abf1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\External\Utils">
+      <UniqueIdentifier>{50f34701-6ebf-49b7-a650-a4546cb9cd5f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -54,6 +57,12 @@
     <ClInclude Include="DbGlobalInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ITileCoordinate.h">
+      <Filter>Header Files\External</Filter>
+    </ClInclude>
+    <ClInclude Include="TileCoordinate.h">
+      <Filter>Header Files\External\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -69,6 +78,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DbBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DbGlobalInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

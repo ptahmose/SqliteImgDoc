@@ -77,9 +77,9 @@ static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int size
     CSimpleDataObjUncmp dataObj(sizeX, sizeY);
 
     dbw->BeginTransaction();
-   // for (int i = 0; i < 1000; ++i)
+    for (int i = 0; i < 10; ++i)
     {
-        //simpleCoord.t = i;
+        simpleCoord.t = i;
         for (int r = 0; r < rows;++r)
         {
             for (int c = 0; c < columns; ++c)

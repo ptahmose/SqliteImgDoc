@@ -26,13 +26,25 @@ public:
         TileDataId
     };
 
-    virtual const std::string& GetTableName(TableType tt) = 0;
+    enum class TilesDataColumn
+    {
+        PixelWidth,
+        PixelHeight,
+        PixelType,
+        DataType,
+        DataBinHdr,
+        Data
+    };
+
+    virtual const std::string& GetTableName(TableType tt) const = 0;
 
     virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const = 0;
 
     virtual const std::string& GetTileInfoColumnName(TilesInfoColumn c) const = 0;
 
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & tableName) const = 0;
+
+    virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const = 0;
 };
 
 class CDbDocInfo :public IDbDocInfo
@@ -52,13 +64,21 @@ private:
     static std::string ColumnName_TilesInfo_TileHeight;
     static std::string ColumnName_TilesInfo_PyrLvl;
     static std::string ColumnName_TilesInfo_TileDataId;
+
+    static std::string ColumnName_TilesData_PixelWidth;
+    static std::string ColumnName_TilesData_PixelHeight;
+    static std::string ColumnName_TilesData_PixelType;
+    static std::string ColumnName_TilesData_DataType;
+    static std::string ColumnName_TilesData_DataBinHdr;
+    static std::string ColumnName_TilesData_Data;
 public:
-public:
-    virtual const std::string& GetTableName(TableType tt);
+    virtual const std::string& GetTableName(TableType tt) const;
 
     virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const;
 
     virtual const std::string& GetTileInfoColumnName(TilesInfoColumn c) const;
 
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & tableName) const;
+
+    virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
 };

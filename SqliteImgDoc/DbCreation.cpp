@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 
+#include "DbCreation.h"
 #include "Interface.h"
 #include "DbBase.h"
 #include "DbWrite.h"
@@ -110,4 +111,60 @@ static void CreateTileTable(SQLite::Database* db)
     }
 
     return new CDbWrite(db);
+}
+
+//-------------------------------------------------------------------------------------------------
+
+CDbCreation::CDbCreation(const IDbDocInfo& docInfo, const SlImgDoc::CreateOptions& opts)
+    : docInfo(docInfo), opts(opts)
+{
+}
+
+void CDbCreation::DoCreate()
+{
+    try
+    {
+        SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+    }
+}
+
+std::string CDbCreation::GetTilesInfoCreateSqlStatement() const
+{
+    auto ss = stringstream();
+    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo) << "]("
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << "] INTEGER NOT NULL PRIMARY KEY,"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "] DOUBLE NOT NULL,"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "] DOUBLE NOT NULL,"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "] DOUBLE NOT NULL,"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "] DOUBLE NOT NULL,"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "] INTEGER(1),"
+        "[" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << "] INTEGER(8)";
+
+    const auto tileDims = this->docInfo.GetTileDimensions();
+    for (const auto dim : tileDims)
+    {
+        string colName;
+        bool b = this->docInfo.GetTileInfoColumnNameForDimension(dim, colName);
+        ss << ", [" << colName << "] INTEGER(4)";
+    }
+
+    ss << ");";
+    return ss.str();
+}
+
+std::string CDbCreation::GetTilesDataCreateSqlStatement() const
+{
+    auto ss = stringstream();
+    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::TilesData) << "]("
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << "] INTEGER(4),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << "] INTEGER(4),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << "] INTEGER(1),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << "] INTEGER(4),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << "] BLOB(32),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << "] BLOB);";
+    return ss.str();
 }

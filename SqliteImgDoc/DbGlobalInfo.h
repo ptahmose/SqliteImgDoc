@@ -51,6 +51,9 @@ class CDbDocInfo :public IDbDocInfo
 {
 private:
     std::vector< SlImgDoc::TileDim> dimensions;
+    std::string tableNameTilesData;
+    std::string tableNameTilesInfo;
+    std::string tableNameSpatialIndex;
 private:
     //static std::string TableName_DocumentInfo;
     static std::string TableName_TilesData;
@@ -72,6 +75,9 @@ private:
     static std::string ColumnName_TilesData_DataBinHdr;
     static std::string ColumnName_TilesData_Data;
 public:
+    CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex);
+    CDbDocInfo();
+
     virtual const std::string& GetTableName(TableType tt) const;
 
     virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const;

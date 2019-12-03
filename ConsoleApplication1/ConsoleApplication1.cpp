@@ -99,6 +99,10 @@ int main()
 {
     CreateOptions opts;
     opts.dbFilename = "D:\\test.db";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.dimensions.emplace('T');
+    opts.dimensions.emplace('M');
     //opts.dbFilename = "C:\\temp\\test.db";
 
     auto dbw = IDbFactory::CreateNew(opts);

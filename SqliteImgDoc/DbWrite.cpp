@@ -64,7 +64,15 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
     try
     {
         stringstream ss;
-        ss << "INSERT INTO " << CDbBase::TableName_TileData << " (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);";
+        //ss << "INSERT INTO " << CDbBase::TableName_TileData << " (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);";
+        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesData) << " (" 
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
+            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
+            " VALUES (?1,?2,?3,?4,?5,?6);"; 
         SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO SUBBLKTABLE (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);"*/);
         const auto hdr = data->GetBinHdr();
 
@@ -95,7 +103,7 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo
     try
     {
         stringstream ss;
-        ss << "INSERT INTO " << CDbBase::VTableName_SpatialTable << " VALUES(?1,?2,?3,?4,?5);";
+        ss << "INSERT INTO " << /*CDbBase::VTableName_SpatialTable*/this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " VALUES(?1,?2,?3,?4,?5);";
 
         SQLite::Statement query(this->GetDb(), ss.str());
         query.bind(1, id);

@@ -4,14 +4,16 @@
 #include "SubBlkCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"
+#include "DbGlobalInfo.h"
 #include <SQLiteCpp/Transaction.h>
 
 class CDbWrite : CDbBase, public SlImgDoc::IDbWrite
 {
 private:
     SQLite::Transaction* transaction;
+    std::shared_ptr<IDbDocInfo> docInfo;
 public:
-    CDbWrite(SQLite::Database* db) : CDbBase(db)
+    CDbWrite(SQLite::Database* db, std::shared_ptr<IDbDocInfo> dbInfo) : CDbBase(db), docInfo(dbInfo)
     {
     }
 

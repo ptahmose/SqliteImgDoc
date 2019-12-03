@@ -10,9 +10,10 @@ private:
 public:
     CDbCreation(const IDbDocInfo& docInfo, const SlImgDoc::CreateOptions& opts);
 
-    void DoCreate();
+    SQLite::Database* DoCreate();
 
 private:
     std::string GetTilesInfoCreateSqlStatement() const;
     std::string GetTilesDataCreateSqlStatement() const;
+    std::string GetTilesSpatialIndexCreateSqlStatement() const;
 };

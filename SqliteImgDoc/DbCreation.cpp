@@ -100,17 +100,20 @@ static void CreateTileTable(SQLite::Database* db)
 
 /*static*/IDbWrite* IDbFactory::CreateNew(const CreateOptions& opts)
 {
-    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
-    try
-    {
-        CreateTileTable(db);
-    }
-    catch (SQLite::Exception & excp)
-    {
-        std::cout << excp.what();
-    }
+    /* SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+     try
+     {
+         CreateTileTable(db);
+     }
+     catch (SQLite::Exception & excp)
+     {
+         std::cout << excp.what();
+     }*/
+    auto docInfo = std::make_shared< CDbDocInfo>();
+    CDbCreation dbCreator(*docInfo, opts);
+    auto db = dbCreator.DoCreate();
 
-    return new CDbWrite(db);
+    return new CDbWrite(db, docInfo);
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -120,16 +123,26 @@ CDbCreation::CDbCreation(const IDbDocInfo& docInfo, const SlImgDoc::CreateOption
 {
 }
 
-void CDbCreation::DoCreate()
+SQLite::Database* CDbCreation::DoCreate()
 {
     try
     {
         SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+
+        auto sqlStatement = this->GetTilesInfoCreateSqlStatement();
+        db->exec(sqlStatement);
+        sqlStatement = this->GetTilesDataCreateSqlStatement();
+        db->exec(sqlStatement);
+        sqlStatement = this->GetTilesSpatialIndexCreateSqlStatement();
+        db->exec(sqlStatement);
+        return db;
     }
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
     }
+
+    return nullptr;
 }
 
 std::string CDbCreation::GetTilesInfoCreateSqlStatement() const
@@ -166,5 +179,16 @@ std::string CDbCreation::GetTilesDataCreateSqlStatement() const
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << "] INTEGER(4),"
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << "] BLOB(32),"
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << "] BLOB);";
+    return ss.str();
+}
+
+std::string CDbCreation::GetTilesSpatialIndexCreateSqlStatement() const
+{
+    auto ss = stringstream();
+    ss << "CREATE VIRTUAL TABLE " << this->docInfo.GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " USING rtree("
+        "id,"           // Integer primary key
+        "minX, maxX,"   // Minimum and maximum X coordinate"
+        "minY, maxY"    // Minimum and maximum Y coordinate"
+        ");";
     return ss.str();
 }

@@ -18,10 +18,30 @@
 /*static*/std::string CDbDocInfo::ColumnName_TilesData_DataBinHdr = "Data_BinHdr";
 /*static*/std::string CDbDocInfo::ColumnName_TilesData_Data = "Data";
 
+CDbDocInfo::CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex)
+    : tableNameTilesData(tableName_tilesdata),
+    tableNameTilesInfo(tableName_tilesinfo),
+    tableNameSpatialIndex(tableName_SpatialIndex)
+{
+}
+
+CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index")
+{
+}
 
 /*virtual*/const std::string& CDbDocInfo::GetTableName(TableType tt) const
 {
+    switch (tt)
+    {
+    case TableType::TilesData:
+        return this->tableNameTilesData;
+    case TableType::TilesInfo:
+        return this->tableNameTilesInfo;
+    case TableType::TilesSpatialIndex:
+        return this->tableNameSpatialIndex;
+    }
 
+    throw std::invalid_argument("Unknown enumeration");
 }
 
 /*virtual*/const std::vector<SlImgDoc::TileDim>& CDbDocInfo::GetTileDimensions() const

@@ -80,6 +80,7 @@ static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int size
     for (int i = 0; i < 10; ++i)
     {
         simpleCoord.t = i;
+        simpleCoord.m = 0;
         for (int r = 0; r < rows;++r)
         {
             for (int c = 0; c < columns; ++c)
@@ -88,6 +89,7 @@ static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int size
                 posInfo.posY = r * sizeY;
 
                 dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
+                simpleCoord.m++;
             }
         }
     }

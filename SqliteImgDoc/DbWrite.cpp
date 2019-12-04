@@ -13,28 +13,73 @@ void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPosition
     try {
         auto idSbBlk = this->AddSubBlk(data);
 
+        const auto dims = this->docInfo->GetTileDimensions();
         stringstream ss;
-        ss << "INSERT INTO " << CDbBase::TableName_TileTable << " (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);";
+        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
+        for (const auto dim : dims)
+        {
+            string tableName;
+            this->docInfo->GetTileInfoColumnNameForDimension(dim, tableName);
+            ss << tableName << ",";
+        }
 
-        SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO TILETABLE (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);"*/);
-        //query.bind(1+0, CDbBase::TableName_TileTable);
-        int i;
-        coord->TryGetCoordinate('C', &i);
-        query.bind(1 + 1, i);
-        coord->TryGetCoordinate('T', &i);
-        query.bind(1 + 2, i);
-        coord->TryGetCoordinate('Z', &i);
-        query.bind(1 + 3, i);
-        coord->TryGetCoordinate('M', &i);
-        query.bind(1 + 4, i);
+        ss << this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
+            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
+            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
+            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
+            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
+            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
+            "VALUES (";
+        for (int i = 1; i <= dims.size() + 6; ++i)
+        {
+            ss << "?" << i;
+            if (i < dims.size() + 6)
+            {
+                ss << ",";
+            }
+        }
 
-        query.bind(1 + 5, info->posX);
-        query.bind(1 + 6, info->posY);
-        query.bind(1 + 7, info->width);
-        query.bind(1 + 8, info->height);
+        ss << ");";
 
-        query.bind(1 + 9, info->pyrLvl);
-        query.bind(11, idSbBlk);
+        SQLite::Statement query(this->GetDb(), ss.str());
+
+        for (int i = 1; i <= dims.size(); ++i)
+        {
+            int v;
+            coord->TryGetCoordinate(dims[i-1], &v);
+            query.bind(i, v);
+        }
+
+        int i = dims.size() + 1;
+        query.bind(i++, info->posX);
+        query.bind(i++, info->posY);
+        query.bind(i++, info->width);
+        query.bind(i++, info->height);
+        query.bind(i++, info->pyrLvl);
+        query.bind(i++, idSbBlk);
+
+        //stringstream ss;
+        //ss << "INSERT INTO " << CDbBase::TableName_TileTable << " (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);";
+
+        //SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO TILETABLE (C,T,Z,M,X,Y,WIDTH,HEIGHT,PYRLVL,SUBBLK) VALUES (?2,?3,?4,?5,?6,?7,?8,?9,?10,?11);"*/);
+        ////query.bind(1+0, CDbBase::TableName_TileTable);
+        //int i;
+        //coord->TryGetCoordinate('C', &i);
+        //query.bind(1 + 1, i);
+        //coord->TryGetCoordinate('T', &i);
+        //query.bind(1 + 2, i);
+        //coord->TryGetCoordinate('Z', &i);
+        //query.bind(1 + 3, i);
+        //coord->TryGetCoordinate('M', &i);
+        //query.bind(1 + 4, i);
+
+        //query.bind(1 + 5, info->posX);
+        //query.bind(1 + 6, info->posY);
+        //query.bind(1 + 7, info->width);
+        //query.bind(1 + 8, info->height);
+
+        //query.bind(1 + 9, info->pyrLvl);
+        //query.bind(11, idSbBlk);
 
         query.exec();
 
@@ -65,14 +110,14 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
     {
         stringstream ss;
         //ss << "INSERT INTO " << CDbBase::TableName_TileData << " (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);";
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesData) << " (" 
+        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesData) << " ("
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
             << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
-            " VALUES (?1,?2,?3,?4,?5,?6);"; 
+            " VALUES (?1,?2,?3,?4,?5,?6);";
         SQLite::Statement query(this->GetDb(), ss.str()/*"INSERT INTO SUBBLKTABLE (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);"*/);
         const auto hdr = data->GetBinHdr();
 

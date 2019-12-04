@@ -75,12 +75,13 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 /*virtual*/bool CDbDocInfo::GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& tableName) const
 {
     const auto it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
-    if (it != this->dimensions.cend())
+    if (it == this->dimensions.cend())
     {
         return false;
     }
 
-    tableName = "Dim_" + d;
+    tableName = "Dim_";
+    tableName += d;
     return true;
 }
 

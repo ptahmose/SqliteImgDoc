@@ -109,7 +109,8 @@ static void CreateTileTable(SQLite::Database* db)
      {
          std::cout << excp.what();
      }*/
-    auto docInfo = std::make_shared< CDbDocInfo>();
+    auto docInfo = std::make_shared<CDbDocInfo>();
+    docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
     CDbCreation dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
 

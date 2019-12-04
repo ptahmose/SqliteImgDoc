@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <algorithm>
 
 #include "ITileCoordinate.h"
 
@@ -77,6 +78,17 @@ private:
 public:
     CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex);
     CDbDocInfo();
+
+    template<typename ForwardIterator>
+    void SetTileDimensions(ForwardIterator begin, ForwardIterator end)
+    {
+        this->dimensions.clear();
+        std::copy(begin, end, std::back_inserter(this->dimensions));
+        /*for (; begin != end; ++begin)
+        {
+            this->dimensions.push_back(*begin);
+        }*/
+    }
 
     virtual const std::string& GetTableName(TableType tt) const;
 

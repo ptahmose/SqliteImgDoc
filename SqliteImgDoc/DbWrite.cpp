@@ -10,12 +10,16 @@ using namespace std;
 
 void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
-    try {
+    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+    try
+    {
         auto idSbBlk = this->AddSubBlk(data);
 
         const auto dims = this->docInfo->GetTileDimensions();
         stringstream ss;
         ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
+
+        // add table-names for "dimensions" first
         for (const auto dim : dims)
         {
             string tableName;
@@ -23,6 +27,7 @@ void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPosition
             ss << tableName << ",";
         }
 
+        // and then the "fixed" columns
         ss << this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
             this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
             this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
@@ -30,6 +35,8 @@ void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPosition
             this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
             this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
             "VALUES (";
+
+        // we have 6 "fixes" columns
         for (int i = 1; i <= dims.size() + 6; ++i)
         {
             ss << "?" << i;
@@ -46,7 +53,7 @@ void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPosition
         for (int i = 1; i <= dims.size(); ++i)
         {
             int v;
-            coord->TryGetCoordinate(dims[i-1], &v);
+            coord->TryGetCoordinate(dims[i - 1], &v);
             query.bind(i, v);
         }
 
@@ -148,7 +155,13 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo
     try
     {
         stringstream ss;
-        ss << "INSERT INTO " << /*CDbBase::VTableName_SpatialTable*/this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " VALUES(?1,?2,?3,?4,?5);";
+        ss << "INSERT INTO " << /*CDbBase::VTableName_SpatialTable*/this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
+            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
+            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
+            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
+            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
+            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
+            " VALUES(?1,?2,?3,?4,?5);";
 
         SQLite::Statement query(this->GetDb(), ss.str());
         query.bind(1, id);

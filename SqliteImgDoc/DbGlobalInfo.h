@@ -37,6 +37,15 @@ public:
         Data
     };
 
+    enum class TilesSpatialIndexColumn
+    {
+        Pk,
+        MinX,
+        MaxX,
+        MinY,
+        MaxY
+    };
+
     virtual const std::string& GetTableName(TableType tt) const = 0;
 
     virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const = 0;
@@ -46,6 +55,8 @@ public:
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & tableName) const = 0;
 
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const = 0;
+
+    virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const = 0;
 };
 
 class CDbDocInfo :public IDbDocInfo
@@ -75,6 +86,12 @@ private:
     static std::string ColumnName_TilesData_DataType;
     static std::string ColumnName_TilesData_DataBinHdr;
     static std::string ColumnName_TilesData_Data;
+
+    static std::string ColumnName_TilesSpatialIndex_Pk;
+    static std::string ColumnName_TilesSpatialIndex_MinX;
+    static std::string ColumnName_TilesSpatialIndex_MaxX;
+    static std::string ColumnName_TilesSpatialIndex_MinY;
+    static std::string ColumnName_TilesSpatialIndex_MaxY;
 public:
     CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex);
     CDbDocInfo();
@@ -99,4 +116,6 @@ public:
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & tableName) const;
 
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
+
+    virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const;
 };

@@ -186,10 +186,11 @@ std::string CDbCreation::GetTilesDataCreateSqlStatement() const
 std::string CDbCreation::GetTilesSpatialIndexCreateSqlStatement() const
 {
     auto ss = stringstream();
-    ss << "CREATE VIRTUAL TABLE " << this->docInfo.GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " USING rtree("
-        "id,"           // Integer primary key
-        "minX, maxX,"   // Minimum and maximum X coordinate"
-        "minY, maxY"    // Minimum and maximum Y coordinate"
-        ");";
+    ss << "CREATE VIRTUAL TABLE " << this->docInfo.GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " USING rtree(" <<
+        this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<         // Integer primary key
+        this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<       // Minimum X coordinate"
+        this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<       // Maximum X coordinate"
+        this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<       // Minimum Y coordinate"
+        this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ");";        // Maximum Y coordinate"
     return ss.str();
 }

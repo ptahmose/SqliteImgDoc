@@ -3,7 +3,7 @@
 #include <string>
 #include <unordered_set>
 #include "ImportExport.h"
-#include "SubBlkCoordinate.h"
+//#include "SubBlkCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"
 #include "ITileCoordinate.h"
@@ -21,6 +21,12 @@ namespace SlImgDoc
         std::unordered_set<char> dimensions;
     };
 
+    class OpenOptions
+    {
+    public:
+        std::string dbFilename;
+    };
+
     class SQLITEIMGDOC_API IDbWrite
     {
     public:
@@ -28,7 +34,7 @@ namespace SlImgDoc
         virtual void CommitTransaction() = 0;
         virtual void RollbackTransaction() = 0;
 
-        virtual void AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+        virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
 
         virtual ~IDbWrite() {};
     };
@@ -36,7 +42,7 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbRead
     {
     public:
-
+        virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
     };
 
 
@@ -44,7 +50,6 @@ namespace SlImgDoc
     {
     public:
         static IDbWrite* CreateNew(const CreateOptions& opts);
+        static IDbRead* OpenExisting(const OpenOptions& opts);
     };
-
-
 }

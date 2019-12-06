@@ -9,6 +9,8 @@
 #include "Interface.h"
 #include "DbBase.h"
 #include "DbWrite.h"
+#include "DbRead.h"
+#include "DbDiscover.h"
 
 
 using namespace SlImgDoc;
@@ -115,6 +117,24 @@ static void CreateTileTable(SQLite::Database* db)
     auto db = dbCreator.DoCreate();
 
     return new CDbWrite(db, docInfo);
+}
+
+/*static*/IDbRead* IDbFactory::OpenExisting(const OpenOptions& opts)
+{
+    /* SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+     try
+     {
+         CreateTileTable(db);
+     }
+     catch (SQLite::Exception & excp)
+     {
+         std::cout << excp.what();
+     }*/
+    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY);
+    CDbDiscover discover(db);
+    auto docInfo = discover.GetDocInfo();
+
+    return new CDbRead(db, docInfo);
 }
 
 //-------------------------------------------------------------------------------------------------

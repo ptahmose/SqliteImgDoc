@@ -7,7 +7,7 @@
 using namespace SlImgDoc;
 using namespace std;
 
-class CSimpleCoord : public ISubBlkCoordinate
+class CSimpleCoord : public ITileCoordinate
 {
 public:
     int c, z, t, m;
@@ -31,6 +31,20 @@ public:
         }
 
         return true;
+    }
+
+    virtual void EnumCoordinates(std::function<bool(TileDim, int)> f) const
+    {
+        char d[4] = { 'C','Z','T','M' };
+        for (int i = 0; i < sizeof(d) / sizeof(d[0]); ++i)
+        {
+            int v;
+            this->TryGetCoordinate(d[i], &v);
+            if (f(d[i], v) == false)
+            {
+                break;
+            }
+        }
     }
 };
 
@@ -66,7 +80,7 @@ public:
     }
 };
 
-static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int sizeY)
+static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int sizeY)
 {
     CSimpleCoord simpleCoord = {};
     LogicalPositionInfo posInfo;
@@ -81,7 +95,7 @@ static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int size
     {
         simpleCoord.t = i;
         simpleCoord.m = 0;
-        for (int r = 0; r < rows;++r)
+        for (int r = 0; r < rows; ++r)
         {
             for (int c = 0; c < columns; ++c)
             {
@@ -97,8 +111,18 @@ static void WriteMosaic(IDbWrite* dbw,int rows, int columns, int sizeX, int size
     dbw->CommitTransaction();
 }
 
+void TestRead()
+{
+    OpenOptions opts;
+    opts.dbFilename = "D:\\test.db";
+    auto read = IDbFactory::OpenExisting(opts);
+}
+
 int main()
 {
+    TestRead();
+
+
     CreateOptions opts;
     opts.dbFilename = "D:\\test.db";
     opts.dimensions.emplace('C');

@@ -45,9 +45,6 @@
     <ClInclude Include="DbWrite.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SubBlkCoordinate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LogicalPositionInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -62,6 +59,12 @@
     </ClInclude>
     <ClInclude Include="TileCoordinate.h">
       <Filter>Header Files\External\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DbRead.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DbDiscover.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -81,6 +84,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DbGlobalInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DbRead.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DbDiscover.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

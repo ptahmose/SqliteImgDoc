@@ -160,7 +160,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="DataBinHdr.h" />
+    <ClInclude Include="DbDiscover.h" />
     <ClInclude Include="DbGlobalInfo.h" />
+    <ClInclude Include="DbRead.h" />
     <ClInclude Include="IDataObj.h" />
     <ClInclude Include="DbBase.h" />
     <ClInclude Include="DbCreation.h" />
@@ -171,13 +173,14 @@
     <ClInclude Include="ITileCoordinate.h" />
     <ClInclude Include="LogicalPositionInfo.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="SubBlkCoordinate.h" />
     <ClInclude Include="TileCoordinate.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DbBase.cpp" />
     <ClCompile Include="DbCreation.cpp" />
+    <ClCompile Include="DbDiscover.cpp" />
     <ClCompile Include="DbGlobalInfo.cpp" />
+    <ClCompile Include="DbRead.cpp" />
     <ClCompile Include="DbWrite.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="pch.cpp">

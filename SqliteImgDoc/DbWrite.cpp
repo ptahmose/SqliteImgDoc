@@ -16,7 +16,7 @@ using namespace std;
     }
 }
 
-void CDbWrite::AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
+void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try

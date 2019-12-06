@@ -1,7 +1,8 @@
 #pragma once
 
 #include "DbBase.h"
-#include "SubBlkCoordinate.h"
+//#include "SubBlkCoordinate.h"
+#include "ITileCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"
 #include "DbGlobalInfo.h"
@@ -25,7 +26,7 @@ public:
     virtual void CommitTransaction();
     virtual void RollbackTransaction();
 
-    virtual void AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
+    virtual void AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
 
     virtual ~CDbWrite();
 

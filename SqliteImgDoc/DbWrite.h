@@ -10,22 +10,30 @@
 class CDbWrite : CDbBase, public SlImgDoc::IDbWrite
 {
 private:
-    SQLite::Transaction* transaction;
+    bool transactionPending;
     std::shared_ptr<IDbDocInfo> docInfo;
+
+    std::unique_ptr<SQLite::Statement> addTilesDataRowStatement;
+    std::unique_ptr<SQLite::Statement> addTilesInfoRowStatement;
+    std::unique_ptr<SQLite::Statement> addTilesSpatialIndexRowStatement;
 public:
-    CDbWrite(SQLite::Database* db, std::shared_ptr<IDbDocInfo> dbInfo) : CDbBase(db), docInfo(dbInfo)
+    CDbWrite(SQLite::Database* db, std::shared_ptr<IDbDocInfo> dbInfo) : CDbBase(db), docInfo(dbInfo), transactionPending(false)
     {
     }
 
     virtual void BeginTransaction();
     virtual void CommitTransaction();
+    virtual void RollbackTransaction();
 
     virtual void AddSubBlock(const ISubBlkCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
 
-    virtual ~CDbWrite()
-    {}
+    virtual ~CDbWrite();
 
 private:
     std::int64_t AddSubBlk(const IDataObjUncompressedBitmap* data);
     void AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo* info);
+
+    void EnsureAddTilesDataRowStatement();
+    void EnsureAddTilesInfoRowStatement();
+    void EnsureAddTilesSpatialIndexRowStatement();
 };

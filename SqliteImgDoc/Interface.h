@@ -8,6 +8,8 @@
 #include "IDataObj.h"
 #include "ITileCoordinate.h"
 #include "TileCoordinate.h"
+#include "IBlob.h"
+#include "BlobOnHeap.h"
 
 namespace SlImgDoc
 {
@@ -39,10 +41,20 @@ namespace SlImgDoc
         virtual ~IDbWrite() {};
     };
 
+    struct TilePixelInfo
+    {
+        int pixelWidth;
+        int pixelHeight;
+        std::uint8_t pixelType;
+        int dataType;
+        std::uint8_t dataBinHdr[32];
+    };
+
     class SQLITEIMGDOC_API IDbRead
     {
     public:
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
+        virtual void ReadTileData(dbIndex ix, TilePixelInfo* pixelInfo, IBlob* data) = 0;
     };
 
 

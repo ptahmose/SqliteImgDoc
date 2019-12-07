@@ -11,6 +11,7 @@
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_PyrLvl = "PyramidLevel";
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_TileDataId = "TileDataId";
 
+/*static*/std::string CDbDocInfo::ColumnName_TilesData_Pk = "rowid";
 /*static*/std::string CDbDocInfo::ColumnName_TilesData_PixelWidth = "Pixelwidth";
 /*static*/std::string CDbDocInfo::ColumnName_TilesData_PixelHeight = "Pixelheight";
 /*static*/std::string CDbDocInfo::ColumnName_TilesData_PixelType = "Pixeltype";
@@ -95,6 +96,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 {
     switch (c)
     {
+    case TilesDataColumn::Pk:
+        return CDbDocInfo::ColumnName_TilesData_Pk;
     case TilesDataColumn::PixelWidth:
         return CDbDocInfo::ColumnName_TilesData_PixelWidth;
     case TilesDataColumn::PixelHeight:

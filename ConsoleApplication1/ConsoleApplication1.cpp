@@ -120,6 +120,10 @@ void TestRead()
     TileCoordinate tileCoord;
     LogicalPositionInfo posInfo;
     read->ReadTileInfo(15, &tileCoord, &posInfo);
+
+    TilePixelInfo tilePixelInfo;
+    BlobOnHeap data;
+    read->ReadTileData(15, &tilePixelInfo, &data);
 }
 
 int main()

@@ -159,10 +159,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BlobOnHeap.h" />
     <ClInclude Include="DataBinHdr.h" />
     <ClInclude Include="DbDiscover.h" />
     <ClInclude Include="DbGlobalInfo.h" />
     <ClInclude Include="DbRead.h" />
+    <ClInclude Include="IBlob.h" />
     <ClInclude Include="IDataObj.h" />
     <ClInclude Include="DbBase.h" />
     <ClInclude Include="DbCreation.h" />
@@ -176,6 +178,7 @@
     <ClInclude Include="TileCoordinate.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BlobOnHeap.cpp" />
     <ClCompile Include="DbBase.cpp" />
     <ClCompile Include="DbCreation.cpp" />
     <ClCompile Include="DbDiscover.cpp" />

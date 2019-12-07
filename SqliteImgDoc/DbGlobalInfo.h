@@ -29,6 +29,7 @@ public:
 
     enum class TilesDataColumn
     {
+        Pk,
         PixelWidth,
         PixelHeight,
         PixelType,
@@ -52,7 +53,7 @@ public:
 
     virtual const std::string& GetTileInfoColumnName(TilesInfoColumn c) const = 0;
 
-    virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & tableName) const = 0;
+    virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string & columnName) const = 0;
 
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const = 0;
 
@@ -80,6 +81,7 @@ private:
     static std::string ColumnName_TilesInfo_PyrLvl;
     static std::string ColumnName_TilesInfo_TileDataId;
 
+    static std::string ColumnName_TilesData_Pk;
     static std::string ColumnName_TilesData_PixelWidth;
     static std::string ColumnName_TilesData_PixelHeight;
     static std::string ColumnName_TilesData_PixelType;

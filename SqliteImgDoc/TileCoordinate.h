@@ -18,6 +18,8 @@ namespace SlImgDoc
     private:
         std::vector<DimensionAndValue> coordinates;
     public:
+        TileCoordinate() : TileCoordinate(5) {}
+
         TileCoordinate(int reservedCapacity)
         {
             this->coordinates.reserve(reservedCapacity);

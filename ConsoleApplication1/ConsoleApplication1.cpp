@@ -116,6 +116,10 @@ void TestRead()
     OpenOptions opts;
     opts.dbFilename = "D:\\test.db";
     auto read = IDbFactory::OpenExisting(opts);
+
+    TileCoordinate tileCoord;
+    LogicalPositionInfo posInfo;
+    read->ReadTileInfo(15, &tileCoord, &posInfo);
 }
 
 int main()

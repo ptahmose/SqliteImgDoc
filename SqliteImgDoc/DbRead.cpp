@@ -3,7 +3,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#define SQLITE_ENABLE_RTREE
+//#define SQLITE_ENABLE_RTREE
 #include <sqlite3.h>
 //#include <sqlite3ext.h>
 
@@ -248,7 +248,7 @@ static bool Intersects(const PointF& a1, const PointF& a2, const PointF& b1, con
 
 static bool IsPointInsideRect(const PointF& p, const RectangleF& r)
 {
-    if (r.x <= p.x && (r.x+r.w) >= p.x && r.y <= p.y && (r.y+r.h) >= p.y)
+    if (r.x <= p.x && (r.x + r.w) >= p.x && r.y <= p.y && (r.y + r.h) >= p.y)
     {
         return true;
     }
@@ -263,11 +263,41 @@ static bool DoesIntersect(const LineThruTwoPoints* line, double xmin, double xma
     PointF bottomRight{ xmax,ymin };
     PointF topLeft{ xmin,ymax };
     RectangleF rect{ xmin,ymin,xmax - xmin,ymax - ymin };
-    return 
-        IsPointInsideRect(line->a,rect)||
+    return
+        IsPointInsideRect(line->a, rect) ||
         IsPointInsideRect(line->b, rect) ||
         Intersects(line->a, line->b, bottomLeft, topRight) ||
         Intersects(line->a, line->b, bottomRight, topLeft);
+}
+
+static int VisibilityTest(const LineThruTwoPoints* line, double xmin, double xmax, double ymin, double ymax)
+{
+    PointF bottomLeft{ xmin,ymin };
+    PointF topRight{ xmax,ymax };
+    PointF bottomRight{ xmax,ymin };
+    PointF topLeft{ xmin,ymax };
+    RectangleF rect{ xmin,ymin,xmax - xmin,ymax - ymin };
+
+    bool b = IsPointInsideRect(line->a, rect);
+    if (b == true)
+    {
+        if (IsPointInsideRect(line->b, rect))
+        {
+            return FULLY_WITHIN;
+        }
+        else
+        {
+            return PARTLY_WITHIN;
+        }
+    }
+
+    if (Intersects(line->a, line->b, bottomLeft, topRight) ||
+        Intersects(line->a, line->b, bottomRight, topLeft))
+    {
+        return PARTLY_WITHIN;
+    }
+
+    return NOT_WITHIN;
 }
 
 static int linethru2points_geom(
@@ -308,19 +338,64 @@ static int linethru2points_geom(
     double ymax{ aCoord[3] };              /* Y dimensions of box being tested */
 
     bool intersect = DoesIntersect(pLine, xmin, xmax, ymin, ymax);
-    
+
     *pRes = intersect == true ? 1 : 0;
+
+    return SQLITE_OK;
+}
+
+static int linethru2points_query(sqlite3_rtree_query_info* info)
+{
+    LineThruTwoPoints* pLine = (LineThruTwoPoints*)info->pUser;
+    if (pLine == nullptr)
+    {
+        /* If pUser is still 0, then the parameter values have not been tested
+        ** for correctness or stored into a "LineThruTwoPoints" structure yet. Do this now. */
+
+        /* This geometry callback is for use with a 2-dimensional r-tree table.
+        ** Return an error if the table does not have exactly 2 dimensions. */
+        if (info->nCoord != 4) return SQLITE_ERROR;
+
+        /* Test that the correct number of parameters (4) have been supplied,
+        */
+        if (info->nParam != 4) return SQLITE_ERROR;
+
+        /*Allocate a structure to cache parameter data in.Return SQLITE_NOMEM
+        ** if the allocation fails.*/
+        pLine = (LineThruTwoPoints*)(info->pUser = sqlite3_malloc(sizeof(LineThruTwoPoints)));
+        if (!pLine) return SQLITE_NOMEM;
+
+        info->xDelUser = LineThruTwoPoints_del;
+        pLine->a.x = info->aParam[0];
+        pLine->a.y = info->aParam[1];
+        pLine->b.x = info->aParam[2];
+        pLine->b.y = info->aParam[3];
+    }
+
+    double xmin{ info->aCoord[0] };
+    double xmax{ info->aCoord[1] };              /* X dimensions of box being tested */
+    double ymin{ info->aCoord[2] };
+    double ymax{ info->aCoord[3] };              /* Y dimensions of box being tested */
+
+    info->eWithin = VisibilityTest(pLine, xmin, xmax, ymin, ymax);
+    info->rScore = info->iLevel;
 
     return SQLITE_OK;
 }
 
 /*virtual*/void CDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoints& rect, std::function<bool(dbIndex)> func)
 {
-    auto rc = sqlite3_rtree_geometry_callback(
+    //auto rc = sqlite3_rtree_geometry_callback(
+    //    this->GetDb().getHandle(),
+    //    "LineThroughPoints",
+    //    linethru2points_geom,
+    //    0);
+
+    auto rc = sqlite3_rtree_query_callback(
         this->GetDb().getHandle(),
         "LineThroughPoints",
-        linethru2points_geom,
-        0);
+        linethru2points_query,
+        0, 0);
 
     stringstream ss;
     ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";

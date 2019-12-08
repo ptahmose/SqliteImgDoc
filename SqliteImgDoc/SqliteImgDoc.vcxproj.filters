@@ -75,6 +75,9 @@
     <ClInclude Include="Types.h">
       <Filter>Header Files\External</Filter>
     </ClInclude>
+    <ClInclude Include="CCustomQueries.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -102,6 +105,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BlobOnHeap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CCustomQueries.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

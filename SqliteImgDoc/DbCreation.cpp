@@ -11,6 +11,7 @@
 #include "DbWrite.h"
 #include "DbRead.h"
 #include "DbDiscover.h"
+#include "CCustomQueries.h"
 
 
 using namespace SlImgDoc;
@@ -131,6 +132,7 @@ static void CreateTileTable(SQLite::Database* db)
          std::cout << excp.what();
      }*/
     SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY);
+    CCustomQueries::SetupCustomQueries(db->getHandle());
     CDbDiscover discover(db);
     auto docInfo = discover.GetDocInfo();
 
@@ -149,6 +151,7 @@ SQLite::Database* CDbCreation::DoCreate()
     try
     {
         SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+        CCustomQueries::SetupCustomQueries(db->getHandle());
 
         auto sqlStatement = this->GetTilesInfoCreateSqlStatement();
         db->exec(sqlStatement);

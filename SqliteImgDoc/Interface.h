@@ -4,6 +4,7 @@
 #include <unordered_set>
 #include "ImportExport.h"
 //#include "SubBlkCoordinate.h"
+#include "Types.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"
 #include "ITileCoordinate.h"
@@ -55,6 +56,12 @@ namespace SlImgDoc
     public:
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
         virtual void ReadTileData(dbIndex ix, TilePixelInfo* pixelInfo, IBlob* data) = 0;
+
+        virtual void GetTilesIntesectingRect(const RectangleF& rect, std::function<bool(dbIndex)> func) = 0;
+        virtual void GetTilesIntersectingWithLine(const LineThruTwoPoints& line, std::function<bool(dbIndex)> func) = 0;
+
+        std::vector<dbIndex> GetTilesIntesectingRect(const RectangleF& rect);
+        std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPoints& line);
     };
 
 

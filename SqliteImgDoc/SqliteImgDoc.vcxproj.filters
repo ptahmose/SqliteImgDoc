@@ -72,6 +72,9 @@
     <ClInclude Include="BlobOnHeap.h">
       <Filter>Header Files\External\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="Types.h">
+      <Filter>Header Files\External</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

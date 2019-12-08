@@ -176,6 +176,7 @@
     <ClInclude Include="LogicalPositionInfo.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="TileCoordinate.h" />
+    <ClInclude Include="Types.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlobOnHeap.cpp" />

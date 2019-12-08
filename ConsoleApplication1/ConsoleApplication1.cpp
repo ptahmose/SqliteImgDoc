@@ -124,6 +124,15 @@ void TestRead()
     TilePixelInfo tilePixelInfo;
     BlobOnHeap data;
     read->ReadTileData(15, &tilePixelInfo, &data);
+
+    RectangleF rect;
+    rect.x = 100; rect.y = 100; rect.w = 20; rect.h = 1100;
+    auto r = read->GetTilesIntesectingRect(rect);
+
+    LineThruTwoPoints line;
+    line.a.x = 0; line.a.y = 0;
+    line.b.x = 499; line.b.y = 500;
+    r = read->GetTilesIntersectingWithLine(line);
 }
 
 int main()

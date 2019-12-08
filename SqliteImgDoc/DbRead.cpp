@@ -2,10 +2,27 @@
 #include "DbRead.h"
 #include <sstream>
 #include <iostream>
-#include <algorithm> 
+#include <algorithm>
+#define SQLITE_ENABLE_RTREE
+#include <sqlite3.h>
+//#include <sqlite3ext.h>
 
 using namespace std;
 using namespace SlImgDoc;
+
+std::vector<dbIndex> IDbRead::GetTilesIntesectingRect(const RectangleF& rect)
+{
+    std::vector<dbIndex> result;
+    this->GetTilesIntesectingRect(rect, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    return result;
+}
+
+std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoints& line)
+{
+    std::vector<dbIndex> result;
+    this->GetTilesIntersectingWithLine(line, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    return result;
+}
 
 /*virtual*/void CDbRead::ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info)
 {
@@ -132,5 +149,194 @@ using namespace SlImgDoc;
     {
         std::cout << excp.what();
         throw;
+    }
+}
+
+
+/*virtual*/void CDbRead::GetTilesIntesectingRect(const RectangleF& rect, std::function<bool(dbIndex)> func)
+{
+    stringstream ss;    //ss << "SELECT Pixelwidth,Pixelheight,Pixeltype,Datatype,Data_BinHdr,Data FROM TILESDATA WHERE rowId=(SELECT TileDataId FROM TILESINFO WHERE Pk=?1);";
+    ss << "SELECT " << this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " FROM "
+        << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " WHERE " <<
+        this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << ">=?1 AND " <<
+        this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "<=?2 AND " <<
+        this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ">=?3 AND " <<
+        this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "<=?4";
+
+    SQLite::Statement query(this->GetDb(), ss.str());
+    query.bind(1, rect.x);
+    query.bind(2, rect.x + rect.w);
+    query.bind(3, rect.y);
+    query.bind(4, rect.y + rect.h);
+
+    while (query.executeStep())
+    {
+        dbIndex idx = query.getColumn(0).getInt64();
+        bool b = func(idx);
+        if (!b)
+        {
+            break;
+        }
+    }
+}
+
+
+static void LineThruTwoPoints_del(void* p)
+{
+    sqlite3_free(p);
+}
+
+/*bool intersect(const LineThruTwoPoints* line,    const RectangleF* box)
+{
+    double st, et, fst = 0, fet = 1;
+    double const* bmin = &box.min.x;
+    F32 const* bmax = &box.max.x;
+    F32 const* si = &start.x;
+    F32 const* ei = &end.x;
+
+    for (int i = 0; i < 3; i++) {
+        if (*si < *ei) {
+            if (*si > * bmax || *ei < *bmin)
+                return false;
+            F32 di = *ei - *si;
+            st = (*si < *bmin) ? (*bmin - *si) / di : 0;
+            et = (*ei > * bmax) ? (*bmax - *si) / di : 1;
+        }
+        else {
+            if (*ei > * bmax || *si < *bmin)
+                return false;
+            F32 di = *ei - *si;
+            st = (*si > * bmax) ? (*bmax - *si) / di : 0;
+            et = (*ei < *bmin) ? (*bmin - *si) / di : 1;
+        }
+
+        if (st > fst) fst = st;
+        if (et < fet) fet = et;
+        if (fet < fst)
+            return false;
+        bmin++; bmax++;
+        si++; ei++;
+    }
+
+    *time = fst;
+    return true;
+}*/
+
+// a1 is line1 start, a2 is line1 end, b1 is line2 start, b2 is line2 end
+static bool Intersects(const PointF& a1, const PointF& a2, const PointF& b1, const PointF& b2)
+{
+    PointF b{ a2.x - a1.x,a2.y - a1.y };
+    PointF d{ b2.x - b1.x,b2.y - b1.y };
+
+    float bDotDPerp = b.x * d.y - b.y * d.x;
+
+    // if b dot d == 0, it means the lines are parallel so have infinite intersection points
+    if (bDotDPerp == 0)
+        return false;
+
+    PointF c{ b1.x - a1.x ,b1.y - a1.y };// = b1 - a1;
+    float t = (c.x * d.y - c.y * d.x) / bDotDPerp;
+    if (t < 0 || t > 1)
+        return false;
+
+    float u = (c.x * b.y - c.y * b.x) / bDotDPerp;
+    if (u < 0 || u > 1)
+        return false;
+
+    return true;
+}
+
+static bool IsPointInsideRect(const PointF& p, const RectangleF& r)
+{
+    if (r.x <= p.x && (r.x+r.w) >= p.x && r.y <= p.y && (r.y+r.h) >= p.y)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+static bool DoesIntersect(const LineThruTwoPoints* line, double xmin, double xmax, double ymin, double ymax)
+{
+    PointF bottomLeft{ xmin,ymin };
+    PointF topRight{ xmax,ymax };
+    PointF bottomRight{ xmax,ymin };
+    PointF topLeft{ xmin,ymax };
+    RectangleF rect{ xmin,ymin,xmax - xmin,ymax - ymin };
+    return 
+        IsPointInsideRect(line->a,rect)||
+        IsPointInsideRect(line->b, rect) ||
+        Intersects(line->a, line->b, bottomLeft, topRight) ||
+        Intersects(line->a, line->b, bottomRight, topLeft);
+}
+
+static int linethru2points_geom(
+    sqlite3_rtree_geometry* p,
+    int nCoord,
+    sqlite3_rtree_dbl* aCoord,
+    int* pRes)
+{
+    LineThruTwoPoints* pLine = (LineThruTwoPoints*)p->pUser;
+    if (pLine == nullptr)
+    {
+        /* If pUser is still 0, then the parameter values have not been tested
+        ** for correctness or stored into a "LineThruTwoPoints" structure yet. Do this now. */
+
+        /* This geometry callback is for use with a 2-dimensional r-tree table.
+        ** Return an error if the table does not have exactly 2 dimensions. */
+        if (nCoord != 4) return SQLITE_ERROR;
+
+        /* Test that the correct number of parameters (4) have been supplied,
+        */
+        if (p->nParam != 4) return SQLITE_ERROR;
+
+        /*Allocate a structure to cache parameter data in.Return SQLITE_NOMEM
+        ** if the allocation fails.*/
+        pLine = (LineThruTwoPoints*)(p->pUser = sqlite3_malloc(sizeof(LineThruTwoPoints)));
+        if (!pLine) return SQLITE_NOMEM;
+
+        p->xDelUser = LineThruTwoPoints_del;
+        pLine->a.x = p->aParam[0];
+        pLine->a.y = p->aParam[1];
+        pLine->b.x = p->aParam[2];
+        pLine->b.y = p->aParam[3];
+    }
+
+    double xmin{ aCoord[0] };
+    double xmax{ aCoord[1] };              /* X dimensions of box being tested */
+    double ymin{ aCoord[2] };
+    double ymax{ aCoord[3] };              /* Y dimensions of box being tested */
+
+    bool intersect = DoesIntersect(pLine, xmin, xmax, ymin, ymax);
+    
+    *pRes = intersect == true ? 1 : 0;
+
+    return SQLITE_OK;
+}
+
+/*virtual*/void CDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoints& rect, std::function<bool(dbIndex)> func)
+{
+    auto rc = sqlite3_rtree_geometry_callback(
+        this->GetDb().getHandle(),
+        "LineThroughPoints",
+        linethru2points_geom,
+        0);
+
+    stringstream ss;
+    ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
+    SQLite::Statement query(this->GetDb(), ss.str());
+    query.bind(1, rect.a.x);
+    query.bind(2, rect.a.y);
+    query.bind(3, rect.b.x);
+    query.bind(4, rect.b.y);
+
+    while (query.executeStep())
+    {
+        dbIndex idx = query.getColumn(0).getInt64();
+        bool b = func(idx);
+        if (!b)
+        {
+            break;
+        }
     }
 }

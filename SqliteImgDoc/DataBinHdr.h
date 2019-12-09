@@ -9,6 +9,9 @@ class PixelType
 public:
     static const std::uint8_t GRAY8 = 1;
     static const std::uint8_t RGB24 = 2;
+    static const std::uint8_t GRAY16 = 3;
+    static const std::uint8_t RGB48 = 4;
+    static const std::uint8_t GRAYFLT32 = 5;
 };
 
 struct BinHdrBase

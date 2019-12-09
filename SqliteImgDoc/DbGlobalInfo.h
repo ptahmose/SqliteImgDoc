@@ -103,10 +103,6 @@ public:
     {
         this->dimensions.clear();
         std::copy(begin, end, std::back_inserter(this->dimensions));
-        /*for (; begin != end; ++begin)
-        {
-            this->dimensions.push_back(*begin);
-        }*/
     }
 
     virtual const std::string& GetTableName(TableType tt) const;

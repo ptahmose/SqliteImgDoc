@@ -1,7 +1,6 @@
 #pragma once
 
 #include "DbBase.h"
-//#include "SubBlkCoordinate.h"
 #include "ITileCoordinate.h"
 #include "LogicalPositionInfo.h"
 #include "IDataObj.h"

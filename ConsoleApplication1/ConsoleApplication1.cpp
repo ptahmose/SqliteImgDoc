@@ -127,50 +127,48 @@ void TestRead()
 
     RectangleD rect;
     rect.x = 100; rect.y = 100; rect.w = 20; rect.h = 1100;
-    auto r = read->GetTilesIntesectingRect(rect);
+    auto r = read->GetTilesIntersectingRect(rect);
 
     LineThruTwoPointsD line;
     line.a.x = 0; line.a.y = 0;
     line.b.x = 499; line.b.y = 500;
     r = read->GetTilesIntersectingWithLine(line);
+
+    delete read;
 }
 
-int main()
+void TestCreateAndWrite()
 {
-    TestRead();
-
-
     CreateOptions opts;
     opts.dbFilename = "D:\\test.db";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');
     opts.dimensions.emplace('T');
     opts.dimensions.emplace('M');
-    //opts.dbFilename = "C:\\temp\\test.db";
 
     auto dbw = IDbFactory::CreateNew(opts);
     WriteMosaic(dbw, 50, 50, 256, 256);
-
-    /*
-    CSimpleCoord simpleCoord = {};
-    LogicalPositionInfo posInfo;
-    posInfo.posX = posInfo.posY = 0;
-    posInfo.width = posInfo.height = 100;
-    posInfo.pyrLvl = 0;
-    CSimpleDataObjUncmp dataObj(1000, 1000);
-
-    dbw->BeginTransaction();
-    for (int i = 0; i < 1000; ++i)
-    {
-        simpleCoord.t = i;
-        dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
-    }
-
-    dbw->CommitTransaction();
-    */
-    std::cout << "Hello World!\n";
-
     delete dbw;
+}
+
+void TestRead2()
+{
+    OpenOptions opts;
+    opts.dbFilename = "D:\\test.db";
+    auto read = IDbFactory::OpenExisting(opts);
+
+    CDimCoordinateQueryClause queryClause;
+    queryClause.AddRangeClause('C', IDimCoordinateQueryClause::RangeClause{ 0,2 });
+    read->Query(&queryClause);
+
+    delete read;
+}
+
+int main()
+{
+    //TestRead();
+    TestRead2();
+    //TestCreateAndWrite()
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

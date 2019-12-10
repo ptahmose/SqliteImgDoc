@@ -78,6 +78,12 @@
     <ClInclude Include="CCustomQueries.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IDimCoordinateQueryClause.h">
+      <Filter>Header Files\External</Filter>
+    </ClInclude>
+    <ClInclude Include="DimCoordinateQueryClause.h">
+      <Filter>Header Files\External\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

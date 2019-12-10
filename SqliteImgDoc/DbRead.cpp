@@ -11,10 +11,10 @@
 using namespace std;
 using namespace SlImgDoc;
 
-std::vector<dbIndex> IDbRead::GetTilesIntesectingRect(const RectangleD& rect)
+std::vector<dbIndex> IDbRead::GetTilesIntersectingRect(const RectangleD& rect)
 {
     std::vector<dbIndex> result;
-    this->GetTilesIntesectingRect(rect, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    this->GetTilesIntersectingRect(rect, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
     return result;
 }
 
@@ -22,6 +22,13 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
 {
     std::vector<dbIndex> result;
     this->GetTilesIntersectingWithLine(line, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    return result;
+}
+
+std::vector<dbIndex> IDbRead:: Query(const IDimCoordinateQueryClause* clause)
+{
+    std::vector<dbIndex> result;
+    this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
     return result;
 }
 
@@ -154,7 +161,7 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
 }
 
 
-/*virtual*/void CDbRead::GetTilesIntesectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func)
+/*virtual*/void CDbRead::GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func)
 {
     stringstream ss;    //ss << "SELECT Pixelwidth,Pixelheight,Pixeltype,Datatype,Data_BinHdr,Data FROM TILESDATA WHERE rowId=(SELECT TileDataId FROM TILESINFO WHERE Pk=?1);";
     ss << "SELECT " << this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " FROM "
@@ -400,7 +407,7 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
 
     stringstream ss;
     //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
-    ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
+    ss << "SELECT id FROM " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
     SQLite::Statement query(this->GetDb(), ss.str());
     query.bind(1, rect.a.x);
     query.bind(2, rect.a.y);
@@ -409,6 +416,42 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
 
     try
     {
+        while (query.executeStep())
+        {
+            dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+    }
+}
+
+/*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
+{
+    stringstream ss;
+    ss << "SELECT "<< this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk)<<" FROM " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
+
+    auto rangeDims = clause->GetTileDimsForRangeClause();
+    for (const auto dim : rangeDims)
+    {
+        auto ranges = clause->GetRangeClause(dim);
+        string dimColumnName;
+        this->docInfo->GetTileInfoColumnNameForDimension(dim, dimColumnName);
+        for (const auto& r : ranges)
+        {
+            ss << "(" << dimColumnName << ">=" << r.start << " AND " << dimColumnName << "<="<< r.end << ")";
+        }
+    }
+
+    try
+    {
+        SQLite::Statement query(this->GetDb(), ss.str());
         while (query.executeStep())
         {
             dbIndex idx = query.getColumn(0).getInt64();

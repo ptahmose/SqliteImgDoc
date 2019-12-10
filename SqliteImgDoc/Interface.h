@@ -10,6 +10,8 @@
 #include "TileCoordinate.h"
 #include "IBlob.h"
 #include "BlobOnHeap.h"
+#include "IDimCoordinateQueryClause.h"
+#include "DimCoordinateQueryClause.h"
 
 namespace SlImgDoc
 {
@@ -56,11 +58,16 @@ namespace SlImgDoc
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
         virtual void ReadTileData(dbIndex ix, TilePixelInfo* pixelInfo, IBlob* data) = 0;
 
-        virtual void GetTilesIntesectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
+        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+
+        virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
 
-        std::vector<dbIndex> GetTilesIntesectingRect(const RectangleD& rect);
+        std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
+        std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
+
+        virtual ~IDbRead() {};
     };
 
 

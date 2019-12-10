@@ -33,7 +33,7 @@ namespace SlImgDoc
             }
         }
 
-        inline void Set(TileDim d, int value)
+        void Set(TileDim d, int value)
         {
             auto it = std::find_if(this->coordinates.begin(), this->coordinates.end(), [=](const auto& s) { return s.dimension == d; });
             if (it != this->coordinates.end())
@@ -47,7 +47,7 @@ namespace SlImgDoc
         }
 
     public:
-        inline virtual bool TryGetCoordinate(TileDim dim, int* coordVal) const
+        virtual bool TryGetCoordinate(TileDim dim, int* coordVal) const
         {
             const auto it = std::find_if(this->coordinates.cbegin(), this->coordinates.cend(), [=](const auto& s) { return s.dimension == dim; });
             if (it != this->coordinates.cend())
@@ -63,7 +63,7 @@ namespace SlImgDoc
             return false;
         }
 
-        inline virtual void EnumCoordinates(std::function<bool(TileDim, int)> f) const
+        virtual void EnumCoordinates(std::function<bool(TileDim, int)> f) const
         {
             for (auto it = this->coordinates.cbegin(); it != this->coordinates.cend(); ++it)
             {

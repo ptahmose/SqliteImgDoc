@@ -165,12 +165,14 @@
     <ClInclude Include="DbDiscover.h" />
     <ClInclude Include="DbGlobalInfo.h" />
     <ClInclude Include="DbRead.h" />
+    <ClInclude Include="DimCoordinateQueryClause.h" />
     <ClInclude Include="IBlob.h" />
     <ClInclude Include="IDataObj.h" />
     <ClInclude Include="DbBase.h" />
     <ClInclude Include="DbCreation.h" />
     <ClInclude Include="DbWrite.h" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="IDimCoordinateQueryClause.h" />
     <ClInclude Include="ImportExport.h" />
     <ClInclude Include="Interface.h" />
     <ClInclude Include="ITileCoordinate.h" />

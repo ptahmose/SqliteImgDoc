@@ -444,7 +444,7 @@ std::vector<dbIndex> IDbRead:: Query(const IDimCoordinateQueryClause* clause)
         string dimColumnName;
         this->docInfo->GetTileInfoColumnNameForDimension(dim, dimColumnName);
 
-        if (ranges.size() > 0)
+        if (!ranges.empty())
         {
             ss << "(";
             bool first = true;

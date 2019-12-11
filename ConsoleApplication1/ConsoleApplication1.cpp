@@ -159,6 +159,7 @@ void TestRead2()
 
     CDimCoordinateQueryClause queryClause;
     queryClause.AddRangeClause('C', IDimCoordinateQueryClause::RangeClause{ 0,2 });
+    queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {1,2,3} });
     read->Query(&queryClause);
 
     delete read;

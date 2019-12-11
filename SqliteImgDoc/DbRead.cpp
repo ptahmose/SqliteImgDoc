@@ -25,7 +25,7 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
     return result;
 }
 
-std::vector<dbIndex> IDbRead:: Query(const IDimCoordinateQueryClause* clause)
+std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
 {
     std::vector<dbIndex> result;
     this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
@@ -434,21 +434,36 @@ std::vector<dbIndex> IDbRead:: Query(const IDimCoordinateQueryClause* clause)
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
 {
-    stringstream ss;
-    ss << "SELECT "<< this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk)<<" FROM " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
 
-    auto rangeDims = clause->GetTileDimsForRangeClause();
+    stringstream ss;
+    ss << "SELECT " << this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
+
+    auto rangeDims = clause->GetTileDimsForClause();
+    bool firstDim = true;
     for (const auto dim : rangeDims)
     {
-        auto ranges = clause->GetRangeClause(dim);
         string dimColumnName;
         this->docInfo->GetTileInfoColumnNameForDimension(dim, dimColumnName);
 
-        if (!ranges.empty())
+        auto ranges = clause->GetRangeClause(dim);
+        auto list = clause->GetListClause(dim);
+
+        if (!ranges.has_value() && !list.has_value())
         {
-            ss << "(";
-            bool first = true;
-            for (const auto& r : ranges)
+            throw invalid_argument("...TODO...");
+        }
+
+        if (!firstDim)
+        {
+            ss << " AND ";
+        }
+
+        ss << "(";
+        bool first = true;
+
+        if (ranges.has_value())
+        {
+            for (const auto& r : ranges.value().get())
             {
                 if (!first)
                 {
@@ -458,9 +473,39 @@ std::vector<dbIndex> IDbRead:: Query(const IDimCoordinateQueryClause* clause)
                 ss << "(" << dimColumnName << ">=" << r.start << " AND " << dimColumnName << "<=" << r.end << ")";
                 first = false;
             }
-
-            ss << ")";
         }
+
+        if (list.has_value())
+        {
+            for (const auto& l : list.value().get())
+            {
+                if (!first)
+                {
+                    ss << " OR ";
+                }
+
+                ss << "(" << dimColumnName << " IN (";
+
+                bool firstInList = true;
+                for (const auto& i : l.list)
+                {
+                    if (!firstInList)
+                    {
+                        ss << ",";
+                    }
+
+                    ss << i;
+                    firstInList = false;
+                }
+
+                ss << "))";
+                first = false;
+            }
+        }
+
+        ss << ")";
+
+        firstDim = false;
     }
 
     try

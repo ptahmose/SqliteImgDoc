@@ -64,49 +64,16 @@ TEST(ReadTests, QueryCoordinates1)
     queryClause.AddListClause('T', IDimCoordinateQueryClause::ListClause{ {3} });
     queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {0} });
     auto r = reader->Query(&queryClause);
-    
-    /*CreateOptions opts;
-    opts.dbFilename = ":memory:";
-    opts.dimensions.emplace('C');
-    opts.dimensions.emplace('Z');
-    opts.dimensions.emplace('T');
-    opts.dimensions.emplace('M');
 
-    auto db = IDbFactory::CreateNew(opts);
+    ASSERT_TRUE(r.size() == 1) << "Expected exactly one result.";
 
-    auto dbWrite = db->GetWriter();
+    TileCoordinate tc;
+    LogicalPositionInfo logPos;
+    reader->ReadTileInfo(r[0], &tc, &logPos);
 
-    dbWrite->BeginTransaction();
-
-    LogicalPositionInfo posInfo;
-    posInfo.posX = 0;
-    posInfo.posY = 0;
-    posInfo.width = 100;
-    posInfo.height = 100;
-    posInfo.pyrLvl = 0;
-    TileBaseInfo tileBaseInfo;
-    tileBaseInfo.pixelWidth = 100;
-    tileBaseInfo.pixelHeight = 100;
-    tileBaseInfo.pixelType = PixelType::GRAY8;
-
-    CDataObjCustom dataCustom(16, 1);
-
-    TileCoordinate tc({ { 'C', 0 }, { 'Z',0 }, { 'T',0 }, { 'M',0 } });
-    for (int c = 0; c < 3; ++c)
-    {
-        tc.Set('C', c);
-        for (int z = 0; z < 20; ++z)
-        {
-            tc.Set('Z', c);
-            for (int t = 0; t < 5; ++t)
-            {
-                tc.Set('T', t);
-
-
-                dbWrite->AddSubBlock(&tc, &posInfo, &tileBaseInfo, &dataCustom);
-            }
-        }
-    }
-
-    dbWrite->CommitTransaction();*/
+    EXPECT_EQ(logPos.posX, 0);
+    EXPECT_EQ(logPos.posY, 0);
+    EXPECT_EQ(logPos.width, 100);
+    EXPECT_EQ(logPos.height, 100);
+    EXPECT_EQ(logPos.pyrLvl, 0);
 }

@@ -66,7 +66,8 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
         ss << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) <<
             "," << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) <<
             "," << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) <<
-            "," << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight);
+            "," << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) <<
+            "," << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl);
     }
 
     ss << " FROM '" << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << "' ";
@@ -92,6 +93,7 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
         info->posY = query.getColumn(i + 1).getDouble();
         info->width = query.getColumn(i + 2).getDouble();
         info->height = query.getColumn(i + 3).getDouble();
+        info->pyrLvl = query.getColumn(i + 4).getInt();
     }
 }
 

@@ -24,8 +24,4 @@ public:
     SQLite::Database& GetDb() { return *this->db.get(); }
     const IDbDocInfo& GetDocInfo() { return *this->docInfo.get(); }
 private:
-    std::shared_ptr<CDb> getptr()
-    {
-        return this->shared_from_this();
-    }
 };

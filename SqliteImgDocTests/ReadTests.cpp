@@ -76,4 +76,14 @@ TEST(ReadTests, QueryCoordinates1)
     EXPECT_EQ(logPos.width, 100);
     EXPECT_EQ(logPos.height, 100);
     EXPECT_EQ(logPos.pyrLvl, 0);
+
+    int coordVal = -1;
+    bool b = tc.TryGetCoordinate('C', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 1);
+    b = tc.TryGetCoordinate('Z', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 2);
+    b = tc.TryGetCoordinate('T', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 3);
+    b = tc.TryGetCoordinate('M', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 0);
 }

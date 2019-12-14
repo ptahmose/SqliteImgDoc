@@ -88,7 +88,7 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
 
     if (info != nullptr)
     {
-        int i = tileDimension.size();
+        int i = (coord != nullptr) ? tileDimension.size() : 0;
         info->posX = query.getColumn(i).getDouble();
         info->posY = query.getColumn(i + 1).getDouble();
         info->width = query.getColumn(i + 2).getDouble();

@@ -87,3 +87,55 @@ TEST(ReadTests, QueryCoordinates1)
     b = tc.TryGetCoordinate('M', &coordVal);
     EXPECT_TRUE(b); EXPECT_EQ(coordVal, 0);
 }
+
+TEST(ReadTests, QueryCoordinates2)
+{
+    auto db = CreateTestDatabase();
+
+    auto reader = db->GetReader();
+    CDimCoordinateQueryClause queryClause;
+    queryClause.AddListClause('C', IDimCoordinateQueryClause::ListClause{ {1} });
+    queryClause.AddListClause('Z', IDimCoordinateQueryClause::ListClause{ {2} });
+    queryClause.AddListClause('T', IDimCoordinateQueryClause::ListClause{ {3} });
+    queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {0} });
+    auto r = reader->Query(&queryClause);
+
+    ASSERT_TRUE(r.size() == 1) << "Expected exactly one result.";
+
+    TileCoordinate tc;
+    reader->ReadTileInfo(r[0], &tc, nullptr);
+
+    int coordVal = -1;
+    bool b = tc.TryGetCoordinate('C', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 1);
+    b = tc.TryGetCoordinate('Z', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 2);
+    b = tc.TryGetCoordinate('T', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 3);
+    b = tc.TryGetCoordinate('M', &coordVal);
+    EXPECT_TRUE(b); EXPECT_EQ(coordVal, 0);
+}
+
+TEST(ReadTests, QueryCoordinates3)
+{
+    auto db = CreateTestDatabase();
+
+    auto reader = db->GetReader();
+    CDimCoordinateQueryClause queryClause;
+    queryClause.AddListClause('C', IDimCoordinateQueryClause::ListClause{ {1} });
+    queryClause.AddListClause('Z', IDimCoordinateQueryClause::ListClause{ {2} });
+    queryClause.AddListClause('T', IDimCoordinateQueryClause::ListClause{ {3} });
+    queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {0} });
+    auto r = reader->Query(&queryClause);
+
+    ASSERT_TRUE(r.size() == 1) << "Expected exactly one result.";
+
+    LogicalPositionInfo logPos;
+    reader->ReadTileInfo(r[0], nullptr, &logPos);
+
+    EXPECT_EQ(logPos.posX, 0);
+    EXPECT_EQ(logPos.posY, 0);
+    EXPECT_EQ(logPos.width, 100);
+    EXPECT_EQ(logPos.height, 100);
+    EXPECT_EQ(logPos.pyrLvl, 0);
+}

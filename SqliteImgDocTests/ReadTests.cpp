@@ -5,5 +5,12 @@ using namespace SlImgDoc;
 
 TEST(Test1, ReadTests)
 {
-   // unique_ptr<
+    CreateOptions opts;
+    opts.dbFilename = ":memory:";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.dimensions.emplace('T');
+    opts.dimensions.emplace('M');
+
+    auto db = IDbFactory::CreateNew(opts);
 }

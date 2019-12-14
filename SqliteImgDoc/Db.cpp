@@ -15,8 +15,8 @@
         return w;
     }
 
-    w = std::make_shared<CDbRead>(this->getptr());
-    this->reader = w;
+    w = std::make_shared<CDbWrite>(this->getptr());
+    this->writer = w;
     return w;
 
     //return std::make_shared<CDbWrite>(this->getptr());

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <utility>
 #include <SQLiteCpp/Database.h> 
 #include "Interface.h"
 #include "DbGlobalInfo.h"
@@ -15,7 +16,7 @@ private:
     //std::shared_ptr< SlImgDoc::IDbRead> reader;
     std::weak_ptr<SlImgDoc::IDbRead> reader;
 public:
-    CDb(SQLite::Database* db, std::shared_ptr<IDbDocInfo> docInfo) : db(db), docInfo(docInfo) {}
+    CDb(SQLite::Database* db, std::shared_ptr<IDbDocInfo> docInfo) : db(db), docInfo(std::move(docInfo)) {}
     virtual ~CDb();
 
     virtual std::shared_ptr<SlImgDoc::IDbWrite> GetWriter();

@@ -54,7 +54,7 @@ namespace SlImgDoc
             {
                 if (coordVal != nullptr)
                 {
-                    it->value;
+                    *coordVal = it->value;
                 }
 
                 return true;

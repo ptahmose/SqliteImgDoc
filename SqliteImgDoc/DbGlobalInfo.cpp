@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <stdexcept> 
 #include <algorithm>
+#include <utility>
 #include "DbGlobalInfo.h"
 
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_Pk = "Pk";
@@ -25,10 +26,13 @@
 /*static*/std::string CDbDocInfo::ColumnName_TilesSpatialIndex_MinY = "minY";
 /*static*/std::string CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY = "maxY";
 
-CDbDocInfo::CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex)
-    : tableNameTilesData(tableName_tilesdata),
-    tableNameTilesInfo(tableName_tilesinfo),
-    tableNameSpatialIndex(tableName_SpatialIndex)
+CDbDocInfo::CDbDocInfo(
+    std::string tableName_tilesdata, 
+    std::string tableName_tilesinfo,
+    std::string tableName_SpatialIndex)
+    : tableNameTilesData(std::move(tableName_tilesdata)),
+      tableNameTilesInfo(std::move(tableName_tilesinfo)),
+      tableNameSpatialIndex(std::move(tableName_SpatialIndex))
 {
 }
 

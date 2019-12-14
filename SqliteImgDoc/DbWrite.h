@@ -27,11 +27,14 @@ public:
     virtual void RollbackTransaction();
 
     virtual void AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
+    virtual void AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data);
 
     virtual ~CDbWrite();
 
 private:
     std::int64_t AddSubBlk(const IDataObjUncompressedBitmap* data);
+    std::int64_t AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data);
+
     void AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo* info);
 
     void EnsureAddTilesDataRowStatement();

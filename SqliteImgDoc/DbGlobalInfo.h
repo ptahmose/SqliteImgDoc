@@ -95,7 +95,7 @@ private:
     static std::string ColumnName_TilesSpatialIndex_MinY;
     static std::string ColumnName_TilesSpatialIndex_MaxY;
 public:
-    CDbDocInfo(const std::string& tableName_tilesdata, const std::string& tableName_tilesinfo, const std::string& tableName_SpatialIndex);
+    CDbDocInfo(std::string tableName_tilesdata, std::string tableName_tilesinfo, std::string tableName_SpatialIndex);
     CDbDocInfo();
 
     template<typename ForwardIterator>

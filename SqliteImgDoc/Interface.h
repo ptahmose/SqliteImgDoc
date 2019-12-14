@@ -12,6 +12,8 @@
 #include "BlobOnHeap.h"
 #include "IDimCoordinateQueryClause.h"
 #include "DimCoordinateQueryClause.h"
+#include "DataTypes.h"
+#include "DataObjImpl.h"
 
 namespace SlImgDoc
 {
@@ -31,6 +33,12 @@ namespace SlImgDoc
         std::string dbFilename;
     };
 
+    struct TileBaseInfo
+    {
+        int pixelWidth;
+        int pixelHeight;
+        std::uint8_t pixelType;
+    };
 
     class SQLITEIMGDOC_API IDbWrite
     {
@@ -40,6 +48,8 @@ namespace SlImgDoc
         virtual void RollbackTransaction() = 0;
 
         virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+        virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+        //virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjZero* data) = 0;
 
         virtual ~IDbWrite() {};
     };

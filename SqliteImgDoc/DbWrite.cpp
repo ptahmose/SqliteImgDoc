@@ -87,6 +87,46 @@ void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const Logical
     }
 }
 
+/*virtual*/void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
+{
+    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+    try
+    {
+        const void* ptrHdrData; size_t sizeHdrData;
+        data->GetHeader(&ptrHdrData, &sizeHdrData);
+        auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
+
+        const auto dims = this->GetDocInfo().GetTileDimensions();
+
+        this->EnsureAddTilesInfoRowStatement();
+        this->addTilesInfoRowStatement->reset();
+
+        for (int i = 1; i <= dims.size(); ++i)
+        {
+            int v;
+            coord->TryGetCoordinate(dims[i - 1], &v);
+            this->addTilesInfoRowStatement->bind(i, v);
+        }
+
+        int i = dims.size() + 1;
+        this->addTilesInfoRowStatement->bind(i++, info->posX);
+        this->addTilesInfoRowStatement->bind(i++, info->posY);
+        this->addTilesInfoRowStatement->bind(i++, info->width);
+        this->addTilesInfoRowStatement->bind(i++, info->height);
+        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
+        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
+
+        this->addTilesInfoRowStatement->exec();
+
+        auto id = this->GetDb().getLastInsertRowid();
+        this->AddToSpatialIndexTable(id, info);
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+    }
+}
+
 /*virtual*/void CDbWrite::BeginTransaction()
 {
     if (this->transactionPending != false)
@@ -157,6 +197,37 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
         this->addTilesDataRowStatement->bind(3, hdr.pixeltype);
         this->addTilesDataRowStatement->bind(4, 1);
         this->addTilesDataRowStatement->bind(5, binhdr, sizeof(binhdr));
+        const void* p; size_t s;
+        data->GetData(&p, &s);
+        this->addTilesDataRowStatement->bindNoCopy(6, p, (int)s);
+
+        this->addTilesDataRowStatement->exec();
+
+        return this->GetDb().getLastInsertRowid();
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+        throw;
+    }
+}
+
+std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
+{
+    try
+    {
+        this->EnsureAddTilesDataRowStatement();
+        this->addTilesDataRowStatement->reset();
+     /*   const auto hdr = data->GetBinHdr();
+
+        std::uint8_t binhdr[32];
+        for (int i = 0; i < sizeof(binhdr); ++i) { binhdr[i] = (uint8_t)i; }*/
+
+        this->addTilesDataRowStatement->bind(1, width);
+        this->addTilesDataRowStatement->bind(2, height);
+        this->addTilesDataRowStatement->bind(3, pixeltype);
+        this->addTilesDataRowStatement->bind(4, datatype);
+        this->addTilesDataRowStatement->bind(5, binHdr, sizeBinHdr);
         const void* p; size_t s;
         data->GetData(&p, &s);
         this->addTilesDataRowStatement->bindNoCopy(6, p, (int)s);

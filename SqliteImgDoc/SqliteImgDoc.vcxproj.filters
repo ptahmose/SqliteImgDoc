@@ -87,6 +87,12 @@
     <ClInclude Include="Db.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DataObjImpl.h">
+      <Filter>Header Files\External\Utils</Filter>
+    </ClInclude>
+    <ClInclude Include="DataTypes.h">
+      <Filter>Header Files\External</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

@@ -163,6 +163,8 @@
     <ClInclude Include="BlobOnHeap.h" />
     <ClInclude Include="CCustomQueries.h" />
     <ClInclude Include="DataBinHdr.h" />
+    <ClInclude Include="DataObjImpl.h" />
+    <ClInclude Include="DataTypes.h" />
     <ClInclude Include="Db.h" />
     <ClInclude Include="DbDiscover.h" />
     <ClInclude Include="DbGlobalInfo.h" />

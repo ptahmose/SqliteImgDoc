@@ -19,12 +19,19 @@ struct BinHdrBase
     std::uint8_t type;
 };
 
-struct BinHdrUncompressedBitmap : BinHdrBase
+struct BinHdrBitmapBase : BinHdrBase
 {
     std::uint32_t width;
     std::uint32_t height;
-    std::uint32_t stride;
     std::uint8_t pixeltype;
+};
+
+struct BinHdrUncompressedBitmap : BinHdrBitmapBase
+{
+    //std::uint32_t width;
+    //std::uint32_t height;
+    std::uint32_t stride;
+    //std::uint8_t pixeltype;
 };
 
 #include <poppack.h>

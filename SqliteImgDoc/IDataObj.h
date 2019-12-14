@@ -13,3 +13,15 @@ class IDataObjUncompressedBitmap : public IDataObjBase
 public:
     virtual const BinHdrUncompressedBitmap& GetBinHdr() const = 0;
 };
+
+class IDataObjCustom : public IDataObjBase
+{
+public:
+    virtual void GetHeader(const void** p, size_t* s) const = 0;
+};
+
+class IDataObjZero : public IDataObjBase
+{
+public:
+    virtual void GetHeader(const void** p, size_t* s) const = 0;
+};

@@ -115,7 +115,8 @@ void TestRead()
 {
     OpenOptions opts;
     opts.dbFilename = "D:\\test.db";
-    auto read = IDbFactory::OpenExisting(opts);
+    auto readDb = IDbFactory::OpenExisting(opts);
+    auto read = readDb->GetReader();// IDbFactory::OpenExisting(opts);
 
     TileCoordinate tileCoord;
     LogicalPositionInfo posInfo;
@@ -133,8 +134,6 @@ void TestRead()
     line.a.x = 0; line.a.y = 0;
     line.b.x = 499; line.b.y = 500;
     r = read->GetTilesIntersectingWithLine(line);
-
-    delete read;
 }
 
 void TestCreateAndWrite()
@@ -146,28 +145,31 @@ void TestCreateAndWrite()
     opts.dimensions.emplace('T');
     opts.dimensions.emplace('M');
 
-    auto dbw = IDbFactory::CreateNew(opts);
-    WriteMosaic(dbw, 50, 50, 256, 256);
-    delete dbw;
+    auto db = IDbFactory::CreateNew(opts);
+    auto dbw = db->GetWriter();
+    WriteMosaic(dbw.get(), 50, 50, 256, 256);
 }
 
 void TestRead2()
 {
     OpenOptions opts;
     opts.dbFilename = "D:\\test.db";
-    auto read = IDbFactory::OpenExisting(opts);
+    {
+        auto readDb = IDbFactory::OpenExisting(opts);
+        auto read = readDb->GetReader();
 
-    CDimCoordinateQueryClause queryClause;
-    queryClause.AddRangeClause('C', IDimCoordinateQueryClause::RangeClause{ 0,2 });
-    queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {1,2,3} });
-    read->Query(&queryClause);
+        CDimCoordinateQueryClause queryClause;
+        queryClause.AddRangeClause('C', IDimCoordinateQueryClause::RangeClause{ 0,2 });
+        queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {1,2,3} });
+        read->Query(&queryClause);
+    }
 
-    delete read;
+    return;
 }
 
 int main()
 {
-    //TestRead();
+   // TestRead();
     TestRead2();
     //TestCreateAndWrite()
 }

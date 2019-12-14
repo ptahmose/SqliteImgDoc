@@ -163,6 +163,7 @@
     <ClInclude Include="BlobOnHeap.h" />
     <ClInclude Include="CCustomQueries.h" />
     <ClInclude Include="DataBinHdr.h" />
+    <ClInclude Include="Db.h" />
     <ClInclude Include="DbDiscover.h" />
     <ClInclude Include="DbGlobalInfo.h" />
     <ClInclude Include="DbRead.h" />
@@ -185,6 +186,7 @@
   <ItemGroup>
     <ClCompile Include="BlobOnHeap.cpp" />
     <ClCompile Include="CCustomQueries.cpp" />
+    <ClCompile Include="Db.cpp" />
     <ClCompile Include="DbBase.cpp" />
     <ClCompile Include="DbCreation.cpp" />
     <ClCompile Include="DbDiscover.cpp" />

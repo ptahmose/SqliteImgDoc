@@ -101,6 +101,7 @@ static void CreateTileTable(SQLite::Database* db)
       db->exec(CreateSpatialIndexSqlStatement);*/
 }
 
+#if false
 /*static*/IDbWrite* IDbFactory::CreateNew(const CreateOptions& opts)
 {
     /* SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
@@ -119,7 +120,18 @@ static void CreateTileTable(SQLite::Database* db)
 
     return new CDbWrite(db, docInfo);
 }
+#endif
+/*static*/ std::shared_ptr<IDb> IDbFactory::CreateNew(const CreateOptions& opts)
+{
+    auto docInfo = std::make_shared<CDbDocInfo>();
+    docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
+    CDbCreation dbCreator(*docInfo, opts);
+    auto db = dbCreator.DoCreate();
 
+    return make_shared<CDb>(db, docInfo);
+}
+
+#if false
 /*static*/IDbRead* IDbFactory::OpenExisting(const OpenOptions& opts)
 {
     /* SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
@@ -137,6 +149,16 @@ static void CreateTileTable(SQLite::Database* db)
     auto docInfo = discover.GetDocInfo();
 
     return new CDbRead(db, docInfo);
+}
+#endif
+/*static*/std::shared_ptr<IDb> IDbFactory::OpenExisting(const OpenOptions& opts)
+{
+    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY);
+    CCustomQueries::SetupCustomQueries(db->getHandle());
+    CDbDiscover discover(db);
+    auto docInfo = discover.GetDocInfo();
+
+    return make_shared<CDb>(db, docInfo);
 }
 
 //-------------------------------------------------------------------------------------------------

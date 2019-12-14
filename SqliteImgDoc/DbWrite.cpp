@@ -23,7 +23,7 @@ void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const Logical
     {
         auto idSbBlk = this->AddSubBlk(data);
 
-        const auto dims = this->docInfo->GetTileDimensions();
+        const auto dims = this->GetDocInfo().GetTileDimensions();
         /*stringstream ss;
         ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
 
@@ -210,13 +210,13 @@ void CDbWrite::EnsureAddTilesDataRowStatement()
     else
     {
         stringstream ss;
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesData) << " ("
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
-            << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
+        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesData) << " ("
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
+            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
             " VALUES (?1,?2,?3,?4,?5,?6);";
 
         this->addTilesDataRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str());
@@ -231,25 +231,25 @@ void CDbWrite::EnsureAddTilesInfoRowStatement()
     }
     else
     {
-        const auto dims = this->docInfo->GetTileDimensions();
+        const auto dims = this->GetDocInfo().GetTileDimensions();
         stringstream ss;
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
+        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
 
         // add table-names for "dimensions" first
         for (const auto dim : dims)
         {
             string tableName;
-            this->docInfo->GetTileInfoColumnNameForDimension(dim, tableName);
+            this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, tableName);
             ss << tableName << ",";
         }
 
         // and then the "fixed" columns
-        ss << this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
+        ss << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
             "VALUES (";
 
         // we have 6 "fixes" columns
@@ -277,12 +277,12 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
     else
     {
         stringstream ss;
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
+        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
             " VALUES(?1,?2,?3,?4,?5);";
 
         this->addTilesSpatialIndexRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str());

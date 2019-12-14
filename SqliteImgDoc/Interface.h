@@ -31,6 +31,7 @@ namespace SlImgDoc
         std::string dbFilename;
     };
 
+
     class SQLITEIMGDOC_API IDbWrite
     {
     public:
@@ -70,11 +71,21 @@ namespace SlImgDoc
         virtual ~IDbRead() {};
     };
 
+    class SQLITEIMGDOC_API IDb
+    {
+    public:
+        virtual std::shared_ptr<IDbWrite> GetWriter() = 0;
+        virtual std::shared_ptr<IDbRead> GetReader() = 0;
+
+        virtual ~IDb() {}
+    };
 
     class SQLITEIMGDOC_API IDbFactory
     {
     public:
-        static IDbWrite* CreateNew(const CreateOptions& opts);
-        static IDbRead* OpenExisting(const OpenOptions& opts);
+        /*static IDbWrite* CreateNew(const CreateOptions& opts);
+        static IDbRead* OpenExisting(const OpenOptions& opts);*/
+        static std::shared_ptr<IDb> CreateNew(const CreateOptions& opts);
+        static std::shared_ptr<IDb> OpenExisting(const OpenOptions& opts);
     };
 }

@@ -2,22 +2,27 @@
 
 #include <memory>
 #include "Interface.h"
+#include "Db.h"
 #include <SQLiteCpp/Database.h>
 
 class CDbBase
 {
 private:
-    std::unique_ptr<SQLite::Database> db;
+    //std::unique_ptr<SQLite::Database> db;
+    std::shared_ptr<CDb> db;
 public:
-    CDbBase(SQLite::Database* db) : db(db)
-    {
-    }
+    CDbBase(std::shared_ptr<CDb> db):db(db){}
+
+    //CDbBase(SQLite::Database* db) : db(db)
+    //{
+    //}
 
     virtual ~CDbBase()
     {}
 
 protected:
-    SQLite::Database& GetDb() { return *this->db.get(); }
+    SQLite::Database& GetDb() { return /* *this->db.get();*/this->db->GetDb(); }
+    const IDbDocInfo& GetDocInfo() { return this->db->GetDocInfo(); }
 
 public:
     /// The name of the table with the "technical document info"

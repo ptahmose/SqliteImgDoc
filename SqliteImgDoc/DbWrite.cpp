@@ -16,7 +16,7 @@ using namespace std;
     }
 }
 
-void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
+void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try
@@ -87,7 +87,7 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPosi
     }
 }
 
-/*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
+/*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try
@@ -243,7 +243,7 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
     }
 }
 
-void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const LogicalPositionInfo* info)
+void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPositionInfo* info)
 {
     try
     {

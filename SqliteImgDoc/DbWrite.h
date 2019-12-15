@@ -26,8 +26,8 @@ public:
     virtual void CommitTransaction();
     virtual void RollbackTransaction();
 
-    virtual void AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
-    virtual void AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data);
+    virtual void AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
+    virtual void AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data);
 
     virtual ~CDbWrite();
 

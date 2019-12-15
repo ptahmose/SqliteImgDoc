@@ -5,6 +5,9 @@ using namespace SlImgDoc;
 
 static shared_ptr<IDb> CreateTestDatabase()
 {
+    // create a database with dimensions 'C', 'Z', 'T' and 'M'
+    // C=[0,2] Z=[0,19] T=[0,5] M=0
+
     CreateOptions opts;
     opts.dbFilename = ":memory:";
     //opts.dbFilename = "D:\\unittest.db";
@@ -43,7 +46,7 @@ static shared_ptr<IDb> CreateTestDatabase()
             {
                 tc.Set('T', t);
 
-                dbWrite->AddSubBlock(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+                dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
             }
         }
     }
@@ -138,4 +141,51 @@ TEST(ReadTests, QueryCoordinates3)
     EXPECT_EQ(logPos.width, 100);
     EXPECT_EQ(logPos.height, 100);
     EXPECT_EQ(logPos.pyrLvl, 0);
+}
+
+TEST(ReadTests, QueryCoordinates4)
+{
+    auto db = CreateTestDatabase();
+
+    auto reader = db->GetReader();
+    CDimCoordinateQueryClause queryClause;
+
+    // since we do not give a condition for 'C', we expect to find 3 tiles
+    queryClause.AddListClause('Z', IDimCoordinateQueryClause::ListClause{ {2} });
+    queryClause.AddListClause('T', IDimCoordinateQueryClause::ListClause{ {3} });
+    queryClause.AddListClause('M', IDimCoordinateQueryClause::ListClause{ {0} });
+    auto r = reader->Query(&queryClause);
+
+    ASSERT_TRUE(r.size() == 3) << "Expected exactly three results.";
+
+    std::vector expectedC = { 0,1,2 };
+    for (int i = 0; i < r.size(); ++i)
+    {
+        TileCoordinate tc;
+        LogicalPositionInfo logPos;
+        reader->ReadTileInfo(r[i], &tc, &logPos);
+
+        EXPECT_EQ(logPos.posX, 0);
+        EXPECT_EQ(logPos.posY, 0);
+        EXPECT_EQ(logPos.width, 100);
+        EXPECT_EQ(logPos.height, 100);
+        EXPECT_EQ(logPos.pyrLvl, 0);
+
+        int coordVal = -1;
+        bool b = tc.TryGetCoordinate('C', &coordVal);
+        EXPECT_TRUE(b);
+        auto expectedIt = find(expectedC.begin(), expectedC.end(), coordVal);
+        EXPECT_TRUE(expectedIt != expectedC.end());
+        if (expectedIt!= expectedC.end())
+        {
+            expectedC.erase(expectedIt);
+        }
+
+        b = tc.TryGetCoordinate('Z', &coordVal);
+        EXPECT_TRUE(b); EXPECT_EQ(coordVal, 2);
+        b = tc.TryGetCoordinate('T', &coordVal);
+        EXPECT_TRUE(b); EXPECT_EQ(coordVal, 3);
+        b = tc.TryGetCoordinate('M', &coordVal);
+        EXPECT_TRUE(b); EXPECT_EQ(coordVal, 0);
+    }
 }

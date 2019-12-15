@@ -47,9 +47,9 @@ namespace SlImgDoc
         virtual void CommitTransaction() = 0;
         virtual void RollbackTransaction() = 0;
 
-        virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
-        virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
-        //virtual void AddSubBlock(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjZero* data) = 0;
+        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+        //virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjZero* data) = 0;
 
         virtual ~IDbWrite() {};
     };

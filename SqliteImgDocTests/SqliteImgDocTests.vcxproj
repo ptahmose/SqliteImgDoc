@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ReadTests.cpp" />
+    <ClCompile Include="SpatialReadTests.cpp" />
     <ClCompile Include="test.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

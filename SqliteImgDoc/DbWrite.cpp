@@ -16,7 +16,7 @@ using namespace std;
     }
 }
 
-void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
+void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try
@@ -87,7 +87,7 @@ void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const Logical
     }
 }
 
-/*virtual*/void CDbWrite::AddSubBlock(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
+/*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try

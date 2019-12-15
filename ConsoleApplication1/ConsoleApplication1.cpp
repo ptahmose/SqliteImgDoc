@@ -102,7 +102,7 @@ static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int siz
                 posInfo.posX = c * sizeX;
                 posInfo.posY = r * sizeY;
 
-                dbw->AddSubBlock(&simpleCoord, &posInfo, &dataObj);
+                dbw->AddTile(&simpleCoord, &posInfo, &dataObj);
                 simpleCoord.m++;
             }
         }

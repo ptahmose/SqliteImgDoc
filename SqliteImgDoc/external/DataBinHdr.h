@@ -2,7 +2,13 @@
 
 #include <cstdint>
 
-#include <pshpack1.h>
+#if defined(_MSC_VER) || defined(__GNUC__)
+#pragma pack(push,1)
+#else
+#error "Need to define struct-alignment for this compiler"
+#endif
+
+//#include <pshpack1.h>
 
 class PixelType
 {
@@ -34,4 +40,7 @@ struct BinHdrUncompressedBitmap : BinHdrBitmapBase
     //std::uint8_t pixeltype;
 };
 
-#include <poppack.h>
+#if defined(_MSC_VER) || defined(__GNUC__)
+#pragma pack(pop)
+#endif
+//#include <poppack.h>

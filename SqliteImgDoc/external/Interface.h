@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <memory>
 #include <unordered_set>
 #include "ImportExport.h"
 #include "Types.h"

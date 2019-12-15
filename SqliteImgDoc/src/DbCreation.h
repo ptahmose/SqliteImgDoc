@@ -1,5 +1,5 @@
 #pragma once
-#include "Interface.h"
+#include "../external/Interface.h"
 #include "DbGlobalInfo.h"
 
 class CDbCreation

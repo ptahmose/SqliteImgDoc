@@ -1,5 +1,7 @@
 #pragma once
 
+#define _SQLITEIMGDOCSTATICLIB
+
 // if linking with the static libCZI-library, the variable "_LIBCZISTATICLIB" should be defined.
 #if !defined(_SQLITEIMGDOCSTATICLIB)
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <memory>
-#include "Interface.h"
+#include "../external/Interface.h"
 #include "Db.h"
 #include <SQLiteCpp/Database.h>
 

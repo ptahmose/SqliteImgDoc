@@ -55,15 +55,15 @@ static shared_ptr<IDb> CreateMosaicTestDatabase(int rows, int columns, int sizeX
 
 static bool CheckIfSetsAreEqual(std::vector<LogicalPositionInfo>& a, std::vector<LogicalPositionInfo>& b)
 {
-    if (a.size()!=b.size())
+    if (a.size() != b.size())
     {
         return false;
     }
 
-    for (size_t i=0;i<a.size();++i)
+    for (size_t i = 0; i < a.size(); ++i)
     {
         auto f = find(a.cbegin(), a.cend(), b[i]);
-        if (f==a.cend())
+        if (f == a.cend())
         {
             return false;
         }
@@ -105,7 +105,7 @@ TEST(SpatialReadTests, QueryLine1)
 {
     auto db = CreateMosaicTestDatabase(50, 50, 256, 256);
     auto reader = db->GetReader();
-   
+
     LineThruTwoPointsD line;
     line.a.x = 0; line.a.y = 0;
     line.b.x = 128; line.b.y = 640;

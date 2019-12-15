@@ -3,7 +3,7 @@
 #include <memory>
 #include <utility>
 #include <SQLiteCpp/Database.h> 
-#include "Interface.h"
+#include "../external/Interface.h"
 #include "DbGlobalInfo.h"
 
 class CDb : public SlImgDoc::IDb, public std::enable_shared_from_this<CDb>

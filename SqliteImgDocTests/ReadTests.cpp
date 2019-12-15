@@ -176,7 +176,7 @@ TEST(ReadTests, QueryCoordinates4)
         EXPECT_TRUE(b);
         auto expectedIt = find(expectedC.begin(), expectedC.end(), coordVal);
         EXPECT_TRUE(expectedIt != expectedC.end());
-        if (expectedIt!= expectedC.end())
+        if (expectedIt != expectedC.end())
         {
             expectedC.erase(expectedIt);
         }

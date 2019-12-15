@@ -3,7 +3,7 @@
 #include <string>
 #include <algorithm>
 
-#include "ITileCoordinate.h"
+#include "../external/ITileCoordinate.h"
 
 
 class IDbDocInfo

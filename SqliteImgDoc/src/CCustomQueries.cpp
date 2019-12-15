@@ -1,7 +1,7 @@
 #include "pch.h"
 #include <stdexcept> 
 #include "CCustomQueries.h"
-#include "Types.h"
+#include "../external/Types.h"
 
 using namespace SlImgDoc;
 

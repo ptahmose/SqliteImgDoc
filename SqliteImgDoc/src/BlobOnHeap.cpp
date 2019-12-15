@@ -1,6 +1,6 @@
 #include "pch.h"
 #include <malloc.h>
-#include "BlobOnHeap.h"
+#include "../external/BlobOnHeap.h"
 
 using namespace SlImgDoc;
 

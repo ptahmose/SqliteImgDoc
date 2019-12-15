@@ -1,9 +1,9 @@
 #pragma once
 
 #include "DbBase.h"
-#include "ITileCoordinate.h"
-#include "LogicalPositionInfo.h"
-#include "IDataObj.h"
+#include "../external/ITileCoordinate.h"
+#include "../external/LogicalPositionInfo.h"
+#include "../external/IDataObj.h"
 #include "DbGlobalInfo.h"
 #include <SQLiteCpp/Transaction.h>
 

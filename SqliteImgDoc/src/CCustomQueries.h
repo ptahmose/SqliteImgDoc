@@ -2,7 +2,7 @@
 
 #include <string>
 #include <sqlite3.h>
-#include "Types.h"
+#include "../external/Types.h"
 
 /// Custom Queries are found here - here we register custom extensions.
 /// Currently, we extend R-Tree queries (https://sqlite.org/rtree.html).

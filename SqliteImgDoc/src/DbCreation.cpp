@@ -6,7 +6,7 @@
 #include <iostream>
 
 #include "DbCreation.h"
-#include "Interface.h"
+#include "../external/Interface.h"
 #include "DbBase.h"
 #include "DbWrite.h"
 #include "DbRead.h"

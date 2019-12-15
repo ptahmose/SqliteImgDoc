@@ -2,7 +2,7 @@
 //
 
 #include <iostream>
-#include "../SqliteImgDoc/Interface.h"
+#include "../SqliteImgDoc/external/Interface.h"
 
 using namespace SlImgDoc;
 using namespace std;
@@ -169,7 +169,7 @@ void TestRead2()
 
 int main()
 {
-   // TestRead();
+    // TestRead();
     TestRead2();
     //TestCreateAndWrite()
 }

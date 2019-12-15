@@ -7,4 +7,4 @@
 
 #include "gtest/gtest.h"
 
-#include "../SqliteImgDoc/Interface.h"
+#include "../SqliteImgDoc/external/Interface.h"

@@ -29,7 +29,30 @@ namespace SlImgDoc
             return this->dims;
         }
 
-        std::optional<std::reference_wrapper<const std::vector<RangeClause>>> GetRangeClause(TileDim d) const override
+        const std::vector<RangeClause>* GetRangeClause(TileDim d) const override
+        {
+            const auto& c = this->rangeClauses.find(d);
+            if (c != this->rangeClauses.cend())
+            {
+                return &c->second;
+            }
+
+            return nullptr;
+        }
+
+        const std::vector<ListClause>* GetListClause(TileDim d) const override
+        {
+            const auto& c = this->listClauses.find(d);
+            if (c != this->listClauses.cend())
+            {
+                return &c->second;
+            }
+
+            return nullptr;
+        }
+
+
+        /*std::optional<std::reference_wrapper<const std::vector<RangeClause>>> GetRangeClause(TileDim d) const override
         {
             const auto& c = this->rangeClauses.find(d);
             if (c != this->rangeClauses.cend())
@@ -49,7 +72,7 @@ namespace SlImgDoc
             }
 
             return std::nullopt;
-        }
+        }*/
 
         /*
         virtual std::vector<TileDim> GetTileDimsForRangeClause() const override

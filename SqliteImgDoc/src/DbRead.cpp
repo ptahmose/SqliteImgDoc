@@ -235,7 +235,8 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
         auto ranges = clause->GetRangeClause(dim);
         auto list = clause->GetListClause(dim);
 
-        if (!ranges.has_value() && !list.has_value())
+        //if (!ranges.has_value() && !list.has_value())
+        if (ranges != nullptr && list != nullptr)
         {
             throw invalid_argument("...TODO...");
         }
@@ -248,9 +249,11 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
         ss << "(";
         bool first = true;
 
-        if (ranges.has_value())
+        //if (ranges.has_value())
+        if (ranges != nullptr)
         {
-            for (const auto& r : ranges.value().get())
+            //for (const auto& r : ranges.value().get())
+            for (const auto& r : *ranges)
             {
                 if (!first)
                 {
@@ -262,9 +265,11 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
             }
         }
 
-        if (list.has_value())
+        //if (list.has_value())
+        if (list != nullptr)
         {
-            for (const auto& l : list.value().get())
+            //for (const auto& l : list.value().get())
+            for (const auto& l : *list)
             {
                 if (!first)
                 {

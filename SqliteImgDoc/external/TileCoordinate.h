@@ -35,7 +35,7 @@ namespace SlImgDoc
 
         void Set(TileDim d, int value)
         {
-            auto it = std::find_if(this->coordinates.begin(), this->coordinates.end(), [=](const auto& s) { return s.dimension == d; });
+            auto it = std::find_if(this->coordinates.begin(), this->coordinates.end(), [=](const DimensionAndValue& s) { return s.dimension == d; });
             if (it != this->coordinates.end())
             {
                 it->value = value;
@@ -49,7 +49,7 @@ namespace SlImgDoc
     public:
         virtual bool TryGetCoordinate(TileDim dim, int* coordVal) const
         {
-            const auto it = std::find_if(this->coordinates.cbegin(), this->coordinates.cend(), [=](const auto& s) { return s.dimension == dim; });
+            const auto it = std::find_if(this->coordinates.cbegin(), this->coordinates.cend(), [=](const DimensionAndValue& s) { return s.dimension == dim; });
             if (it != this->coordinates.cend())
             {
                 if (coordVal != nullptr)

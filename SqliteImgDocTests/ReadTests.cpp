@@ -158,7 +158,7 @@ TEST(ReadTests, QueryCoordinates4)
 
     ASSERT_TRUE(r.size() == 3) << "Expected exactly three results.";
 
-    std::vector expectedC = { 0,1,2 };
+    std::vector<int> expectedC = { 0,1,2 };
     for (int i = 0; i < r.size(); ++i)
     {
         TileCoordinate tc;

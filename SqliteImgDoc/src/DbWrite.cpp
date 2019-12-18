@@ -291,7 +291,8 @@ void CDbWrite::EnsureAddTilesDataRowStatement()
             << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
             " VALUES (?1,?2,?3,?4,?5,?6);";
 
-        this->addTilesDataRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str());
+        //this->addTilesDataRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
+        this->addTilesDataRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
 }
 
@@ -336,7 +337,8 @@ void CDbWrite::EnsureAddTilesInfoRowStatement()
 
         ss << ");";
 
-        this->addTilesInfoRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str());
+        //this->addTilesInfoRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
+        this->addTilesInfoRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
 }
 
@@ -357,6 +359,7 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
             this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
             " VALUES(?1,?2,?3,?4,?5);";
 
-        this->addTilesSpatialIndexRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str());
+        //this->addTilesSpatialIndexRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
+        this->addTilesSpatialIndexRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
 }

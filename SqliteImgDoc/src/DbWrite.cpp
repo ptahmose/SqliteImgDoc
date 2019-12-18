@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <memory>
 
 using namespace std;
 

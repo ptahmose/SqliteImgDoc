@@ -2,7 +2,7 @@
 #include "miscutilities.h"
 #include <cstdlib>
 #include <cerrno>
-#include <limits>
+#include <cstdint>
 
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
 {

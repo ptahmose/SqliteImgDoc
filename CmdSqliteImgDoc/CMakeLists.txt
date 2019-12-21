@@ -19,7 +19,7 @@ elseif(UNIX AND APPLE)
 endif()
 
 set_target_properties(CmdSqliteImgDoc  PROPERTIES
-           CXX_STANDARD 17
+           CXX_STANDARD 11
            CXX_EXTENSIONS OFF)
 
 

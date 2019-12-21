@@ -12,7 +12,7 @@ target_link_libraries(SqliteImgDocTests  ${GTEST_BOTH_LIBRARIES} SqliteImgDoc SQ
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 
 set_target_properties(SqliteImgDocTests PROPERTIES
-           CXX_STANDARD 17
+           CXX_STANDARD 11
            CXX_EXTENSIONS OFF)
 
 

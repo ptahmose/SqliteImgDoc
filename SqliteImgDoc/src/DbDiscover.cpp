@@ -2,6 +2,7 @@
 #include "DbDiscover.h"
 #include <iostream>
 #include <sstream>
+#include <regex>
 
 using namespace std;
 
@@ -9,19 +10,11 @@ std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
 {
     auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
     auto dims = this->GetTileDims(colNames);
-    /*SQLite::Statement query(*this->db, "SELECT name FROM PRAGMA_TABLE_INFO('TILESINFO');");
 
-    bool b = query.executeStep();
-
-    int count = query.getColumnCount();
-
-    for (int i = 0; i < count; ++i)
-    {
-        auto colName = query.getColumn(i);
-        std::cout << colName << endl;
-    }*/
     auto docInfo = std::make_shared< CDbDocInfo>();
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
+
+    this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
 
     return docInfo;
     //throw std::invalid_argument("Unknown enumeration");
@@ -55,4 +48,38 @@ std::vector<SlImgDoc::TileDim> CDbDiscover::GetTileDims(std::vector<std::string>
     }
 
     return dims;
+}
+
+std::uint32_t CDbDiscover::GetSchemaSizeOfColumn(const char* tableName, const char* columnName)
+{
+    stringstream ss;
+    ss << "PRAGMA table_info(" << tableName << ")";
+    SQLite::Statement query(*this->db, ss.str());
+    const int colIdx_name = query.getColumnIndex("name");
+    const int colIdx_type = query.getColumnIndex("type");
+    while (query.executeStep())
+    {
+        if (strcmp(query.getColumn(colIdx_name).getText(),columnName)==0)
+        {
+            auto type = query.getColumn(colIdx_type).getString();
+            std::uint32_t s;
+            bool b = TryParseBlobSize(type, &s);
+            if (b==true)
+            {
+                return s;
+            }
+        }
+    }
+}
+
+bool CDbDiscover::TryParseBlobSize(const std::string& str, std::uint32_t* s)
+{
+    regex blobLimit("BLOB\\([[:digit:]]+\\)");
+    smatch sm;
+    if (regex_match(str,sm,blobLimit))
+    {
+        const auto capture = sm[1].str();
+    }
+    *s = 42;
+    return true;
 }

@@ -47,6 +47,12 @@ public:
         MaxY
     };
 
+    enum class DbParameter
+    {
+        ///< An enum constant representing the size of the "DataBinHdr"-field in bytes.
+        DataBinHdrSize
+    };
+
     virtual const std::string& GetTableName(TableType tt) const = 0;
 
     virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const = 0;
@@ -58,6 +64,8 @@ public:
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const = 0;
 
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const = 0;
+
+    virtual std::uint32_t GetDbParameter(DbParameter parameter) const = 0;
 };
 
 class CDbDocInfo :public IDbDocInfo
@@ -116,4 +124,6 @@ public:
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
 
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const;
+
+    virtual std::uint32_t GetDbParameter(DbParameter parameter) const;
 };

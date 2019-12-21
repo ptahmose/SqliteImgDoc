@@ -11,15 +11,11 @@ class CDbWrite : CDbBase, public SlImgDoc::IDbWrite
 {
 private:
     bool transactionPending;
-  //  std::shared_ptr<IDbDocInfo> docInfo;
 
     std::unique_ptr<SQLite::Statement> addTilesDataRowStatement;
     std::unique_ptr<SQLite::Statement> addTilesInfoRowStatement;
     std::unique_ptr<SQLite::Statement> addTilesSpatialIndexRowStatement;
 public:
-  /*  CDbWrite(SQLite::Database* db, std::shared_ptr<IDbDocInfo> dbInfo) : CDbBase(db), docInfo(dbInfo), transactionPending(false)
-    {
-    }*/
     CDbWrite(std::shared_ptr<CDb> db) : CDbBase(db), transactionPending(false) {}
 
     virtual void BeginTransaction();

@@ -8,3 +8,5 @@
 #include "gtest/gtest.h"
 
 #include "../SqliteImgDoc/external/Interface.h"
+
+#include "../SqliteImgDoc/src/miscutilities.h"

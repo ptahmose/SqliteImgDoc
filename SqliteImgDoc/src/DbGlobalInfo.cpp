@@ -137,3 +137,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
     throw std::invalid_argument("Unknown enumeration");
 }
+
+/*virtual*/std::uint32_t CDbDocInfo::GetDbParameter(DbParameter parameter) const
+{
+    throw "ERROR";
+}

@@ -4,7 +4,45 @@
 #cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
-add_library (SqliteImgDoc STATIC "CMakeProject1.cpp" "CMakeProject1.h" src/BlobOnHeap.cpp src/CCustomQueries.cpp src/CCustomQueries.h external/DataBinHdr.h src/Db.cpp src/Db.h src/DbBase.cpp src/DbBase.h src/DbCreation.cpp src/DbCreation.h src/DbDiscover.cpp src/DbDiscover.h src/DbGlobalInfo.h src/DbGlobalInfo.cpp src/DbRead.cpp src/DbRead.h src/DbWrite.cpp src/DbWrite.h src/dllmain.cpp src/framework.h external/IDataObj.h src/pch.cpp src/pch.h external/BlobOnHeap.h external/DataObjImpl.h external/DataTypes.h external/DimCoordinateQueryClause.h external/IBlob.h external/IDimCoordinateQueryClause.h external/ImportExport.h external/Interface.h external/ITileCoordinate.h external/LogicalPositionInfo.h external/TileCoordinate.h external/Types.h external/utilities.h)
+add_library (SqliteImgDoc STATIC 
+						src/BlobOnHeap.cpp 
+						src/CCustomQueries.cpp 
+						src/CCustomQueries.h 
+						src/Db.cpp 
+						src/Db.h 
+						src/DbBase.cpp 
+						src/DbBase.h 
+						src/DbCreation.cpp 
+						src/DbCreation.h 
+						src/DbDiscover.cpp 
+						src/DbDiscover.h 
+						src/DbGlobalInfo.h 
+						src/DbGlobalInfo.cpp 
+						src/DbRead.cpp 
+						src/DbRead.h 
+						src/DbWrite.cpp 
+						src/DbWrite.h 
+						src/dllmain.cpp 
+						src/framework.h 
+						src/pch.cpp 
+						src/pch.h 
+						src/miscutilities.h
+						src/miscutilities.cpp
+						external/DataBinHdr.h 
+						external/IDataObj.h 
+						external/BlobOnHeap.h 
+						external/DataObjImpl.h 
+						external/DataTypes.h 
+						external/DimCoordinateQueryClause.h 
+						external/IBlob.h 
+						external/IDimCoordinateQueryClause.h 
+						external/ImportExport.h 
+						external/Interface.h 
+						external/ITileCoordinate.h 
+						external/LogicalPositionInfo.h 
+						external/TileCoordinate.h 
+						external/Types.h 
+						external/utilities.h)
 
 target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 #set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)

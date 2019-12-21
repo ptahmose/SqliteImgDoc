@@ -4,7 +4,11 @@
 #cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
-add_executable( SqliteImgDocTests TileCoordinateTests.cpp ReadTests.cpp SpatialReadTests.cpp)
+add_executable( SqliteImgDocTests 
+                    TileCoordinateTests.cpp 
+                    ReadTests.cpp 
+                    SpatialReadTests.cpp
+                    utilitiesTests.cpp)
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocTests  ${GTEST_BOTH_LIBRARIES} SqliteImgDoc SQLiteCpp sqlite3)

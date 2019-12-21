@@ -3,7 +3,7 @@
 using namespace std;
 using namespace SlImgDoc;
 
-TEST(Test1, TileCoordinate)
+TEST(TileCoordinate,Test1)
 {
     TileCoordinate tc{ { 'T',1 }, { 'C',2 } };
 

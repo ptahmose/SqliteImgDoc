@@ -12,10 +12,10 @@ target_link_libraries(CmdSqliteImgDoc   SqliteImgDoc SQLiteCpp sqlite3)
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)
    # Linux
-   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread dl)
+   target_link_libraries(CmdSqliteImgDoc SQLiteCpp pthread dl)
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread)
+   target_link_libraries(CmdSqliteImgDoc SQLiteCpp pthread)
 endif()
 
 set_target_properties(CmdSqliteImgDoc  PROPERTIES

@@ -11,7 +11,7 @@ target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)
 
 ##target_compile_features(SqliteImgDoc PRIVATE cxx_std_17)
-target_compile_features(SqliteImgDoc PRIVATE CXX_STANDARD 11 CXX_EXTENSIONS OFF)
+#target_compile_features(SqliteImgDoc PRIVATE CXX_STANDARD 11 CXX_EXTENSIONS OFF)
 
 
 # TODO: Add tests and install targets if needed.

@@ -9,6 +9,16 @@ add_executable( SqliteImgDocTests TileCoordinateTests.cpp ReadTests.cpp SpatialR
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocTests  ${GTEST_BOTH_LIBRARIES} SqliteImgDoc SQLiteCpp sqlite3)
 
+if(UNIX AND NOT APPLE)
+   # Linux
+   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread dl)
+elseif(UNIX AND APPLE)
+   # Mac OS
+   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread)
+endif()
+
+
+
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 
 set_target_properties(SqliteImgDocTests PROPERTIES

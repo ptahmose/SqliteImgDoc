@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstdint>
+#include <climits>
 
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
 {

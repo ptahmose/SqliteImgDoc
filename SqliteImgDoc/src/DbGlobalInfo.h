@@ -2,7 +2,7 @@
 
 #include <string>
 #include <algorithm>
-
+#include <map>
 #include "../external/ITileCoordinate.h"
 
 
@@ -75,6 +75,7 @@ private:
     std::string tableNameTilesData;
     std::string tableNameTilesInfo;
     std::string tableNameSpatialIndex;
+    std::map<IDbDocInfo::DbParameter,std::uint32_t> dbParameters;
 private:
     //static std::string TableName_DocumentInfo;
     static std::string TableName_TilesData;
@@ -111,6 +112,11 @@ public:
     {
         this->dimensions.clear();
         std::copy(begin, end, std::back_inserter(this->dimensions));
+    }
+
+    void SetDbParameters(std::map<IDbDocInfo::DbParameter, std::uint32_t>&& dbParams)
+    {
+        this->dbParameters = std::move(dbParams);
     }
 
     virtual const std::string& GetTableName(TableType tt) const;

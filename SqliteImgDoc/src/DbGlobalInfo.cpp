@@ -2,7 +2,12 @@
 #include <stdexcept> 
 #include <algorithm>
 #include <utility>
+#include <sstream>
 #include "DbGlobalInfo.h"
+#include "../external/SqliteImgDocException.h"
+
+using namespace std;
+using namespace SlImgDoc;
 
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_Pk = "Pk";
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_TileX = "TilePosX";
@@ -27,12 +32,12 @@
 /*static*/std::string CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY = "maxY";
 
 CDbDocInfo::CDbDocInfo(
-    std::string tableName_tilesdata, 
+    std::string tableName_tilesdata,
     std::string tableName_tilesinfo,
     std::string tableName_SpatialIndex)
     : tableNameTilesData(std::move(tableName_tilesdata)),
-      tableNameTilesInfo(std::move(tableName_tilesinfo)),
-      tableNameSpatialIndex(std::move(tableName_SpatialIndex))
+    tableNameTilesInfo(std::move(tableName_tilesinfo)),
+    tableNameSpatialIndex(std::move(tableName_SpatialIndex))
 {
 }
 
@@ -85,7 +90,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/bool CDbDocInfo::GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& tableName) const
 {
-    const auto it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
+    const auto& it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
     if (it == this->dimensions.cend())
     {
         return false;
@@ -140,5 +145,14 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/std::uint32_t CDbDocInfo::GetDbParameter(DbParameter parameter) const
 {
-    throw "ERROR";
+    try
+    {
+        return this->dbParameters.at(parameter);
+    }
+    catch (const std::out_of_range& oor)
+    {
+        stringstream ss;
+        ss << "The DbParameter with value \"" << static_cast<typename std::underlying_type<IDbDocInfo::DbParameter>::type>(parameter) << "\" is unknown.";
+        throw SqliteImgDocInvalidArgumentException(ss.str(), oor);
+    }
 }

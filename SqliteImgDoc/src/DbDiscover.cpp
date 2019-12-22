@@ -17,10 +17,11 @@ std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
     auto docInfo = std::make_shared< CDbDocInfo>();
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
 
-    this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
+    std::map<IDbDocInfo::DbParameter, std::uint32_t> dbParams;
+    dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] =this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
+    docInfo->SetDbParameters(std::move(dbParams));
 
     return docInfo;
-    //throw std::invalid_argument("Unknown enumeration");
 }
 
 std::vector<std::string> CDbDiscover::GetColumnNamesStartingWith(const char* tableName, const char* startsWith)

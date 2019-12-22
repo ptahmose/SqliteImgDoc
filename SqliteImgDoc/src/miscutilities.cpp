@@ -9,6 +9,7 @@
 {
     std::uint64_t v;
     char* end;
+    errno = 0;
     v = std::strtoull(sz, &end, 10);
     if (*end != '\0')
     {
@@ -35,6 +36,7 @@
 {
     std::uint32_t v;
     char* end;
+    errno = 0;
     v = std::strtoul(sz, &end, 10);
     if (*end != '\0')
     {

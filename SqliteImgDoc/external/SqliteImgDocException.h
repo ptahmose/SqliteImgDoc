@@ -14,7 +14,7 @@ public:
 class SqliteImgDocDbDiscoverException:public SqliteImgDocException
 {
 public:
-    class enum Errortype
+    enum class Errortype
     {
         InvalidSchema
     };

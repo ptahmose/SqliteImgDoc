@@ -7,6 +7,7 @@
 #include "../external/SqliteImgDocException.h"
 
 using namespace std;
+using namespace SlImgDoc;
 
 std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
 {
@@ -73,7 +74,9 @@ std::uint32_t CDbDiscover::GetSchemaSizeOfColumn(const char* tableName, const ch
         }
     }
 
-    throw SqliteImgDocDbDiscoverException();
+    stringstream ssExcp;
+    ssExcp << "Error in retrieving the size of the BLOB in column \"" << columnName << "\" in table \"" << tableName << "\".";
+    throw SqliteImgDocDbDiscoverException(ssExcp.str(), SqliteImgDocDbDiscoverException::ErrorType::UnsuitableDb);
 }
 
 bool CDbDiscover::TryParseBlobSize(const std::string& str, std::uint32_t* s)

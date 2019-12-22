@@ -3,13 +3,15 @@
 #include <iostream>
 #include <sstream>
 #include <regex>
+#include "miscutilities.h"
+#include "../external/SqliteImgDocException.h"
 
 using namespace std;
 
 std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
 {
-    auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
-    auto dims = this->GetTileDims(colNames);
+    const auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
+    const auto dims = this->GetTileDims(colNames);
 
     auto docInfo = std::make_shared< CDbDocInfo>();
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
@@ -59,27 +61,29 @@ std::uint32_t CDbDiscover::GetSchemaSizeOfColumn(const char* tableName, const ch
     const int colIdx_type = query.getColumnIndex("type");
     while (query.executeStep())
     {
-        if (strcmp(query.getColumn(colIdx_name).getText(),columnName)==0)
+        if (strcmp(query.getColumn(colIdx_name).getText(), columnName) == 0)
         {
             auto type = query.getColumn(colIdx_type).getString();
             std::uint32_t s;
-            bool b = TryParseBlobSize(type, &s);
-            if (b==true)
+            const bool b = CDbDiscover::TryParseBlobSize(type, &s);
+            if (b == true)
             {
                 return s;
             }
         }
     }
+
+    throw SqliteImgDocDbDiscoverException();
 }
 
 bool CDbDiscover::TryParseBlobSize(const std::string& str, std::uint32_t* s)
 {
-    regex blobLimit("BLOB\\([[:digit:]]+\\)");
     smatch sm;
-    if (regex_match(str,sm,blobLimit))
+    if (regex_match(str, sm, regex("BLOB\\([[:digit:]]+\\)")))
     {
-        const auto capture = sm[1].str();
+        const auto& capture = sm[1].str();
+        return  MiscUtils::TryParseUint32(capture, s);
     }
-    *s = 42;
-    return true;
+    
+    return false;
 }

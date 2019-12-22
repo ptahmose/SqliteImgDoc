@@ -42,7 +42,8 @@ add_library (SqliteImgDoc STATIC
 						external/LogicalPositionInfo.h 
 						external/TileCoordinate.h 
 						external/Types.h 
-						external/utilities.h)
+						external/utilities.h
+						external/SqliteImgDocException.h)
 
 target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 #set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)

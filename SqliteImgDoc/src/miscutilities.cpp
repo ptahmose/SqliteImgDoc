@@ -7,10 +7,9 @@
 
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
 {
-    std::uint64_t v;
     char* end;
     errno = 0;
-    v = std::strtoull(sz, &end, 10);
+    std::uint64_t v = std::strtoull(sz, &end, 10);
     if (*end != '\0')
     {
         return false;
@@ -34,10 +33,9 @@
 
 /*static*/bool MiscUtils::TryParseUint32(const char* sz, std::uint32_t* val)
 {
-    std::uint32_t v;
     char* end;
     errno = 0;
-    v = std::strtoul(sz, &end, 10);
+    std::uint32_t v = std::strtoul(sz, &end, 10);
     if (*end != '\0')
     {
         return false;

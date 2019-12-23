@@ -15,6 +15,7 @@
 #include "DimCoordinateQueryClause.h"
 #include "DataTypes.h"
 #include "DataObjImpl.h"
+#include "SqliteImgDocException.h"
 
 namespace SlImgDoc
 {

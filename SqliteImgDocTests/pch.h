@@ -10,3 +10,6 @@
 #include "../SqliteImgDoc/external/Interface.h"
 
 #include "../SqliteImgDoc/src/miscutilities.h"
+
+#include "../SqliteImgDoc/src/IInternalDb.h"
+#include "../SqliteImgDoc/src/DbDiscover.h"

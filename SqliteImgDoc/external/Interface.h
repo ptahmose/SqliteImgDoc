@@ -94,8 +94,6 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbFactory
     {
     public:
-        /*static IDbWrite* CreateNew(const CreateOptions& opts);
-        static IDbRead* OpenExisting(const OpenOptions& opts);*/
         static std::shared_ptr<IDb> CreateNew(const CreateOptions& opts);
         static std::shared_ptr<IDb> OpenExisting(const OpenOptions& opts);
     };

@@ -8,7 +8,6 @@
 class CDbBase
 {
 private:
-    //std::unique_ptr<SQLite::Database> db;
     std::shared_ptr<CDb> db;
 public:
     CDbBase(std::shared_ptr<CDb> db):db(db){}

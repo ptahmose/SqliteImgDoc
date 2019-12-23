@@ -18,7 +18,7 @@ std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
 
     std::map<IDbDocInfo::DbParameter, std::uint32_t> dbParams;
-    dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] =this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
+    dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
     docInfo->SetDbParameters(std::move(dbParams));
 
     return docInfo;
@@ -83,10 +83,10 @@ std::uint32_t CDbDiscover::GetSchemaSizeOfColumn(const char* tableName, const ch
 bool CDbDiscover::TryParseBlobSize(const std::string& str, std::uint32_t* s)
 {
     smatch sm;
-    if (regex_match(str, sm, regex("BLOB\\([[:digit:]]+\\)")))
+    if (regex_match(str, sm, regex("BLOB\\(([[:digit:]]+)\\)")))
     {
         const auto& capture = sm[1].str();
-        return  MiscUtils::TryParseUint32(capture, s);
+        return MiscUtils::TryParseUint32(capture, s);
     }
     
     return false;

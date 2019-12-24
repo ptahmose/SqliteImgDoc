@@ -25,3 +25,11 @@ class IDataObjZero : public IDataObjBase
 public:
     virtual void GetHeader(const void** p, size_t* s) const = 0;
 };
+
+//-----------------------------------------------------------------------------
+
+class IDataObjUncompressedBrick : public IDataObjBase
+{
+public:
+    virtual const BinHdrUncompressedBrick& GetBinHdr() const = 0;
+};

@@ -42,18 +42,31 @@ namespace SlImgDoc
         std::uint8_t pixelType;
     };
 
-    class SQLITEIMGDOC_API IDbWrite
+    class SQLITEIMGDOC_API IDbWriteTransaction
     {
     public:
         virtual void BeginTransaction() = 0;
         virtual void CommitTransaction() = 0;
         virtual void RollbackTransaction() = 0;
+        virtual ~IDbWriteTransaction() = default;
+    };
 
+    class SQLITEIMGDOC_API IDbWrite : public IDbWriteTransaction
+    {
+    public:
         virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
         virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
-        //virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjZero* data) = 0;
 
-        virtual ~IDbWrite() {};
+        virtual ~IDbWrite() = default;
+    };
+
+    class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteTransaction
+    {
+    public:
+        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
+        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+
+        virtual ~IDbWrite3D() = default;
     };
 
     struct TilePixelInfo
@@ -96,6 +109,8 @@ namespace SlImgDoc
     {
     public:
         static std::shared_ptr<IDb> CreateNew(const CreateOptions& opts);
+        static std::shared_ptr<IDb> CreateNew3D(const CreateOptions& opts);
         static std::shared_ptr<IDb> OpenExisting(const OpenOptions& opts);
+
     };
 }

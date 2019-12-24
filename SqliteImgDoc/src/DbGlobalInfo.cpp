@@ -67,7 +67,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/const std::string& CDbDocInfo::GetTileInfoColumnName(TilesInfoColumn c) const
 {
-    switch (c)
+    /*switch (c)
     {
     case TilesInfoColumn::Pk:
         return CDbDocInfo::ColumnName_TilesInfo_Pk;
@@ -85,7 +85,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         return CDbDocInfo::ColumnName_TilesInfo_TileDataId;
     }
 
-    throw std::invalid_argument("Unknown enumeration");
+    throw std::invalid_argument("Unknown enumeration");*/
+    return CDbDocInfo::GetDefaultTileInfoColumnName(c);
 }
 
 /*virtual*/bool CDbDocInfo::GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& tableName) const
@@ -103,6 +104,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/const std::string& CDbDocInfo::GetTileDataColumnName(TilesDataColumn c) const
 {
+    /*
     switch (c)
     {
     case TilesDataColumn::Pk:
@@ -121,7 +123,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         return CDbDocInfo::ColumnName_TilesData_Data;
     }
 
-    throw std::invalid_argument("Unknown enumeration");
+    throw std::invalid_argument("Unknown enumeration");*/
+    return CDbDocInfo::GetDefaultTileDataColumnName(c);
 }
 
 /*virtual*/const std::string& CDbDocInfo::GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const
@@ -155,4 +158,50 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         ss << "The DbParameter with value \"" << static_cast<typename std::underlying_type<IDbDocInfo::DbParameter>::type>(parameter) << "\" is unknown.";
         throw SqliteImgDocInvalidArgumentException(ss.str(), oor);
     }
+}
+
+/*static*/const std::string& CDbDocInfo::GetDefaultTileInfoColumnName(TilesInfoColumn c) 
+{
+    switch (c)
+    {
+    case TilesInfoColumn::Pk:
+        return CDbDocInfo::ColumnName_TilesInfo_Pk;
+    case TilesInfoColumn::TileX:
+        return CDbDocInfo::ColumnName_TilesInfo_TileX;
+    case TilesInfoColumn::TileY:
+        return CDbDocInfo::ColumnName_TilesInfo_TileY;
+    case TilesInfoColumn::TileWidth:
+        return CDbDocInfo::ColumnName_TilesInfo_TileWidth;
+    case TilesInfoColumn::TileHeight:
+        return CDbDocInfo::ColumnName_TilesInfo_TileHeight;
+    case TilesInfoColumn::PyrLvl:
+        return CDbDocInfo::ColumnName_TilesInfo_PyrLvl;
+    case TilesInfoColumn::TileDataId:
+        return CDbDocInfo::ColumnName_TilesInfo_TileDataId;
+    }
+
+    throw std::invalid_argument("Unknown enumeration");
+}
+
+/*static*/const std::string& CDbDocInfo::GetDefaultTileDataColumnName(TilesDataColumn c)
+{
+    switch (c)
+    {
+    case TilesDataColumn::Pk:
+        return CDbDocInfo::ColumnName_TilesData_Pk;
+    case TilesDataColumn::PixelWidth:
+        return CDbDocInfo::ColumnName_TilesData_PixelWidth;
+    case TilesDataColumn::PixelHeight:
+        return CDbDocInfo::ColumnName_TilesData_PixelHeight;
+    case TilesDataColumn::PixelType:
+        return CDbDocInfo::ColumnName_TilesData_PixelType;
+    case TilesDataColumn::DataType:
+        return CDbDocInfo::ColumnName_TilesData_DataType;
+    case TilesDataColumn::DataBinHdr:
+        return CDbDocInfo::ColumnName_TilesData_DataBinHdr;
+    case TilesDataColumn::Data:
+        return CDbDocInfo::ColumnName_TilesData_Data;
+    }
+
+    throw std::invalid_argument("Unknown enumeration");
 }

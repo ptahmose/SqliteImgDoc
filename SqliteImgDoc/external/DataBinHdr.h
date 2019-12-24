@@ -8,8 +8,6 @@
 #error "Need to define struct-alignment for this compiler"
 #endif
 
-//#include <pshpack1.h>
-
 class PixelType
 {
 public:
@@ -34,10 +32,21 @@ struct BinHdrBitmapBase : BinHdrBase
 
 struct BinHdrUncompressedBitmap : BinHdrBitmapBase
 {
-    //std::uint32_t width;
-    //std::uint32_t height;
     std::uint32_t stride;
-    //std::uint8_t pixeltype;
+};
+
+struct BinHdrBrickBase : BinHdrBase
+{
+    std::uint32_t width;
+    std::uint32_t height;
+    std::uint32_t depth;
+    std::uint8_t pixeltype;
+};
+
+struct BinHdrUncompressedBrick : BinHdrBitmapBase
+{
+    std::uint32_t strideX;
+    std::uint32_t strideXY;
 };
 
 #if defined(_MSC_VER) || defined(__GNUC__)

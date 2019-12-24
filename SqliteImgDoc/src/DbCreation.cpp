@@ -121,15 +121,20 @@ static void CreateTileTable(SQLite::Database* db)
     return new CDbWrite(db, docInfo);
 }
 #endif
-/*static*/ std::shared_ptr<IDb> IDbFactory::CreateNew(const CreateOptions& opts)
+/*static*/std::shared_ptr<IDb> IDbFactory::CreateNew(const CreateOptions& opts)
 {
     auto docInfo = std::make_shared<CDbDocInfo>();
     docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
     CDbCreation dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
-
     return make_shared<CDb>(db, docInfo);
 }
+
+/*static*/std::shared_ptr<IDb> IDbFactory::CreateNew3D(const CreateOptions& opts)
+{
+    
+}
+
 
 #if false
 /*static*/IDbRead* IDbFactory::OpenExisting(const OpenOptions& opts)

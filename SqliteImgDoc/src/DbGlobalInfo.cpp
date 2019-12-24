@@ -129,7 +129,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/const std::string& CDbDocInfo::GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const
 {
-    switch (c)
+   /* switch (c)
     {
     case TilesSpatialIndexColumn::Pk:
         return CDbDocInfo::ColumnName_TilesSpatialIndex_Pk;
@@ -143,7 +143,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY;
     }
 
-    throw std::invalid_argument("Unknown enumeration");
+    throw std::invalid_argument("Unknown enumeration");*/
+    return CDbDocInfo::GetDefaultSpatialIndexColumnName(c);
 }
 
 /*virtual*/std::uint32_t CDbDocInfo::GetDbParameter(DbParameter parameter) const
@@ -201,6 +202,25 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         return CDbDocInfo::ColumnName_TilesData_DataBinHdr;
     case TilesDataColumn::Data:
         return CDbDocInfo::ColumnName_TilesData_Data;
+    }
+
+    throw std::invalid_argument("Unknown enumeration");
+}
+
+/*static*/const std::string& CDbDocInfo::GetDefaultSpatialIndexColumnName(TilesSpatialIndexColumn c)
+{
+    switch (c)
+    {
+    case TilesSpatialIndexColumn::Pk:
+        return CDbDocInfo::ColumnName_TilesSpatialIndex_Pk;
+    case TilesSpatialIndexColumn::MinX:
+        return CDbDocInfo::ColumnName_TilesSpatialIndex_MinX;
+    case TilesSpatialIndexColumn::MaxX:
+        return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxX;
+    case TilesSpatialIndexColumn::MinY:
+        return CDbDocInfo::ColumnName_TilesSpatialIndex_MinY;
+    case TilesSpatialIndexColumn::MaxY:
+        return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY;
     }
 
     throw std::invalid_argument("Unknown enumeration");

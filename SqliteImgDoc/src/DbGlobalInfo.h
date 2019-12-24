@@ -135,4 +135,5 @@ public:
 public:
     static const std::string& GetDefaultTileInfoColumnName(TilesInfoColumn c);
     static const std::string& GetDefaultTileDataColumnName(TilesDataColumn c);
+    static const std::string& GetDefaultSpatialIndexColumnName(TilesSpatialIndexColumn c);
 };

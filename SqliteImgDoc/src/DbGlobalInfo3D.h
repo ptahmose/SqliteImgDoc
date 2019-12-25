@@ -76,6 +76,12 @@ public:
 class CDbDocInfo3D :public IDbDocInfo3D
 {
 private:
+	std::vector< SlImgDoc::TileDim> dimensions;
+	std::string tableNameBricksData;
+	std::string tableNameBricksInfo;
+	std::string tableNameSpatialIndex;
+	std::map<IDbDocInfo3D::DbParameter, std::uint32_t> dbParameters;
+private:
 	static std::string ColumnName_TilesInfo_TileZ;
 	static std::string ColumnName_TilesInfo_TileHeight;
 
@@ -83,6 +89,21 @@ private:
 
 	static std::string ColumnName_TilesSpatialIndex_MinZ;
 	static std::string ColumnName_TilesSpatialIndex_MaxZ;
+public:
+	CDbDocInfo3D(std::string tableName_bricksdata, std::string tableName_bricksinfo, std::string tableName_SpatialIndex);
+	CDbDocInfo3D();
+
+	template<typename ForwardIterator>
+	void SetTileDimensions(ForwardIterator begin, ForwardIterator end)
+	{
+		this->dimensions.clear();
+		std::copy(begin, end, std::back_inserter(this->dimensions));
+	}
+
+	void SetDbParameters(std::map<IDbDocInfo3D::DbParameter, std::uint32_t>&& dbParams)
+	{
+		this->dbParameters = std::move(dbParams);
+	}
 public:
 	virtual const std::string& GetTableName(TableType tt) const;
 	virtual const std::vector<SlImgDoc::TileDim>& GetTileDimensions() const;

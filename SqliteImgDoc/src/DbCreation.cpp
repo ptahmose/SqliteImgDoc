@@ -12,6 +12,8 @@
 #include "DbRead.h"
 #include "DbDiscover.h"
 #include "CCustomQueries.h"
+#include "DbGlobalInfo3D.h"
+#include "DbCreation3D.h"
 
 
 using namespace SlImgDoc;
@@ -132,9 +134,13 @@ static void CreateTileTable(SQLite::Database* db)
 
 /*static*/std::shared_ptr<IDb> IDbFactory::CreateNew3D(const CreateOptions& opts)
 {
-    
-}
+    auto docInfo = std::make_shared<CDbDocInfo3D>();
+    docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
+    CDbCreation3D dbCreator(*docInfo, opts);
+    auto db = dbCreator.DoCreate();
 
+    return make_shared<CDb>(db, docInfo);
+}
 
 #if false
 /*static*/IDbRead* IDbFactory::OpenExisting(const OpenOptions& opts)

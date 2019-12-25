@@ -25,39 +25,6 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
         auto idSbBlk = this->AddSubBlk(data);
 
         const auto dims = this->GetDocInfo().GetTileDimensions();
-        /*stringstream ss;
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
-
-        // add table-names for "dimensions" first
-        for (const auto dim : dims)
-        {
-            string tableName;
-            this->docInfo->GetTileInfoColumnNameForDimension(dim, tableName);
-            ss << tableName << ",";
-        }
-
-        // and then the "fixed" columns
-        ss << this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
-            this->docInfo->GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
-            "VALUES (";
-
-        // we have 6 "fixes" columns
-        for (int i = 1; i <= dims.size() + 6; ++i)
-        {
-            ss << "?" << i;
-            if (i < dims.size() + 6)
-            {
-                ss << ",";
-            }
-        }
-
-        ss << ");";
-
-        SQLite::Statement query(this->GetDb(), ss.str());*/
 
         this->EnsureAddTilesInfoRowStatement();
         this->addTilesInfoRowStatement->reset();
@@ -176,18 +143,6 @@ std::int64_t CDbWrite::AddSubBlk(const IDataObjUncompressedBitmap* data)
         this->EnsureAddTilesDataRowStatement();
         this->addTilesDataRowStatement->reset();
 
-        //stringstream ss;
-        ////ss << "INSERT INTO " << CDbBase::TableName_TileData << " (PIXELWIDTH,PIXELHEIGHT,PIXELTYPE,DATATYPE,DATA_BINHDR,DATA) VALUES (?1,?2,?3,?4,?5,?6);";
-        //ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesData) << " ("
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
-        //    << this->docInfo->GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
-        //    " VALUES (?1,?2,?3,?4,?5,?6);";
-        //SQLite::Statement query(this->GetDb(), ss.str());
-        // 
         const auto hdr = data->GetBinHdr();
 
         std::uint8_t binhdr[32];
@@ -219,11 +174,6 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
     {
         this->EnsureAddTilesDataRowStatement();
         this->addTilesDataRowStatement->reset();
-     /*   const auto hdr = data->GetBinHdr();
-
-        std::uint8_t binhdr[32];
-        for (int i = 0; i < sizeof(binhdr); ++i) { binhdr[i] = (uint8_t)i; }*/
-
         this->addTilesDataRowStatement->bind(1, width);
         this->addTilesDataRowStatement->bind(2, height);
         this->addTilesDataRowStatement->bind(3, pixeltype);
@@ -250,16 +200,6 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPo
     {
         this->EnsureAddTilesSpatialIndexRowStatement();
         this->addTilesSpatialIndexRowStatement->reset();
-        /*stringstream ss;
-        ss << "INSERT INTO " << this->docInfo->GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
-            this->docInfo->GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
-            " VALUES(?1,?2,?3,?4,?5);";
-
-        SQLite::Statement query(this->GetDb(), ss.str());*/
         this->addTilesSpatialIndexRowStatement->bind(1, id);
         this->addTilesSpatialIndexRowStatement->bind(2, info->posX);
         this->addTilesSpatialIndexRowStatement->bind(3, info->posX + info->width);

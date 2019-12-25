@@ -14,10 +14,14 @@ add_library (SqliteImgDoc STATIC
 						src/DbBase.h 
 						src/DbCreation.cpp 
 						src/DbCreation.h 
+						src/DbCreation3D.cpp 
+						src/DbCreation3D.h 
 						src/DbDiscover.cpp 
 						src/DbDiscover.h 
 						src/DbGlobalInfo.h 
 						src/DbGlobalInfo.cpp 
+						src/DbGlobalInfo3D.h 
+						src/DbGlobalInfo3D.cpp 
 						src/DbRead.cpp 
 						src/DbRead.h 
 						src/DbWrite.cpp 
@@ -26,6 +30,7 @@ add_library (SqliteImgDoc STATIC
 						src/framework.h 
 						src/pch.cpp 
 						src/pch.h 
+						src/IInternalDb.h 
 						src/miscutilities.h
 						src/miscutilities.cpp
 						external/DataBinHdr.h 

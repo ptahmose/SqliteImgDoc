@@ -10,7 +10,7 @@ static shared_ptr<IDb> CreateBrickTestDatabase(int rows, int columns, int stacks
 
     CreateOptions opts;
     opts.dbFilename = ":memory:";
-    opts.dbFilename = "E:\\unittest3d.db";
+    //opts.dbFilename = "E:\\unittest3d.db";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');
     opts.dimensions.emplace('T');

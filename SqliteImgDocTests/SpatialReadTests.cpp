@@ -16,7 +16,7 @@ static shared_ptr<IDb> CreateMosaicTestDatabase(int rows, int columns, int sizeX
     opts.dimensions.emplace('T');
     opts.dimensions.emplace('M');
 
-    auto db = IDbFactory::CreateNew3D(opts);
+    auto db = IDbFactory::CreateNew(opts);
 
     auto dbWrite = db->GetWriter();
 

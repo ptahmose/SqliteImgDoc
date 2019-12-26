@@ -69,11 +69,11 @@ namespace SlImgDoc
         std::uint8_t pixelType;
     };
 
-    class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteTransaction
+    class SQLITEIMGDOC_API IDbWrite3D : public virtual IDbWriteTransaction
     {
     public:
         virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
-        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
+        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
 
         virtual ~IDbWrite3D() = default;
     };
@@ -110,6 +110,8 @@ namespace SlImgDoc
     public:
         virtual std::shared_ptr<IDbWrite> GetWriter() = 0;
         virtual std::shared_ptr<IDbRead> GetReader() = 0;
+
+        virtual std::shared_ptr<IDbWrite3D> GetWriter3D() = 0;
 
         virtual ~IDb() {}
     };

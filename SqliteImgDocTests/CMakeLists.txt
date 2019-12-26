@@ -8,6 +8,7 @@ add_executable( SqliteImgDocTests
                     TileCoordinateTests.cpp 
                     ReadTests.cpp 
                     SpatialReadTests.cpp
+                    SpatialBrickReadTests.cpp
                     utilitiesTests.cpp
                     DbDiscoverTests.cpp)
 

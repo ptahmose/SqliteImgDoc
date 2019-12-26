@@ -62,7 +62,7 @@ using namespace std;
         data->GetHeader(&ptrHdrData, &sizeHdrData);
         auto idSbBlk = this->AddBrickData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelDepth ,tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
 
-        const auto dims = this->GetDocInfo().GetTileDimensions();
+        const auto dims = this->GetDocInfo3D().GetTileDimensions();
 
         this->EnsureAddTilesInfoRowStatement();
         this->addTilesInfoRowStatement->reset();
@@ -208,15 +208,15 @@ void CDbWrite3D::EnsureAddTilesInfoRowStatement()
     }
     else
     {
-        const auto dims = this->GetDocInfo().GetTileDimensions();
+        const auto dims = this->GetDocInfo3D().GetTileDimensions();
         stringstream ss;
-        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << "(";
+        ss << "INSERT INTO " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesInfo) << "(";
 
         // add table-names for "dimensions" first
         for (const auto dim : dims)
         {
             string tableName;
-            this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, tableName);
+            this->GetDocInfo3D().GetTileInfoColumnNameForDimension(dim, tableName);
             ss << tableName << ",";
         }
 

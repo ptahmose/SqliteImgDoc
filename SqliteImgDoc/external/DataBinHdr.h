@@ -45,6 +45,7 @@ struct BinHdrBrickBase : BinHdrBase
 
 struct BinHdrUncompressedBrick : BinHdrBitmapBase
 {
+    std::uint32_t depth;
     std::uint32_t strideX;
     std::uint32_t strideXY;
 };

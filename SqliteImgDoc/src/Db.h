@@ -29,6 +29,7 @@ public:
 public:
     virtual SQLite::Database& GetDb() { return *this->db.get(); }
     const IDbDocInfo& GetDocInfo() { return *this->docInfo.get(); }
+    const IDbDocInfo3D& GetDocInfo3D() { return *this->docInfo3D.get(); }
 private:
     bool Is2D() { return !!this->docInfo; }
     bool Is3D() { return !!this->docInfo3D; }

@@ -22,6 +22,7 @@ public:
 protected:
     SQLite::Database& GetDb() { return /* *this->db.get();*/this->db->GetDb(); }
     const IDbDocInfo& GetDocInfo() { return this->db->GetDocInfo(); }
+    const IDbDocInfo3D& GetDocInfo3D() { return this->db->GetDocInfo3D(); }
 
 public:
     /// The name of the table with the "technical document info"

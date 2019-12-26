@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "DbWrite.h"
+#include "DbWrite3D.h"
 #include <SQLiteCpp/Database.h>
 #include <SQLiteCpp/Transaction.h>
 
@@ -9,20 +9,16 @@
 
 using namespace std;
 
-/*virtual*/CDbWrite::~CDbWrite()
+/*virtual*/CDbWrite3D::~CDbWrite3D()
 {
-    //if (this->transactionPending == true)
-    //{
-    //    this->RollbackTransaction();
-    //}
 }
 
-void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
+/*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try
     {
-        auto idSbBlk = this->AddTileUncompressed(data);
+        auto idSbBlk = this->AddBrickUncompressed(data);
 
         const auto dims = this->GetDocInfo().GetTileDimensions();
 
@@ -39,8 +35,10 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
         int i = dims.size() + 1;
         this->addTilesInfoRowStatement->bind(i++, info->posX);
         this->addTilesInfoRowStatement->bind(i++, info->posY);
+        this->addTilesInfoRowStatement->bind(i++, info->posZ);
         this->addTilesInfoRowStatement->bind(i++, info->width);
         this->addTilesInfoRowStatement->bind(i++, info->height);
+        this->addTilesInfoRowStatement->bind(i++, info->depth);
         this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
         this->addTilesInfoRowStatement->bind(i++, idSbBlk);
 
@@ -55,14 +53,14 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
     }
 }
 
-/*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
+/*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
 {
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
     try
     {
         const void* ptrHdrData; size_t sizeHdrData;
         data->GetHeader(&ptrHdrData, &sizeHdrData);
-        auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
+        auto idSbBlk = this->AddBrickData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelDepth ,tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
 
         const auto dims = this->GetDocInfo().GetTileDimensions();
 
@@ -79,8 +77,10 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
         int i = dims.size() + 1;
         this->addTilesInfoRowStatement->bind(i++, info->posX);
         this->addTilesInfoRowStatement->bind(i++, info->posY);
+        this->addTilesInfoRowStatement->bind(i++, info->posZ);
         this->addTilesInfoRowStatement->bind(i++, info->width);
         this->addTilesInfoRowStatement->bind(i++, info->height);
+        this->addTilesInfoRowStatement->bind(i++, info->depth);
         this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
         this->addTilesInfoRowStatement->bind(i++, idSbBlk);
 
@@ -95,48 +95,7 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
     }
 }
 
-///*virtual*/void CDbWrite::BeginTransaction()
-//{
-//    if (this->transactionPending != false)
-//    {
-//        throw runtime_error("A transaction was already pending.");
-//    }
-//
-//    this->GetDb().exec("BEGIN");
-//    this->transactionPending = true;
-//}
-//
-///*virtual*/void CDbWrite::CommitTransaction()
-//{
-//    if (this->transactionPending != true)
-//    {
-//        throw runtime_error("There is no pending transaction.");
-//    }
-//
-//    this->GetDb().exec("COMMIT");
-//    this->transactionPending = false;
-//}
-//
-///*virtual*/void CDbWrite::RollbackTransaction()
-//{
-//    if (this->transactionPending != true)
-//    {
-//        throw runtime_error("There is no pending transaction.");
-//    }
-//
-//    try
-//    {
-//        this->GetDb().exec("ROLLBACK");
-//    }
-//    catch (SQLite::Exception&)
-//    {
-//        // TODO: deal with error, see https://www.sqlite.org/lang_transaction.html for the rules...
-//    }
-//
-//    this->transactionPending = false;
-//}
-
-std::int64_t CDbWrite::AddTileUncompressed(const IDataObjUncompressedBitmap* data)
+std::int64_t CDbWrite3D::AddBrickUncompressed(const IDataObjUncompressedBrick* data)
 {
     try
     {
@@ -150,12 +109,13 @@ std::int64_t CDbWrite::AddTileUncompressed(const IDataObjUncompressedBitmap* dat
 
         this->addTilesDataRowStatement->bind(1, hdr.width);
         this->addTilesDataRowStatement->bind(2, hdr.height);
-        this->addTilesDataRowStatement->bind(3, hdr.pixeltype);
-        this->addTilesDataRowStatement->bind(4, SlImgDoc::DataTypes::UNCOMPRESSED_BITMAP);
-        this->addTilesDataRowStatement->bind(5, binhdr, sizeof(binhdr));
+        this->addTilesDataRowStatement->bind(3, hdr.depth);
+        this->addTilesDataRowStatement->bind(4, hdr.pixeltype);
+        this->addTilesDataRowStatement->bind(5, SlImgDoc::DataTypes::UNCOMPRESSED_BRICK);
+        this->addTilesDataRowStatement->bind(6, binhdr, sizeof(binhdr));
         const void* p; size_t s;
         data->GetData(&p, &s);
-        this->addTilesDataRowStatement->bindNoCopy(6, p, (int)s);
+        this->addTilesDataRowStatement->bindNoCopy(7, p, (int)s);
 
         this->addTilesDataRowStatement->exec();
 
@@ -168,7 +128,7 @@ std::int64_t CDbWrite::AddTileUncompressed(const IDataObjUncompressedBitmap* dat
     }
 }
 
-std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
+std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height, std::uint32_t depth, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
     try
     {
@@ -176,12 +136,13 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
         this->addTilesDataRowStatement->reset();
         this->addTilesDataRowStatement->bind(1, width);
         this->addTilesDataRowStatement->bind(2, height);
-        this->addTilesDataRowStatement->bind(3, pixeltype);
-        this->addTilesDataRowStatement->bind(4, datatype);
-        this->addTilesDataRowStatement->bind(5, binHdr, sizeBinHdr);
+        this->addTilesDataRowStatement->bind(3, depth);
+        this->addTilesDataRowStatement->bind(4, pixeltype);
+        this->addTilesDataRowStatement->bind(5, datatype);
+        this->addTilesDataRowStatement->bind(6, binHdr, sizeBinHdr);
         const void* p; size_t s;
         data->GetData(&p, &s);
-        this->addTilesDataRowStatement->bindNoCopy(6, p, (int)s);
+        this->addTilesDataRowStatement->bindNoCopy(7, p, (int)s);
 
         this->addTilesDataRowStatement->exec();
 
@@ -194,7 +155,7 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
     }
 }
 
-void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPositionInfo* info)
+void CDbWrite3D::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPositionInfo3D* info)
 {
     try
     {
@@ -205,6 +166,8 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPo
         this->addTilesSpatialIndexRowStatement->bind(3, info->posX + info->width);
         this->addTilesSpatialIndexRowStatement->bind(4, info->posY);
         this->addTilesSpatialIndexRowStatement->bind(5, info->posY + info->height);
+        this->addTilesSpatialIndexRowStatement->bind(6, info->posZ);
+        this->addTilesSpatialIndexRowStatement->bind(7, info->posZ + info->depth);
         this->addTilesSpatialIndexRowStatement->exec();
     }
     catch (SQLite::Exception & excp)
@@ -213,7 +176,7 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPo
     }
 }
 
-void CDbWrite::EnsureAddTilesDataRowStatement()
+void CDbWrite3D::EnsureAddTilesDataRowStatement()
 {
     if (this->addTilesDataRowStatement)
     {
@@ -222,21 +185,22 @@ void CDbWrite::EnsureAddTilesDataRowStatement()
     else
     {
         stringstream ss;
-        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesData) << " ("
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelWidth) << ","
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << ","
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << ","
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << ","
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << ","
-            << this->GetDocInfo().GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << ") "
-            " VALUES (?1,?2,?3,?4,?5,?6);";
+        ss << "INSERT INTO " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesData) << " ("
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::PixelWidth) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::PixelHeight) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::PixelDepth) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::PixelType) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::DataType) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::DataBinHdr) << ","
+            << this->GetDocInfo3D().GetTileDataColumnName(IDbDocInfo3D::TilesDataColumn::Data) << ") "
+            " VALUES (?1,?2,?3,?4,?5,?6,?7);";
 
         //this->addTilesDataRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
         this->addTilesDataRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
 }
 
-void CDbWrite::EnsureAddTilesInfoRowStatement()
+void CDbWrite3D::EnsureAddTilesInfoRowStatement()
 {
     if (this->addTilesInfoRowStatement)
     {
@@ -257,19 +221,21 @@ void CDbWrite::EnsureAddTilesInfoRowStatement()
         }
 
         // and then the "fixed" columns
-        ss << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
-            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
-            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
-            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
-            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << "," <<
-            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileDataId) << ")"
+        ss << this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileX) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileY) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileZ) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileWidth) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileHeight) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileDepth) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::PyrLvl) << "," <<
+            this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::TileDataId) << ")"
             "VALUES (";
 
-        // we have 6 "fixes" columns
-        for (int i = 1; i <= dims.size() + 6; ++i)
+        // we have 8 "fixes" columns
+        for (int i = 1; i <= dims.size() + 8; ++i)
         {
             ss << "?" << i;
-            if (i < dims.size() + 6)
+            if (i < dims.size() + 8)
             {
                 ss << ",";
             }
@@ -282,7 +248,7 @@ void CDbWrite::EnsureAddTilesInfoRowStatement()
     }
 }
 
-void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
+void CDbWrite3D::EnsureAddTilesSpatialIndexRowStatement()
 {
     if (this->addTilesSpatialIndexRowStatement)
     {
@@ -291,13 +257,15 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
     else
     {
         stringstream ss;
-        ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
-            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
-            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
-            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
-            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
-            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ")"
-            " VALUES(?1,?2,?3,?4,?5);";
+        ss << "INSERT INTO " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesSpatialIndex) << "(" <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::Pk) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MinX) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MaxX) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MinY) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MaxY) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MinZ) << "," <<
+            this->GetDocInfo3D().GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MaxZ) << ")"
+            " VALUES(?1,?2,?3,?4,?5,?6,?7);";
 
         //this->addTilesSpatialIndexRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
         this->addTilesSpatialIndexRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));

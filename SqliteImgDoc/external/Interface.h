@@ -51,7 +51,8 @@ namespace SlImgDoc
         virtual ~IDbWriteTransaction() = default;
     };
 
-    class SQLITEIMGDOC_API IDbWrite : public IDbWriteTransaction
+    /// A sqliteimgdoc api. see https://stackoverflow.com/questions/11205230/virtual-inheritance-and-interfaces
+    class SQLITEIMGDOC_API IDbWrite : public virtual IDbWriteTransaction
     {
     public:
         virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
@@ -60,11 +61,19 @@ namespace SlImgDoc
         virtual ~IDbWrite() = default;
     };
 
+    struct TileBaseInfo3D
+    {
+        int pixelWidth;
+        int pixelHeight;
+        int pixelDepth;
+        std::uint8_t pixelType;
+    };
+
     class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteTransaction
     {
     public:
-        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
-        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
+        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
 
         virtual ~IDbWrite3D() = default;
     };

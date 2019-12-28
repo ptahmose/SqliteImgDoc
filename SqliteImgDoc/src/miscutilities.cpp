@@ -46,7 +46,7 @@ using namespace std;
     }
 
     cout << "v=" << v << " errno=" << errno << " numeric_limits<uint32_t>::max()=" << numeric_limits<uint32_t>::max() << " ERANGE = " << ERANGE << endl;
-    if (v == numeric_limits<uint32_t>::max()/*ULONG_MAX*/)
+    if (v == 0 || v == numeric_limits<uint32_t>::max()/*ULONG_MAX*/)
     {
         if (errno == ERANGE)
         {

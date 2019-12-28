@@ -105,6 +105,34 @@ namespace SlImgDoc
         virtual ~IDbRead() {};
     };
 
+    struct TilePixelInfo3D
+    {
+        int pixelWidth;
+        int pixelHeight;
+        int pixelDepth;
+        std::uint8_t pixelType;
+        int dataType;
+        std::uint8_t dataBinHdr[32];
+    };
+
+    class SQLITEIMGDOC_API IDbRead3D
+    {
+    public:
+        virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info) = 0;
+        virtual void ReadTileData(dbIndex ix, TilePixelInfo3D* pixelInfo, IBlob* data) = 0;
+
+        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+
+        virtual void GetTilesIntersectingCuboid(const CuboidD& rect, std::function<bool(dbIndex)> func) = 0;
+        //virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
+
+        std::vector<dbIndex> GetTilesIntersectingCuboid(const CuboidD& cuboid);
+        //std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
+        std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
+
+        virtual ~IDbRead3D() = default;
+    };
+
     class SQLITEIMGDOC_API IDb
     {
     public:

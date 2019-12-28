@@ -3,7 +3,9 @@
 #include <cstdlib>
 #include <cerrno>
 #include <cstdint>
-#include <climits>
+#include <limits>
+
+using namespace std;
 
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
 {
@@ -15,7 +17,7 @@
         return false;
     }
 
-    if (v == ULLONG_MAX)
+    if (v == numeric_limits<uint64_t>::max()/*ULLONG_MAX*/)
     {
         if (errno == ERANGE)
         {
@@ -41,7 +43,7 @@
         return false;
     }
 
-    if (v == ULONG_MAX)
+    if (v == numeric_limits<uint32_t>::max()/*ULONG_MAX*/)
     {
         if (errno == ERANGE)
         {

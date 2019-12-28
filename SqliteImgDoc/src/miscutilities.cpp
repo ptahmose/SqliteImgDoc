@@ -2,10 +2,7 @@
 #include "miscutilities.h"
 #include <cstdlib>
 #include <cerrno>
-//#include <cstdint>
 #include <limits>
-
-#include <iostream>
 
 using namespace std;
 
@@ -19,7 +16,7 @@ using namespace std;
         return false;
     }
 
-    if (v == numeric_limits<uint64_t>::max()/*ULLONG_MAX*/)
+    if (v == numeric_limits<uint64_t>::max())
     {
         if (errno == ERANGE)
         {

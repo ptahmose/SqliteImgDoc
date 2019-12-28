@@ -14,7 +14,7 @@ using namespace std;
     char* end;
     errno = 0;
     std::uint64_t v = std::strtoull(sz, &end, 10);
-    if (*end != '\0')
+    if (sz[0] == '\0' || *end != '\0')
     {
         return false;
     }
@@ -40,7 +40,7 @@ using namespace std;
     char* end;
     errno = 0;
     std::uint32_t v = std::strtoul(sz, &end, 10);
-    if (*end != '\0')
+    if (sz[0] == '\0' || *end != '\0')
     {
         return false;
     }

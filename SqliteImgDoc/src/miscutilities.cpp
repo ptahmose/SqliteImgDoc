@@ -5,6 +5,8 @@
 #include <cstdint>
 #include <limits>
 
+#include <iostream>
+
 using namespace std;
 
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
@@ -17,6 +19,7 @@ using namespace std;
         return false;
     }
 
+    cout << "v=" << v << " errno=" << errno << endl;
     if (v == numeric_limits<uint64_t>::max()/*ULLONG_MAX*/)
     {
         if (errno == ERANGE)

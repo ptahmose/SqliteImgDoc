@@ -142,3 +142,36 @@ TEST(SpatialBrickReadTests, QueryCuboid2)
     bool correct = CheckIfSetsAreEqual(logPositions, expected);
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
+
+TEST(SpatialBrickReadTests, QueryPlane1)
+{
+    auto db = CreateBrickTestDatabase(10, 10, 10, 256, 256, 256);
+
+    auto reader = db->GetReader3D();
+    //Plane_NormalAndDistD plane{ Vector3dD{1,1,-1},5 * 256 };
+    Plane_NormalAndDistD plane{ Vector3dD{0,0,1},128 };
+    auto r = reader->GetTilesIntersectingWithPlane(plane);
+    ASSERT_TRUE(r.size() == 100) << "Expected exactly 100 results.";
+
+    std::vector<LogicalPositionInfo3D> logPositions;
+    for (size_t i = 0; i < r.size(); ++i)
+    {
+        LogicalPositionInfo3D logPos;
+        reader->ReadTileInfo(r[i], nullptr, &logPos);
+
+        logPositions.push_back(logPos);
+    }
+
+    std::vector<LogicalPositionInfo3D> expected;
+    expected.reserve(100);
+    for (int x = 0; x < 10; ++x)
+    {
+        for (int y = 0; y < 10; ++y)
+        {
+            expected.push_back(LogicalPositionInfo3D{ x * 256.0,y * 256.0,0,256,256,256,0 });
+        }
+    }
+
+    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    EXPECT_TRUE(correct) << "did not get the expected tiles";
+}

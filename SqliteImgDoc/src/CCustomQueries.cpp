@@ -29,6 +29,13 @@ using namespace SlImgDoc;
         CCustomQueries::LineThrough2Points2d_Query,
         nullptr,
         nullptr);
+
+    rc = sqlite3_rtree_query_callback(
+        db,
+        CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_PlaneAabb3D).c_str(),
+        CCustomQueries::Plane3d_Query,
+        nullptr,
+        nullptr);
 }
 
 /*static*/int CCustomQueries::LineThrough2Points2d_Query(sqlite3_rtree_query_info* info)
@@ -144,7 +151,7 @@ using namespace SlImgDoc;
     const bool doIntersect = CCustomQueries::DoAabbAndPlaneIntersect(aabb, *pPlane);
     if (doIntersect)
     {
-        info->eWithin = FULLY_WITHIN;
+        info->eWithin = PARTLY_WITHIN;
     }
     else
     {

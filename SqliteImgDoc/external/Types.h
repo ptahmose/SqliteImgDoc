@@ -238,7 +238,8 @@ namespace SlImgDoc
 
     struct Plane_NormalAndDistD : Plane_NormalAndDist<double>
     {
-        Plane_NormalAndDistD() {}
+        Plane_NormalAndDistD() = default;
         Plane_NormalAndDistD(const Vector3dD& n, double d) :Plane_NormalAndDist<double>(n, d) {}
+        Plane_NormalAndDistD(const Vector3dT<double>& n, double d) :Plane_NormalAndDist<double>(n, d) {}
     };
 }

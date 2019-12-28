@@ -16,12 +16,12 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingCuboid(const CuboidD& cuboid
     return result;
 }
 
-//std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithLine(const LineThruTwoPointsD& line)
-//{
-//    std::vector<dbIndex> result;
-//    this->GetTilesIntersectingWithLine(line, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
-//    return result;
-//}
+std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane)
+{
+    std::vector<dbIndex> result;
+    this->GetTilesIntersectingWithPlane(plane, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    return result;
+}
 
 std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
 {
@@ -289,5 +289,34 @@ std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
         {
             break;
         }
+    }
+}
+
+/*virtual*/void CDbRead3D::GetTilesIntersectingWithPlane(const SlImgDoc::Plane_NormalAndDistD& plane, std::function<bool(SlImgDoc::dbIndex)> func)
+{
+    stringstream ss;
+    //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH PlaneNormalDistance3d(?1,?2,?3,?4)";
+    ss << "SELECT id FROM " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesSpatialIndex) << " WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_PlaneAabb3D) << "(?1,?2,?3,?4)";
+    SQLite::Statement query(this->GetDb(), ss.str());
+    query.bind(1, plane.normal.x);
+    query.bind(2, plane.normal.y);
+    query.bind(3, plane.normal.z);
+    query.bind(4, plane.distance);
+
+    try
+    {
+        while (query.executeStep())
+        {
+            dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
     }
 }

@@ -36,10 +36,7 @@ TEST_F(CustomQueriesTest, aabbAndPlaneIntersection3)
 TEST_F(CustomQueriesTest, aabbAndPlaneIntersection4)
 {
     CuboidD aabb(10, 10, 10, 10, 10, 10);
-    auto n = Vector3dD(1, 1, 1).Normalize();
-    Plane_NormalAndDistD plane;
-    plane.normal = Vector3dD(1, 1, -1).Normalize();
-    plane.distance = 0;
+    Plane_NormalAndDistD plane{ Vector3dD(1, 1, -1).Normalize(), 0 };
     bool b = CustomQueriesTest::DoAabbAndPlaneIntersect(aabb, plane);
     EXPECT_TRUE(b) << "Aabb and plane should be reported intersecting.";
 }

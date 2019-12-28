@@ -14,4 +14,5 @@ public:
     virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(SlImgDoc::dbIndex)> func);
 
     virtual void GetTilesIntersectingCuboid(const SlImgDoc::CuboidD& rect, std::function<bool(SlImgDoc::dbIndex)> func);
+    virtual void GetTilesIntersectingWithPlane(const SlImgDoc::Plane_NormalAndDistD& plane, std::function<bool(SlImgDoc::dbIndex)> func);
 };

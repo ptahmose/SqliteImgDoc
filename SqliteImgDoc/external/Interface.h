@@ -124,10 +124,10 @@ namespace SlImgDoc
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
 
         virtual void GetTilesIntersectingCuboid(const CuboidD& rect, std::function<bool(dbIndex)> func) = 0;
-        //virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
+        virtual void GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane, std::function<bool(dbIndex)> func) = 0;
 
         std::vector<dbIndex> GetTilesIntersectingCuboid(const CuboidD& cuboid);
-        //std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
+        std::vector<dbIndex> GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane);
         std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead3D() = default;

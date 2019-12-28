@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ImportExport.h"
+#include <cstdlib>
 
 namespace SlImgDoc
 {

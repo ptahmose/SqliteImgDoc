@@ -140,6 +140,7 @@ namespace SlImgDoc
         virtual std::shared_ptr<IDbRead> GetReader() = 0;
 
         virtual std::shared_ptr<IDbWrite3D> GetWriter3D() = 0;
+        virtual std::shared_ptr<IDbRead3D> GetReader3D() = 0;
 
         virtual ~IDb() {}
     };

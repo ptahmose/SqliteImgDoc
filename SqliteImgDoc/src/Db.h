@@ -21,6 +21,7 @@ private:
     std::weak_ptr<SlImgDoc::IDbRead> reader;
 
     std::weak_ptr<SlImgDoc::IDbWrite3D> writer3D;
+    std::weak_ptr<SlImgDoc::IDbRead3D> reader3D;
 public:
     CDb(SQLite::Database* db, std::shared_ptr<IDbDocInfo> docInfo) : db(db), docInfo(std::move(docInfo)) {}
     CDb(SQLite::Database* db, std::shared_ptr<IDbDocInfo3D> docInfo3D) : db(db), docInfo3D(std::move(docInfo3D)) {}
@@ -29,6 +30,7 @@ public:
     virtual std::shared_ptr<SlImgDoc::IDbWrite> GetWriter();
     virtual std::shared_ptr<SlImgDoc::IDbRead> GetReader();
     virtual std::shared_ptr<SlImgDoc::IDbWrite3D> GetWriter3D();
+    virtual std::shared_ptr<SlImgDoc::IDbRead3D> GetReader3D();
 public:
     virtual SQLite::Database& GetDb() { return *this->db.get(); }
     const IDbDocInfo& GetDocInfo() { return *this->docInfo.get(); }

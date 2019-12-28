@@ -30,7 +30,6 @@ std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
     return result;
 }
 
-
 /*virtual*/void CDbRead3D::ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info)
 {
     stringstream ss;

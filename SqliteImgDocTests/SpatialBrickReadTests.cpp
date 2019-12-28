@@ -62,4 +62,21 @@ static shared_ptr<IDb> CreateBrickTestDatabase(int rows, int columns, int stacks
 TEST(SpatialBrickReadTests, QueryCuboid1)
 {
     auto db = CreateBrickTestDatabase(10, 10, 10, 256, 256, 256);
+
+    auto reader = db->GetReader3D();
+    CuboidD cuboid;
+    cuboid.x = 100; cuboid.y = 100; cuboid.w = 20; cuboid.h = 1100; cuboid.z = 0; cuboid.d = 10;
+    auto r = reader->GetTilesIntersectingCuboid(cuboid);
+    ASSERT_TRUE(r.size() == 5) << "Expected exactly five results.";
+}
+
+TEST(SpatialBrickReadTests, QueryCuboid2)
+{
+    auto db = CreateBrickTestDatabase(10, 10, 10, 256, 256, 256);
+
+    auto reader = db->GetReader3D();
+    CuboidD cuboid;
+    cuboid.x = 100; cuboid.y = 100; cuboid.w = 20; cuboid.h = 1100; cuboid.z = 0; cuboid.d = 500;
+    auto r = reader->GetTilesIntersectingCuboid(cuboid);
+    ASSERT_TRUE(r.size() == 5*2) << "Expected exactly five results.";
 }

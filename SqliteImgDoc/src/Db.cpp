@@ -3,6 +3,7 @@
 #include "DbRead.h"
 #include "DbWrite.h"
 #include "DbWrite3D.h"
+#include "DbRead3D.h"
 
 using namespace std;
 
@@ -62,4 +63,22 @@ using namespace std;
     w = std::make_shared<CDbWrite3D>(this->shared_from_this());
     this->writer3D = w;
     return w;
+}
+
+/*virtual*/std::shared_ptr<SlImgDoc::IDbRead3D> CDb::GetReader3D()
+{
+    if (!this->Is3D())
+    {
+        return shared_ptr<SlImgDoc::IDbRead3D>();
+    }
+
+    auto r = this->reader3D.lock();
+    if (r)
+    {
+        return r;
+    }
+
+    r = std::make_shared<CDbRead3D>(this->shared_from_this());
+    this->reader3D = r;
+    return r;
 }

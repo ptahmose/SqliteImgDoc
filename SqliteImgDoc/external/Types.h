@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdexcept>
+#include <ctgmath>
 
 namespace SlImgDoc
 {
@@ -130,7 +131,7 @@ namespace SlImgDoc
         t h;
         t d;
 
-        bool IsPointInside(const Point3dD& p)
+        bool IsPointInside(const Point3dD& p) const
         {
             if (this->x <= p.x && (this->x + this->w) >= p.x && this->y <= p.y && (this->y + this->h) >= p.y && this->z <= p.z && (this->z + this->d) >= p.z)
             {
@@ -138,6 +139,11 @@ namespace SlImgDoc
             }
 
             return false;
+        }
+
+        Point3dT<t> CenterPoint() const
+        {
+            return Point3dT<t>(this->x + this->w / 2, this->y + this->h / 2, this->z + this->d / 2);
         }
     };
 
@@ -151,5 +157,88 @@ namespace SlImgDoc
     {
         CuboidD() :CuboidT<double>() {}
         CuboidD(double x, double y, double z, double w, double h, double d) :CuboidT<double>(x, y, z, w, h, d) {}
+    };
+
+    template <typename t>
+    struct Vector3dT
+    {
+        Vector3dT() :x(0), y(0), z(0) {}
+        Vector3dT(t x, t y, t z) :x(x), y(y), z(z) {}
+        Vector3dT(const Point3dT<t> p) : Vector3dT(p.x, p.y, p.z) {}
+        t x;
+        t y;
+        t z;
+
+        Vector3dT<t> Normalize() const
+        {
+            t absVal = this->AbsoluteValue();
+            return Vector3dT(this->x / absVal, this->y / absVal, this->z / absVal);
+        }
+
+        t AbsoluteValueSquared() const
+        {
+            return this->x * this->x + this->y * this->y + this->z * this->z;
+        }
+
+        t AbsoluteValue() const
+        {
+            return std::sqrt(this->AbsoluteValueSquared());
+        }
+
+        static Vector3dT<t> Cross(const Vector3dT<t>& vectorA, const Vector3dT<t>& vectorB)
+        {
+            return Vector3dT
+            {
+              vectorA.y * vectorB.z - vectorA.z * vectorB.y,
+              vectorA.z * vectorB.x - vectorA.x * vectorB.z,
+              vectorA.x * vectorB.y - vectorA.y * vectorB.x
+            };
+        }
+
+        static t Dot(const Vector3dT<t>& vectorA, const Vector3dT<t>& vectorB)
+        {
+            return vectorA.x * vectorB.x + vectorA.y * vectorB.y + vectorA.z * vectorB.z;
+        }
+    };
+
+    struct Vector3dF : Vector3dT<float>
+    {
+        Vector3dF() :Vector3dT<float>() {}
+        Vector3dF(float x, float y, float z) :Vector3dT<float>(x, y, z) {}
+    };
+
+    struct Vector3dD : Vector3dT<double>
+    {
+        Vector3dD() :Vector3dT<double>() {}
+        Vector3dD(double x, double y, double z) :Vector3dT<double>(x, y, z) {}
+    };
+
+    /// Parametrization of a plane, parametrized as a normal-vector and the distance to the origin.
+    /// The normal must be normalized.
+    /// The equation of the plane is: dot( x, normal) = distance.
+    template<typename T>
+    struct Plane_NormalAndDist
+    {
+        Vector3dT<T> normal;
+        T distance;
+
+        Plane_NormalAndDist() :distance(0) {}
+        Plane_NormalAndDist(const Vector3dT<T>& n, T d) :normal(n), distance(d) {}
+
+        static Plane_NormalAndDist<T> FromThreePoints(Point3dT<T> a, Point3dT<T> b, Point3dT<T> c)
+        {
+            auto n = Vector3dT<T>::Cross(Vector3dT<T>(b.x - a.x, b.y - a.y, b.z - a.z), Vector3dT<T>(c.x - a.x, c.y - a.y, c.z - a.z)).Normalize();
+            auto dist = Vector3dT<T>::Dot(n, Vector3dT<T>(a));
+            return Plane_NormalAndDist<T>(n, dist);
+        }
+    };
+
+    struct Plane_NormalAndDistF : Plane_NormalAndDist<float>
+    {};
+
+    struct Plane_NormalAndDistD : Plane_NormalAndDist<double>
+    {
+        Plane_NormalAndDistD() {}
+        Plane_NormalAndDistD(const Vector3dD& n, double d) :Plane_NormalAndDist<double>(n, d) {}
     };
 }

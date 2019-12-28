@@ -2,7 +2,7 @@
 #include "miscutilities.h"
 #include <cstdlib>
 #include <cerrno>
-#include <cstdint>
+//#include <cstdint>
 #include <limits>
 
 #include <iostream>
@@ -37,27 +37,23 @@ using namespace std;
 
 /*static*/bool MiscUtils::TryParseUint32(const char* sz, std::uint32_t* val)
 {
-    char* end;
-    errno = 0;
-    std::uint32_t v = std::strtoul(sz, &end, 10);
-    if (sz[0] == '\0' || *end != '\0')
+    // note: no idea what wrong, but on Linux std::strtoul behaves strange because if does not detect overflows, e.g. 
+    // for "4294967296" I get 0 and errno is NOT set to ERANGE
+    uint64_t val64;
+    if (!MiscUtils::TryParseUint64(sz, &val64))
     {
         return false;
     }
 
-    cout << "v=" << v << " errno=" << errno << " numeric_limits<uint32_t>::max()=" << numeric_limits<uint32_t>::max() << " ERANGE = " << ERANGE << endl;
-    if (v == 0 || v == numeric_limits<uint32_t>::max()/*ULONG_MAX*/)
+    if (val64 <= numeric_limits<uint32_t>::max())
     {
-        if (errno == ERANGE)
+        if (val != nullptr)
         {
-            return false;
+            *val = static_cast<uint32_t>(val64);
         }
+
+        return true;
     }
 
-    if (val != nullptr)
-    {
-        *val = v;
-    }
-
-    return true;
+    return false;
 }

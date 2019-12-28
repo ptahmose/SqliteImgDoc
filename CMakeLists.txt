@@ -44,6 +44,16 @@ add_subdirectory ("SqliteImgDoc")
 # GTest
 enable_testing()
 find_package(GTest  REQUIRED)
+
+# https://stackoverflow.com/questions/13513905/how-to-set-up-googletest-as-a-shared-library-on-linux
+# sudo apt-get install libgtest-dev
+# cd /usr/src/gtest
+# sudo cmake CMakeLists.txt
+# sudo make
+# sudo make install
+# copy or symlink libgtest.a and libgtest_main.a to your /usr/lib folder
+# sudo cp *.a /usr/lib
+
 ##target_link_libraries(main PRIVATE GTest::gtest GTest::gtest_main GTest::gmock GTest::gmock_main)
 
 message(STATUS "XYZ")

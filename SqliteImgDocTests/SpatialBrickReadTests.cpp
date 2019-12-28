@@ -59,6 +59,25 @@ static shared_ptr<IDb> CreateBrickTestDatabase(int rows, int columns, int stacks
     return db;
 }
 
+static bool CheckIfSetsAreEqual(std::vector<LogicalPositionInfo3D>& a, std::vector<LogicalPositionInfo3D>& b)
+{
+    if (a.size() != b.size())
+    {
+        return false;
+    }
+
+    for (size_t i = 0; i < a.size(); ++i)
+    {
+        auto f = find(a.cbegin(), a.cend(), b[i]);
+        if (f == a.cend())
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 TEST(SpatialBrickReadTests, QueryCuboid1)
 {
     auto db = CreateBrickTestDatabase(10, 10, 10, 256, 256, 256);
@@ -68,6 +87,25 @@ TEST(SpatialBrickReadTests, QueryCuboid1)
     cuboid.x = 100; cuboid.y = 100; cuboid.w = 20; cuboid.h = 1100; cuboid.z = 0; cuboid.d = 10;
     auto r = reader->GetTilesIntersectingCuboid(cuboid);
     ASSERT_TRUE(r.size() == 5) << "Expected exactly five results.";
+
+    std::vector<LogicalPositionInfo3D> logPositions;
+    for (size_t i = 0; i < r.size(); ++i)
+    {
+        LogicalPositionInfo3D logPos;
+        reader->ReadTileInfo(r[i], nullptr, &logPos);
+
+        logPositions.push_back(logPos);
+    }
+
+    std::vector<LogicalPositionInfo3D> expected;
+    expected.push_back(LogicalPositionInfo3D{ 0,0,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,256,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,512,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,768,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,1024,0,256,256,256,0 });
+
+    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
 
 TEST(SpatialBrickReadTests, QueryCuboid2)
@@ -78,5 +116,29 @@ TEST(SpatialBrickReadTests, QueryCuboid2)
     CuboidD cuboid;
     cuboid.x = 100; cuboid.y = 100; cuboid.w = 20; cuboid.h = 1100; cuboid.z = 0; cuboid.d = 500;
     auto r = reader->GetTilesIntersectingCuboid(cuboid);
-    ASSERT_TRUE(r.size() == 5*2) << "Expected exactly five results.";
+    ASSERT_TRUE(r.size() == 5 * 2) << "Expected exactly five results.";
+
+    std::vector<LogicalPositionInfo3D> logPositions;
+    for (size_t i = 0; i < r.size(); ++i)
+    {
+        LogicalPositionInfo3D logPos;
+        reader->ReadTileInfo(r[i], nullptr, &logPos);
+
+        logPositions.push_back(logPos);
+    }
+
+    std::vector<LogicalPositionInfo3D> expected;
+    expected.push_back(LogicalPositionInfo3D{ 0,0,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,256,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,512,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,768,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,1024,0,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,0,256,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,256,256,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,512,256,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,768,256,256,256,256,0 });
+    expected.push_back(LogicalPositionInfo3D{ 0,1024,256,256,256,256,0 });
+
+    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    EXPECT_TRUE(correct) << "did not get the expected tiles";
 }

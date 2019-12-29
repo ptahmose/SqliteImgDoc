@@ -174,23 +174,23 @@ using namespace SlImgDoc;
 
 /*static*/bool CCustomQueries::DoLinesIntersect(const SlImgDoc::PointD& a1, const SlImgDoc::PointD& a2, const SlImgDoc::PointD& b1, const SlImgDoc::PointD& b2)
 {
-    PointD b( a2.x - a1.x,a2.y - a1.y );
-    PointD d( b2.x - b1.x,b2.y - b1.y );
+    const PointD b( a2.x - a1.x,a2.y - a1.y );
+    const PointD d( b2.x - b1.x,b2.y - b1.y );
 
-    double bDotDPerp = b.x * d.y - b.y * d.x;
+    const double bDotDPerp = b.x * d.y - b.y * d.x;
 
     // if b dot d == 0, it means the lines are parallel so have infinite intersection points
     if (bDotDPerp == 0)
         return false;
 
-    PointD c( b1.x - a1.x ,b1.y - a1.y );// = b1 - a1;
-    double t = (c.x * d.y - c.y * d.x) / bDotDPerp;
+    const PointD c( b1.x - a1.x ,b1.y - a1.y );// = b1 - a1;
+    const double t = (c.x * d.y - c.y * d.x) / bDotDPerp;
     if (t < 0 || t > 1)
     {
         return false;
     }
 
-    double u = (c.x * b.y - c.y * b.x) / bDotDPerp;
+    const double u = (c.x * b.y - c.y * b.x) / bDotDPerp;
     if (u < 0 || u > 1)
     {
         return false;
@@ -202,14 +202,14 @@ using namespace SlImgDoc;
 /*static*/bool CCustomQueries::DoAabbAndPlaneIntersect(const SlImgDoc::CuboidD& aabb, const SlImgDoc::Plane_NormalAndDistD& plane)
 {
     // -> https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
-    auto centerAabb = aabb.CenterPoint();
-    Vector3dD aabbExtents = Vector3dD(aabb.w / 2, aabb.h / 2, aabb.d / 2);
+    const auto centerAabb = aabb.CenterPoint();
+    const Vector3dD aabbExtents = Vector3dD(aabb.w / 2, aabb.h / 2, aabb.d / 2);
 
     // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-    auto r = aabbExtents.x * fabs(plane.normal.x) + aabbExtents.y * fabs(plane.normal.y) + aabbExtents.z * fabs(plane.normal.z);
+    const auto r = aabbExtents.x * fabs(plane.normal.x) + aabbExtents.y * fabs(plane.normal.y) + aabbExtents.z * fabs(plane.normal.z);
 
     // Compute distance of box center from plane
-    auto s = Vector3dD::Dot(plane.normal, centerAabb) - plane.distance;
+    const auto s = Vector3dD::Dot(plane.normal, centerAabb) - plane.distance;
 
     // Intersection occurs when distance s falls within [-r,+r] interval
     return fabs(s) <= r;

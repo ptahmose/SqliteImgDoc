@@ -172,7 +172,7 @@ TEST(SpatialBrickReadTests, QueryPlane1)
         }
     }
 
-    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    const bool correct = CheckIfSetsAreEqual(logPositions, expected);
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
 
@@ -185,10 +185,10 @@ TEST(SpatialBrickReadTests, QueryPlane2)
     auto r = reader->GetTilesIntersectingWithPlane(plane);
 
     std::vector<LogicalPositionInfo3D> logPositions;
-    for (size_t i = 0; i < r.size(); ++i)
+    for (dbIndex i : r)
     {
         LogicalPositionInfo3D logPos;
-        reader->ReadTileInfo(r[i], nullptr, &logPos);
+        reader->ReadTileInfo(i, nullptr, &logPos);
 
         logPositions.push_back(logPos);
     }
@@ -210,6 +210,6 @@ TEST(SpatialBrickReadTests, QueryPlane2)
         }
     }
 
-    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    const bool correct = CheckIfSetsAreEqual(logPositions, expected);
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }

@@ -175,3 +175,41 @@ TEST(SpatialBrickReadTests, QueryPlane1)
     bool correct = CheckIfSetsAreEqual(logPositions, expected);
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
+
+TEST(SpatialBrickReadTests, QueryPlane2)
+{
+    auto db = CreateBrickTestDatabase(10, 10, 10, 256, 256, 256);
+
+    auto reader = db->GetReader3D();
+    Plane_NormalAndDistD plane{ Vector3dD{1,1,-1},5 * 256 };
+    auto r = reader->GetTilesIntersectingWithPlane(plane);
+
+    std::vector<LogicalPositionInfo3D> logPositions;
+    for (size_t i = 0; i < r.size(); ++i)
+    {
+        LogicalPositionInfo3D logPos;
+        reader->ReadTileInfo(r[i], nullptr, &logPos);
+
+        logPositions.push_back(logPos);
+    }
+
+    std::vector<LogicalPositionInfo3D> expected;
+    expected.reserve(300);
+    for (int x = 0; x < 10; ++x)
+    {
+        for (int y = 0; y < 10; ++y)
+        {
+            for (int z = 0; z < 10; ++z)
+            {
+                CuboidD cuboid{ x * 256.0,y * 256.0,z * 256.0,256,256,256 };
+                if (cuboid.DoesIntersectWith(plane))
+                {
+                    expected.push_back(LogicalPositionInfo3D{ cuboid.x,cuboid.y,cuboid.z,cuboid.w,cuboid.h,cuboid.d,0 });
+                }
+            }
+        }
+    }
+
+    bool correct = CheckIfSetsAreEqual(logPositions, expected);
+    EXPECT_TRUE(correct) << "did not get the expected tiles";
+}

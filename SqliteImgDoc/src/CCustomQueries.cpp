@@ -201,6 +201,8 @@ using namespace SlImgDoc;
 
 /*static*/bool CCustomQueries::DoAabbAndPlaneIntersect(const SlImgDoc::CuboidD& aabb, const SlImgDoc::Plane_NormalAndDistD& plane)
 {
+    return aabb.DoesIntersectWith(plane);
+    /*
     // -> https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
     const auto centerAabb = aabb.CenterPoint();
     const Vector3dD aabbExtents = Vector3dD(aabb.w / 2, aabb.h / 2, aabb.d / 2);
@@ -213,4 +215,5 @@ using namespace SlImgDoc;
 
     // Intersection occurs when distance s falls within [-r,+r] interval
     return fabs(s) <= r;
+    */
 }

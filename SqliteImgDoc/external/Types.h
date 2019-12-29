@@ -105,6 +105,9 @@ namespace SlImgDoc
         PointD b;
     };
 
+    template <typename t> struct Vector3dT;
+    template<typename T> struct Plane_NormalAndDist;
+
     template<typename t>
     struct CuboidT
     {
@@ -144,6 +147,27 @@ namespace SlImgDoc
         Point3dT<t> CenterPoint() const
         {
             return Point3dT<t>(this->x + this->w / 2, this->y + this->h / 2, this->z + this->d / 2);
+        }
+
+        static bool DoIntersect(const SlImgDoc::CuboidT<t>& aabb, const SlImgDoc::Plane_NormalAndDist<t>& plane)
+        {
+            // -> https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
+            const auto centerAabb = aabb.CenterPoint();
+            const Vector3dT<t> aabbExtents = Vector3dD(aabb.w / 2, aabb.h / 2, aabb.d / 2);
+
+            // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+            const auto r = aabbExtents.x * fabs(plane.normal.x) + aabbExtents.y * fabs(plane.normal.y) + aabbExtents.z * fabs(plane.normal.z);
+
+            // Compute distance of box center from plane
+            const auto s = Vector3dT<t>::Dot(plane.normal, centerAabb) - plane.distance;
+
+            // Intersection occurs when distance s falls within [-r,+r] interval
+            return fabs(s) <= r;
+        }
+
+        bool DoesIntersectWith(const SlImgDoc::Plane_NormalAndDist<t>& plane) const
+        {
+            return DoIntersect(*this, plane);
         }
     };
 

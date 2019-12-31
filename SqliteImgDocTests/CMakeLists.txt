@@ -14,6 +14,8 @@ add_executable( SqliteImgDocTests
                     CustomQueriesTests.cpp
                     DbCreateDbTests.cpp)
 
+target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
+
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocTests  ${GTEST_BOTH_LIBRARIES} SqliteImgDoc SQLiteCpp sqlite3)
 

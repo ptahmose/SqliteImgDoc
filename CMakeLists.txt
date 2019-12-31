@@ -51,6 +51,20 @@ if ("${GTest_FOUND}")
     message(STATUS "Found GTest, using it.")
 else()
     message(STATUS "Did not find package GTest, will attempt to fetch it locally.")
+
+    include(FetchContent)
+
+    FetchContent_Declare(
+      googletest
+      GIT_REPOSITORY https://github.com/google/googletest.git
+      GIT_TAG        release-1.10.0
+    )
+    FetchContent_GetProperties(googletest)
+    if(NOT googletest_POPULATED)
+        message(STATUS "HERE I AM #1")
+        FetchContent_Populate(googletest)
+    endif()
+
 endif()
 
 # https://stackoverflow.com/questions/13513905/how-to-set-up-googletest-as-a-shared-library-on-linux

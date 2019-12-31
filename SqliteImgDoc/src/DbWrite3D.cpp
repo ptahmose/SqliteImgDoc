@@ -130,6 +130,8 @@ std::int64_t CDbWrite3D::AddBrickUncompressed(const IDataObjUncompressedBrick* d
 
 std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height, std::uint32_t depth, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
+    this->CheckSizeOfBinHdrAndThrow(sizeBinHdr, this->GetDocInfo3D().GetDbParameter(IDbDocInfo3D::DbParameter::DataBinHdrSize));
+
     try
     {
         this->EnsureAddTilesDataRowStatement();

@@ -15,3 +15,4 @@ public:
     virtual void RollbackTransaction();
     virtual ~CDbWriteBase();
 };
+

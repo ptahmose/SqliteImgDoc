@@ -8,6 +8,7 @@
 #include <memory>
 
 using namespace std;
+using namespace SlImgDoc;
 
 /*virtual*/CDbWrite::~CDbWrite()
 {
@@ -57,7 +58,9 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
 
 /*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
 {
+    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
     // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+
     try
     {
         const void* ptrHdrData; size_t sizeHdrData;
@@ -170,6 +173,15 @@ std::int64_t CDbWrite::AddTileUncompressed(const IDataObjUncompressedBitmap* dat
 
 std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
+    //auto dataBinHDrSize = this->GetDocInfo().GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize);
+    //if (sizeBinHdr > dataBinHDrSize)
+    //{
+    //    stringstream ss;
+    //    ss << "Size of 'BinHdr'-field is limited to " << dataBinHDrSize << " bytes, and " << sizeBinHdr << " bytes was requested.";
+    //    throw SqliteImgDocInvalidArgumentException(ss.str());
+    //}
+    this->CheckSizeOfBinHdrAndThrow(sizeBinHdr, this->GetDocInfo().GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize));
+
     try
     {
         this->EnsureAddTilesDataRowStatement();

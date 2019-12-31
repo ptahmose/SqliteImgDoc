@@ -143,8 +143,14 @@ std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
             pixelInfo->pixelType = query.getColumn(colNo++).getInt();
             pixelInfo->dataType = query.getColumn(colNo++).getInt();
 
-            const auto& binHdr = query.getColumn(colNo++);
-            memcpy(pixelInfo->dataBinHdr, binHdr.getBlob(), (std::min)(binHdr.getBytes(), (int)sizeof(pixelInfo->dataBinHdr)));
+            // TODO: we should not query the dataBinHdr if it isn't necessary in the first place
+            if (pixelInfo->dataBinHdr != nullptr)
+            {
+                const auto& binHdr = query.getColumn(colNo++);
+                pixelInfo->dataBinHdr->Set(binHdr.getBlob(), binHdr.getBytes());
+            }
+            /*const auto& binHdr = query.getColumn(colNo++);
+            memcpy(pixelInfo->dataBinHdr, binHdr.getBlob(), (std::min)(binHdr.getBytes(), (int)sizeof(pixelInfo->dataBinHdr)));*/
         }
 
         if (data != nullptr)

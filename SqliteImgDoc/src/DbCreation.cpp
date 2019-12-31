@@ -127,6 +127,10 @@ static void CreateTileTable(SQLite::Database* db)
 {
     auto docInfo = std::make_shared<CDbDocInfo>();
     docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
+    map<IDbDocInfo::DbParameter, std::uint32_t> paramsMap;
+    paramsMap[IDbDocInfo::DbParameter::DataBinHdrSize] = opts.sizeOfDataBinHdrField;
+    docInfo->SetDbParameters(std::move(paramsMap));
+
     CDbCreation dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
     return make_shared<CDb>(db, docInfo);
@@ -136,6 +140,10 @@ static void CreateTileTable(SQLite::Database* db)
 {
     auto docInfo = std::make_shared<CDbDocInfo3D>();
     docInfo->SetTileDimensions(opts.dimensions.cbegin(), opts.dimensions.cend());
+    map<IDbDocInfo3D::DbParameter, std::uint32_t> paramsMap;
+    paramsMap[IDbDocInfo3D::DbParameter::DataBinHdrSize] = opts.sizeOfDataBinHdrField;
+    docInfo->SetDbParameters(std::move(paramsMap));
+
     CDbCreation3D dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
 
@@ -176,11 +184,12 @@ static void CreateTileTable(SQLite::Database* db)
 
 CDbCreation::CDbCreation(const IDbDocInfo& docInfo, const SlImgDoc::CreateOptions& opts)
     : docInfo(docInfo), opts(opts)
-{
-}
+{}
 
 SQLite::Database* CDbCreation::DoCreate()
 {
+    this->CheckCreateOptions(this->opts);
+
     try
     {
         SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
@@ -234,7 +243,7 @@ std::string CDbCreation::GetTilesDataCreateSqlStatement() const
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelHeight) << "] INTEGER(4),"
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::PixelType) << "] INTEGER(1),"
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataType) << "] INTEGER(4),"
-        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << "] BLOB(32),"
+        "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::DataBinHdr) << "] BLOB(" << this->opts.sizeOfDataBinHdrField << "),"
         "[" << this->docInfo.GetTileDataColumnName(IDbDocInfo::TilesDataColumn::Data) << "] BLOB);";
     return ss.str();
 }
@@ -249,4 +258,18 @@ std::string CDbCreation::GetTilesSpatialIndexCreateSqlStatement() const
         this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<       // Minimum Y coordinate"
         this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ");";        // Maximum Y coordinate"
     return ss.str();
+}
+
+/// Checks the create-options for validity. In the case that the data is determined to be invalid,
+/// an exception of type SlImgDoc::SqliteImgDocException thrown.
+/// \exception SlImgDoc::SqliteImgDocException Thrown when the data is determined to be invalid.
+/// \param opts The create-options to be validated.
+void CDbCreation::CheckCreateOptions(const SlImgDoc::CreateOptions& opts) 
+{
+    if (opts.sizeOfDataBinHdrField <= 0)
+    {
+        stringstream ss;
+        ss << "The value \"" << opts.sizeOfDataBinHdrField << "\" for the field 'sizeOfDataBinHdrField' is invalid.";
+        throw SqliteImgDocInvalidArgumentException(ss.str());
+    }
 }

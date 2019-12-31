@@ -34,7 +34,7 @@ static shared_ptr<IDb> CreateMosaicTestDatabase(int rows, int columns, int sizeX
     CDataObjCustom dataCustom(16, 1);
 
     int m = 0;
-    TileCoordinate tc({ { 'M',0 } });
+    TileCoordinate tc({ {'C',0},{'Z',0},{'T',0},{ 'M',0 } });
 
     for (int r = 0; r < rows; ++r)
     {

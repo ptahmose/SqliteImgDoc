@@ -21,12 +21,32 @@ namespace SlImgDoc
 {
     typedef long long dbIndex;
 
+    class IBlobData
+    {
+    public:
+        virtual bool Set(const void* ptrData, size_t size) = 0;
+    };
+
     class CreateOptions
     {
     public:
+        const int DefaultSizeOfDataBinHdrField = 32;
+    public:
+        CreateOptions() : sizeOfDataBinHdrField(DefaultSizeOfDataBinHdrField)
+        {
+        }
+
         std::string dbFilename;
 
         std::unordered_set<char> dimensions;
+
+        /// Size of the DataBinHdr-field in bytes.
+        int  sizeOfDataBinHdrField;
+
+        void SetDefaultValues()
+        {
+            this->sizeOfDataBinHdrField = DefaultSizeOfDataBinHdrField;
+        }
     };
 
     class OpenOptions
@@ -84,7 +104,7 @@ namespace SlImgDoc
         int pixelHeight;
         std::uint8_t pixelType;
         int dataType;
-        std::uint8_t dataBinHdr[32];
+        IBlobData* dataBinHdr;
     };
 
     class SQLITEIMGDOC_API IDbRead
@@ -100,7 +120,7 @@ namespace SlImgDoc
 
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
-        std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead() {};
     };
@@ -112,7 +132,8 @@ namespace SlImgDoc
         int pixelDepth;
         std::uint8_t pixelType;
         int dataType;
-        std::uint8_t dataBinHdr[32];
+        //std::uint8_t dataBinHdr[32];
+        IBlobData* dataBinHdr;
     };
 
     class SQLITEIMGDOC_API IDbRead3D
@@ -128,7 +149,7 @@ namespace SlImgDoc
 
         std::vector<dbIndex> GetTilesIntersectingCuboid(const CuboidD& cuboid);
         std::vector<dbIndex> GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane);
-        std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead3D() = default;
     };
@@ -154,3 +175,5 @@ namespace SlImgDoc
 
     };
 }
+
+#include "BlobData.h"

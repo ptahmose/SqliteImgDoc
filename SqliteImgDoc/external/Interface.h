@@ -21,12 +21,32 @@ namespace SlImgDoc
 {
     typedef long long dbIndex;
 
+    class IBlobData
+    {
+    public:
+        virtual bool Set(const void* ptrData, size_t size) = 0;
+    };
+
     class CreateOptions
     {
     public:
+        const int DefaultSizeOfDataBinHdrField = 32;
+    public:
+        CreateOptions() : sizeOfDataBinHdrField(DefaultSizeOfDataBinHdrField)
+        {
+        }
+
         std::string dbFilename;
 
         std::unordered_set<char> dimensions;
+
+        /// Size of the DataBinHdr-field in bytes.
+        int  sizeOfDataBinHdrField;
+
+        void SetDefaultValues()
+        {
+            this->sizeOfDataBinHdrField = DefaultSizeOfDataBinHdrField;
+        }
     };
 
     class OpenOptions
@@ -42,18 +62,40 @@ namespace SlImgDoc
         std::uint8_t pixelType;
     };
 
-    class SQLITEIMGDOC_API IDbWrite
+    class SQLITEIMGDOC_API IDbWriteTransaction
     {
     public:
         virtual void BeginTransaction() = 0;
         virtual void CommitTransaction() = 0;
         virtual void RollbackTransaction() = 0;
+        virtual ~IDbWriteTransaction() = default;
+    };
 
+    /// A sqliteimgdoc api. see https://stackoverflow.com/questions/11205230/virtual-inheritance-and-interfaces
+    class SQLITEIMGDOC_API IDbWrite : public virtual IDbWriteTransaction
+    {
+    public:
         virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
         virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
-        //virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjZero* data) = 0;
 
-        virtual ~IDbWrite() {};
+        virtual ~IDbWrite() = default;
+    };
+
+    struct TileBaseInfo3D
+    {
+        int pixelWidth;
+        int pixelHeight;
+        int pixelDepth;
+        std::uint8_t pixelType;
+    };
+
+    class SQLITEIMGDOC_API IDbWrite3D : public virtual IDbWriteTransaction
+    {
+    public:
+        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
+        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
+
+        virtual ~IDbWrite3D() = default;
     };
 
     struct TilePixelInfo
@@ -62,7 +104,7 @@ namespace SlImgDoc
         int pixelHeight;
         std::uint8_t pixelType;
         int dataType;
-        std::uint8_t dataBinHdr[32];
+        IBlobData* dataBinHdr;
     };
 
     class SQLITEIMGDOC_API IDbRead
@@ -78,9 +120,38 @@ namespace SlImgDoc
 
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
-        std::vector<dbIndex>  Query(const IDimCoordinateQueryClause* clause);
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead() {};
+    };
+
+    struct TilePixelInfo3D
+    {
+        int pixelWidth;
+        int pixelHeight;
+        int pixelDepth;
+        std::uint8_t pixelType;
+        int dataType;
+        //std::uint8_t dataBinHdr[32];
+        IBlobData* dataBinHdr;
+    };
+
+    class SQLITEIMGDOC_API IDbRead3D
+    {
+    public:
+        virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info) = 0;
+        virtual void ReadTileData(dbIndex ix, TilePixelInfo3D* pixelInfo, IBlob* data) = 0;
+
+        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+
+        virtual void GetTilesIntersectingCuboid(const CuboidD& rect, std::function<bool(dbIndex)> func) = 0;
+        virtual void GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane, std::function<bool(dbIndex)> func) = 0;
+
+        std::vector<dbIndex> GetTilesIntersectingCuboid(const CuboidD& cuboid);
+        std::vector<dbIndex> GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane);
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
+
+        virtual ~IDbRead3D() = default;
     };
 
     class SQLITEIMGDOC_API IDb
@@ -89,6 +160,9 @@ namespace SlImgDoc
         virtual std::shared_ptr<IDbWrite> GetWriter() = 0;
         virtual std::shared_ptr<IDbRead> GetReader() = 0;
 
+        virtual std::shared_ptr<IDbWrite3D> GetWriter3D() = 0;
+        virtual std::shared_ptr<IDbRead3D> GetReader3D() = 0;
+
         virtual ~IDb() {}
     };
 
@@ -96,6 +170,10 @@ namespace SlImgDoc
     {
     public:
         static std::shared_ptr<IDb> CreateNew(const CreateOptions& opts);
+        static std::shared_ptr<IDb> CreateNew3D(const CreateOptions& opts);
         static std::shared_ptr<IDb> OpenExisting(const OpenOptions& opts);
+
     };
 }
+
+#include "BlobData.h"

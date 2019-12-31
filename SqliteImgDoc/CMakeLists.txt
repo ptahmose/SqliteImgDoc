@@ -14,18 +14,29 @@ add_library (SqliteImgDoc STATIC
 						src/DbBase.h 
 						src/DbCreation.cpp 
 						src/DbCreation.h 
+						src/DbCreation3D.cpp 
+						src/DbCreation3D.h 
 						src/DbDiscover.cpp 
 						src/DbDiscover.h 
 						src/DbGlobalInfo.h 
 						src/DbGlobalInfo.cpp 
+						src/DbGlobalInfo3D.h 
+						src/DbGlobalInfo3D.cpp 
 						src/DbRead.cpp 
 						src/DbRead.h 
+						src/DbRead3D.cpp 
+						src/DbRead3D.h 
 						src/DbWrite.cpp 
 						src/DbWrite.h 
+						src/DbWrite3D.cpp 
+						src/DbWrite3D.h 
+						src/DbWriteBase.cpp 
+						src/DbWriteBase.h 
 						src/dllmain.cpp 
 						src/framework.h 
 						src/pch.cpp 
 						src/pch.h 
+						src/IInternalDb.h 
 						src/miscutilities.h
 						src/miscutilities.cpp
 						external/DataBinHdr.h 
@@ -43,7 +54,8 @@ add_library (SqliteImgDoc STATIC
 						external/TileCoordinate.h 
 						external/Types.h 
 						external/utilities.h
-						external/SqliteImgDocException.h)
+						external/SqliteImgDocException.h
+						external/BlobData.h)
 
 target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 #set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)

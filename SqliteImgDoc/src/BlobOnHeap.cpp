@@ -1,5 +1,5 @@
 #include "pch.h"
-#include <malloc.h>
+#include <cstdlib>
 #include "../external/BlobOnHeap.h"
 
 using namespace SlImgDoc;

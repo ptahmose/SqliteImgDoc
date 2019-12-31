@@ -8,8 +8,15 @@ add_executable( SqliteImgDocTests
                     TileCoordinateTests.cpp 
                     ReadTests.cpp 
                     SpatialReadTests.cpp
+                    SpatialBrickReadTests.cpp
                     utilitiesTests.cpp
-                    DbDiscoverTests.cpp)
+                    DbDiscoverTests.cpp
+                    CustomQueriesTests.cpp
+                    DbCreateDbTests.cpp
+                    pch.cpp
+                    pch.h)
+
+target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocTests  ${GTEST_BOTH_LIBRARIES} SqliteImgDoc SQLiteCpp sqlite3)

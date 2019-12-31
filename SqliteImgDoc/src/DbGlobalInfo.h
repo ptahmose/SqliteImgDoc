@@ -132,4 +132,8 @@ public:
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const;
 
     virtual std::uint32_t GetDbParameter(DbParameter parameter) const;
+public:
+    static const std::string& GetDefaultTileInfoColumnName(TilesInfoColumn c);
+    static const std::string& GetDefaultTileDataColumnName(TilesDataColumn c);
+    static const std::string& GetDefaultSpatialIndexColumnName(TilesSpatialIndexColumn c);
 };

@@ -20,7 +20,8 @@ using namespace SlImgDoc;
 
 void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
-    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
+    
     try
     {
         auto idSbBlk = this->AddTileUncompressed(data);
@@ -59,7 +60,6 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
 /*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
-    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
 
     try
     {

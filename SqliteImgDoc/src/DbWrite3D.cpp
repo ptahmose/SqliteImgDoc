@@ -15,7 +15,8 @@ using namespace std;
 
 /*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
 {
-    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
+
     try
     {
         auto idSbBlk = this->AddBrickUncompressed(data);
@@ -55,7 +56,8 @@ using namespace std;
 
 /*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
 {
-    // TODO: check if coord contains all dimensions (as required by this->docInfo->GetTileDimensions())
+    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
+
     try
     {
         const void* ptrHdrData; size_t sizeHdrData;

@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "../SqliteImgDoc/external/Interface.h"
 

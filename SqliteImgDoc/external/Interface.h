@@ -16,6 +16,7 @@
 #include "DataTypes.h"
 #include "DataObjImpl.h"
 #include "SqliteImgDocException.h"
+#include "CoordinateData.h"
 
 namespace SlImgDoc
 {
@@ -42,6 +43,8 @@ namespace SlImgDoc
 
         /// Size of the DataBinHdr-field in bytes.
         int  sizeOfDataBinHdrField;
+
+        PerTileDataCreateOptions perTileData;
 
         void SetDefaultValues()
         {
@@ -75,8 +78,13 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite : public virtual IDbWriteTransaction
     {
     public:
-        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
-        virtual void AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+
+       /* virtual void AddCoordinateData(
+            const ITileCoordinate* coord,
+            std::function<bool(int, CoordinateData&)> funcGetData) = 0;*/
+        virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
 
         virtual ~IDbWrite() = default;
     };
@@ -127,13 +135,12 @@ namespace SlImgDoc
 
     struct TilePixelInfo3D
     {
-        int pixelWidth;
-        int pixelHeight;
-        int pixelDepth;
-        std::uint8_t pixelType;
-        int dataType;
-        //std::uint8_t dataBinHdr[32];
-        IBlobData* dataBinHdr;
+        int pixelWidth;         ///< Width of the brick tile in pixels.
+        int pixelHeight;        ///< Height of the brick tile in pixels.
+        int pixelDepth;         ///< Depth of the brick tile in pixels.
+        std::uint8_t pixelType; ///< The pixel type of the brick tile.
+        int dataType;           ///< The data type of the brick tile.
+        IBlobData* dataBinHdr;  ///< If non-null, pointer to an object which will receive the DataBinHdr.
     };
 
     class SQLITEIMGDOC_API IDbRead3D

@@ -167,11 +167,104 @@ void TestRead2()
     return;
 }
 
+static void WriteMosaicAndPerTileData(IDbWrite* dbw, int rows, int columns, int sizeX, int sizeY)
+{
+    CSimpleCoord simpleCoord = {};
+    LogicalPositionInfo posInfo;
+    posInfo.posX = posInfo.posY = 0;
+    posInfo.width = sizeX;
+    posInfo.height = sizeY;
+    posInfo.pyrLvl = 0;
+    CSimpleDataObjUncmp dataObj(sizeX, sizeY);
+
+    dbw->BeginTransaction();
+    for (int i = 0; i < 10; ++i)
+    {
+        simpleCoord.t = i;
+        simpleCoord.m = 0;
+        for (int r = 0; r < rows; ++r)
+        {
+            for (int c = 0; c < columns; ++c)
+            {
+                posInfo.posX = c * sizeX;
+                posInfo.posY = r * sizeY;
+
+                auto rowid = dbw->AddTile(&simpleCoord, &posInfo, &dataObj);
+
+                dbw->AddPerTileData(
+                    rowid,
+                    [r,c](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
+                {
+                    switch (no)
+                    {
+                    case 0:
+                        kv.Data.DataType = "FLOAT";
+                        kv.Name = "AcquisitionTime";
+                        kv.Data.doubleValue = 42+r;
+                        return true;
+                    case 1:
+                        kv.Data.DataType = "FLOAT";
+                        kv.Name = "FocusPosition";
+                        kv.Data.doubleValue = 43+c;
+                        return true;
+                    default:
+                        return false;
+                    }
+                });
+
+                simpleCoord.m++;
+            }
+        }
+    }
+
+    dbw->CommitTransaction();
+}
+
+void TestCoordinateData1()
+{
+    CreateOptions opts;
+    opts.dbFilename = "D:\\test2.db";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.dimensions.emplace('T');
+    opts.dimensions.emplace('M');
+
+    opts.perTileData.descriptions.push_back(ColumnDescription{ "AcquisitionTime","FLOAT" });
+    opts.perTileData.descriptions.push_back(ColumnDescription{ "FocusPosition","FLOAT" });
+
+    auto db = IDbFactory::CreateNew(opts);
+    auto dbw = db->GetWriter();
+
+    WriteMosaicAndPerTileData(dbw.get(), 10, 10, 1024, 1024);
+
+    /* TileCoordinate tc{ { 'T',1 }, { 'C',2 } };
+     dbw->AddCoordinateData(&tc,
+         [](int no, SlImgDoc::CoordinateData& cd)->bool
+     {
+         switch (no)
+         {
+         case 0:
+             cd.DataType = "FLOAT";
+             cd.Name = "AcquisitionTime";
+             cd.doubleValue = 42;
+             return true;
+         case 1:
+             cd.DataType = "FLOAT";
+             cd.Name = "FocusPosition";
+             cd.doubleValue = 43;
+             return true;
+         default:
+             return false;
+         }
+     });*/
+}
+
 int main()
 {
     // TestRead();
-    TestRead2();
-    //TestCreateAndWrite()
+    //TestRead2();
+    //TestCreateAndWrite();
+    TestCoordinateData1();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

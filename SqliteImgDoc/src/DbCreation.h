@@ -16,6 +16,8 @@ private:
     std::string GetTilesInfoCreateSqlStatement() const;
     std::string GetTilesDataCreateSqlStatement() const;
     std::string GetTilesSpatialIndexCreateSqlStatement() const;
+    std::string GetPerTileDataTableSqlStatement() const;
+    /*void CreateCoordinateDataTable();*/
 
     void CheckCreateOptions(const SlImgDoc::CreateOptions& opts);
 };

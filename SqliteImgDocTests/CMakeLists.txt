@@ -13,6 +13,7 @@ add_executable( SqliteImgDocTests
                     DbDiscoverTests.cpp
                     CustomQueriesTests.cpp
                     DbCreateDbTests.cpp
+                    PerTilesDataTests.cpp
                     pch.cpp
                     pch.h)
 

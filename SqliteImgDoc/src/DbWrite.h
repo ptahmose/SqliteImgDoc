@@ -23,8 +23,10 @@ public:
     //virtual void CommitTransaction();
     //virtual void RollbackTransaction();
 
-    virtual void AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
-    virtual void AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data);
+    virtual SlImgDoc::dbIndex AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data);
+    virtual SlImgDoc::dbIndex AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data);
+
+    virtual void AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData);
 
     virtual ~CDbWrite();
 

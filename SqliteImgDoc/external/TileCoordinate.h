@@ -9,7 +9,7 @@ namespace SlImgDoc
     struct DimensionAndValue
     {
         TileDim dimension;	///< The dimension.
-        int value;							///< The value (for this dimension).
+        int value;			///< The value (for this dimension).
     };
 
 

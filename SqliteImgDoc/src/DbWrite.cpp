@@ -2,6 +2,7 @@
 #include "DbWrite.h"
 #include <SQLiteCpp/Database.h>
 #include <SQLiteCpp/Transaction.h>
+#include "dbutils.h"
 
 #include <iostream>
 #include <sstream>
@@ -18,10 +19,10 @@ using namespace SlImgDoc;
     //}
 }
 
-void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
+dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
-    
+
     try
     {
         auto idSbBlk = this->AddTileUncompressed(data);
@@ -50,6 +51,7 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
 
         auto id = this->GetDb().getLastInsertRowid();
         this->AddToSpatialIndexTable(id, info);
+        return id;
     }
     catch (SQLite::Exception & excp)
     {
@@ -57,7 +59,7 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
     }
 }
 
-/*virtual*/void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
+/*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
 
@@ -91,6 +93,7 @@ void CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::L
 
         auto id = this->GetDb().getLastInsertRowid();
         this->AddToSpatialIndexTable(id, info);
+        return id;
     }
     catch (SQLite::Exception & excp)
     {
@@ -315,3 +318,143 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
         this->addTilesSpatialIndexRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
 }
+
+/*virtual*/void CDbWrite::AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData)
+{
+    stringstream ss;
+    ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::CoordinateData) << "(";
+    ss << this->GetDocInfo().GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk);
+
+    int coordDataCnt;
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        KeyVariadicValuePair kv;
+        bool b = funcGetData(coordDataCnt, kv);
+        if (b == false)
+        {
+            break;
+        }
+
+        ss << "," << kv.Name;
+    }
+
+    ss << ") VALUES(";
+
+    bool isFirst = true;
+    for (int i = 0; i < coordDataCnt + 1; ++i)
+    {
+        if (isFirst != true)
+        {
+            ss << ",";
+        }
+
+        ss << "?" << i + 1;
+        isFirst = false;
+    }
+
+    ss << ");";
+
+    SQLite::Statement statement(this->GetDb(), ss.str());
+    statement.bind(1, index);
+
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        KeyVariadicValuePair kv;
+        bool b = funcGetData(coordDataCnt, kv);
+        if (b == false)
+        {
+            break;
+        }
+
+        ColumnTypeInfo cti;
+        DbUtils::TryParse(kv.Data.DataType, &cti);
+        DbUtils::Bind(statement, coordDataCnt + 2, kv.Data);
+    }
+
+    statement.exec();
+}
+
+#if false
+/*virtual*/void CDbWrite::AddCoordinateData(const SlImgDoc::ITileCoordinate* coord, std::function<bool(int, SlImgDoc::CoordinateData&)> funcGetData)
+{
+    stringstream ss;
+    ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::CoordinateData) << "(";
+
+    auto dims = coord->GetDimensions();
+
+    bool isFirst = true;
+
+    for (auto d : dims)
+    {
+        string colName;
+        this->GetDocInfo().GetCoordinateDataColumnNameForDimension(d, colName);
+        if (isFirst != true)
+        {
+            ss << ",";
+        }
+
+        ss << colName;
+        isFirst = false;
+    }
+
+    int coordDataCnt;
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        CoordinateData cd;
+        bool b = funcGetData(coordDataCnt, cd);
+        if (b == false)
+        {
+            break;
+        }
+
+        if (isFirst != true)
+        {
+            ss << ",";
+        }
+
+        ss << cd.Name;
+        isFirst = false;
+    }
+
+    ss << ") VALUES(";
+    isFirst = true;
+    for (int i = 0; i < coordDataCnt + dims.size(); ++i)
+    {
+        if (isFirst != true)
+        {
+            ss << ",";
+        }
+
+        ss << "?" << i + 1;
+        isFirst = false;
+    }
+
+    ss << ");";
+
+    SQLite::Statement statement(this->GetDb(), ss.str());
+
+    int index = 1;
+    for (auto d : dims)
+    {
+        int v;
+        coord->TryGetCoordinate(d, &v);
+        statement.bind(index, v);
+        ++index;
+    }
+
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        CoordinateData cd;
+        bool b = funcGetData(coordDataCnt, cd);
+        if (b == false)
+        {
+            break;
+        }
+
+        statement.bind(index, cd.doubleValue);
+        ++index;
+    }
+
+    statement.exec();
+}
+#endif

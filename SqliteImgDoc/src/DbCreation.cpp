@@ -23,7 +23,7 @@ using namespace std;
 https://www.tutorialspoint.com/sqlite/sqlite_constraints.htm
 */
 
-
+#if false
 static void CreateTileTable(SQLite::Database* db)
 {
     stringstream ss;
@@ -102,6 +102,7 @@ static void CreateTileTable(SQLite::Database* db)
       db->exec(CreateSubBlkTableSqlStatement);
       db->exec(CreateSpatialIndexSqlStatement);*/
 }
+#endif
 
 #if false
 /*static*/IDbWrite* IDbFactory::CreateNew(const CreateOptions& opts)
@@ -130,6 +131,9 @@ static void CreateTileTable(SQLite::Database* db)
     map<IDbDocInfo::DbParameter, std::uint32_t> paramsMap;
     paramsMap[IDbDocInfo::DbParameter::DataBinHdrSize] = opts.sizeOfDataBinHdrField;
     docInfo->SetDbParameters(std::move(paramsMap));
+
+    auto cc = DbDocInfoUtils::Convert(opts.perTileData);
+    docInfo->SetCoordinateColumns(cc.cbegin(), cc.cend());
 
     CDbCreation dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
@@ -201,6 +205,13 @@ SQLite::Database* CDbCreation::DoCreate()
         db->exec(sqlStatement);
         sqlStatement = this->GetTilesSpatialIndexCreateSqlStatement();
         db->exec(sqlStatement);
+
+        sqlStatement = this->GetPerTileDataTableSqlStatement();
+        if (!sqlStatement.empty())
+        {
+            db->exec(sqlStatement);
+        }
+
         return db;
     }
     catch (SQLite::Exception & excp)
@@ -260,11 +271,57 @@ std::string CDbCreation::GetTilesSpatialIndexCreateSqlStatement() const
     return ss.str();
 }
 
+std::string CDbCreation::GetPerTileDataTableSqlStatement() const
+{
+    const auto& coordinateDataColInfo = this->docInfo.GetCoordinateDataColumnInfo();
+    if (coordinateDataColInfo.empty())
+    {
+        return string();
+    }
+
+    auto ss = stringstream();
+    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::CoordinateData) << "](";
+
+    /* const auto tileDims = this->docInfo.GetTileDimensions();
+     bool isFirst = true;
+     for (const auto dim : tileDims)
+     {
+         string colName;
+         bool b = this->docInfo.GetCoordinateDataColumnNameForDimension(dim, colName);
+         if (isFirst == false)
+         {
+             ss << ",";
+
+         }
+         ss << "[" << colName << "] INTEGER(4)";
+         isFirst = false;
+     }*/
+    ss << this->docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk) << " INTEGER";
+
+    for (const auto& ci : this->docInfo.GetCoordinateDataColumnInfo())
+    {
+        switch (ci.type)
+        {
+        case ColumnType::Integer:
+            ss << ",[" << ci.columnName << "] INTEGER(" << ci.size << ")";
+        case ColumnType::Float:
+            ss << ",[" << ci.columnName << "] DOUBLE";
+        }
+    }
+
+    ss << ",FOREIGN KEY(" << this->docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk) << ") REFERENCES " <<
+        this->docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo) << "(" << this->docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << ")";
+
+    ss << ");";
+
+    return ss.str();
+}
+
 /// Checks the create-options for validity. In the case that the data is determined to be invalid,
 /// an exception of type SlImgDoc::SqliteImgDocException thrown.
 /// \exception SlImgDoc::SqliteImgDocException Thrown when the data is determined to be invalid.
 /// \param opts The create-options to be validated.
-void CDbCreation::CheckCreateOptions(const SlImgDoc::CreateOptions& opts) 
+void CDbCreation::CheckCreateOptions(const SlImgDoc::CreateOptions& opts)
 {
     if (opts.sizeOfDataBinHdrField <= 0)
     {
@@ -273,3 +330,37 @@ void CDbCreation::CheckCreateOptions(const SlImgDoc::CreateOptions& opts)
         throw SqliteImgDocInvalidArgumentException(ss.str());
     }
 }
+//
+//void CDbCreation::CreateCoordinateDataTable()
+//{
+//    auto ss = stringstream();
+//    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::CoordinateData) <<"](";
+//
+//    const auto tileDims = this->docInfo.GetTileDimensions();
+//    bool isFirst = true;
+//    for (const auto dim : tileDims)
+//    {
+//        string colName;
+//        bool b = this->docInfo.GetCoordinateDataColumnNameForDimension(dim, colName);
+//        if (isFirst==false)
+//        {
+//            ss << ",";
+//
+//        }
+//        ss << "[" << colName << "] INTEGER(4),";
+//        isFirst = false;
+//    }
+//
+//    for (const auto& ci:this->docInfo.GetCoordinateDataColumnInfo())
+//    {
+//        switch (ci.type)
+//        {
+//        case ColumnType::Integer:
+//            ss << ",[" << ci.columnName<<"] INTEGER(" << ci.size << ")";
+//        case ColumnType::Float:
+//            ss << ",[" << ci.columnName << "] DOUBLE";
+//        }
+//    }
+//
+//    ss << ");";
+//}

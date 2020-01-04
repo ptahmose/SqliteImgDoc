@@ -39,6 +39,8 @@ add_library (SqliteImgDoc STATIC
 						src/IInternalDb.h 
 						src/miscutilities.h
 						src/miscutilities.cpp
+						src/dbutils.h
+						src/dbutils.cpp
 						external/DataBinHdr.h 
 						external/IDataObj.h 
 						external/BlobOnHeap.h 

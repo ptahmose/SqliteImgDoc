@@ -5,6 +5,7 @@
 #include <sstream>
 #include "DbGlobalInfo.h"
 #include "../external/SqliteImgDocException.h"
+#include "dbutils.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -31,17 +32,22 @@ using namespace SlImgDoc;
 /*static*/std::string CDbDocInfo::ColumnName_TilesSpatialIndex_MinY = "minY";
 /*static*/std::string CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY = "maxY";
 
+/*static*/std::string CDbDocInfo::ColumnName_PerTilesData_Pk = "Pk";
+
 CDbDocInfo::CDbDocInfo(
     std::string tableName_tilesdata,
     std::string tableName_tilesinfo,
-    std::string tableName_SpatialIndex)
+    std::string tableName_SpatialIndex,
+    std::string tableName_CoordinateData)
+
     : tableNameTilesData(std::move(tableName_tilesdata)),
     tableNameTilesInfo(std::move(tableName_tilesinfo)),
-    tableNameSpatialIndex(std::move(tableName_SpatialIndex))
+    tableNameSpatialIndex(std::move(tableName_SpatialIndex)),
+    tableNameCoordinateData(std::move(tableName_CoordinateData))
 {
 }
 
-CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index")
+CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index", "COORDINATEDATA")
 {
 }
 
@@ -55,6 +61,8 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
         return this->tableNameTilesInfo;
     case TableType::TilesSpatialIndex:
         return this->tableNameSpatialIndex;
+    case TableType::CoordinateData:
+        return this->tableNameCoordinateData;
     }
 
     throw std::invalid_argument("Unknown enumeration");
@@ -129,21 +137,21 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
 /*virtual*/const std::string& CDbDocInfo::GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const
 {
-   /* switch (c)
-    {
-    case TilesSpatialIndexColumn::Pk:
-        return CDbDocInfo::ColumnName_TilesSpatialIndex_Pk;
-    case TilesSpatialIndexColumn::MinX:
-        return CDbDocInfo::ColumnName_TilesSpatialIndex_MinX;
-    case TilesSpatialIndexColumn::MaxX:
-        return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxX;
-    case TilesSpatialIndexColumn::MinY:
-        return CDbDocInfo::ColumnName_TilesSpatialIndex_MinY;
-    case TilesSpatialIndexColumn::MaxY:
-        return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY;
-    }
+    /* switch (c)
+     {
+     case TilesSpatialIndexColumn::Pk:
+         return CDbDocInfo::ColumnName_TilesSpatialIndex_Pk;
+     case TilesSpatialIndexColumn::MinX:
+         return CDbDocInfo::ColumnName_TilesSpatialIndex_MinX;
+     case TilesSpatialIndexColumn::MaxX:
+         return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxX;
+     case TilesSpatialIndexColumn::MinY:
+         return CDbDocInfo::ColumnName_TilesSpatialIndex_MinY;
+     case TilesSpatialIndexColumn::MaxY:
+         return CDbDocInfo::ColumnName_TilesSpatialIndex_MaxY;
+     }
 
-    throw std::invalid_argument("Unknown enumeration");*/
+     throw std::invalid_argument("Unknown enumeration");*/
     return CDbDocInfo::GetDefaultSpatialIndexColumnName(c);
 }
 
@@ -153,7 +161,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
     {
         return this->dbParameters.at(parameter);
     }
-    catch (const std::out_of_range& oor)
+    catch (const std::out_of_range & oor)
     {
         stringstream ss;
         ss << "The DbParameter with value \"" << static_cast<typename std::underlying_type<IDbDocInfo::DbParameter>::type>(parameter) << "\" is unknown.";
@@ -161,7 +169,25 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
     }
 }
 
-/*static*/const std::string& CDbDocInfo::GetDefaultTileInfoColumnName(TilesInfoColumn c) 
+/*virtual*/bool CDbDocInfo::GetCoordinateDataColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const
+{
+    const auto& it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
+    if (it == this->dimensions.cend())
+    {
+        return false;
+    }
+
+    columnName = "The";
+    columnName += *it;
+    return true;
+}
+
+/*virtual*/const std::vector<ColumnTypeAllInfo>& CDbDocInfo::GetCoordinateDataColumnInfo() const
+{
+    return this->coordinateDataColumns;
+}
+
+/*static*/const std::string& CDbDocInfo::GetDefaultTileInfoColumnName(TilesInfoColumn c)
 {
     switch (c)
     {
@@ -225,3 +251,73 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_ind
 
     throw std::invalid_argument("Unknown enumeration");
 }
+
+/*virtual*/const std::string& CDbDocInfo::GetPerTilesDataColumnName(PerTileDataColumn c) const
+{
+    switch (c)
+    {
+    case PerTileDataColumn::Pk:
+        return CDbDocInfo::ColumnName_PerTilesData_Pk;
+    }
+
+    throw std::invalid_argument("Unknown enumeration");
+}
+
+//-----------------------------------------------------------------------------
+
+/*static*/std::vector<ColumnTypeAllInfo> DbDocInfoUtils::Convert(const SlImgDoc::PerTileDataCreateOptions& opts)
+{
+    std::vector<ColumnTypeAllInfo> r;
+    r.reserve(opts.descriptions.size());
+    for (const auto& i : opts.descriptions)
+    {
+        ColumnTypeAllInfo allInfo;
+        bool b = DbUtils::TryParse(i.DataType, &allInfo);
+        //bool b = TryParse(i.DataType, &allInfo);
+        allInfo.columnName = i.Name;
+        r.emplace_back(allInfo);
+    }
+
+    return r;
+}
+
+///*static*/bool DbDocInfoUtils::TryParse(const std::string& str, ColumnTypeInfo* colTypeInfo)
+//{
+//    ColumnTypeInfo ti;
+//    if (str == "FLOAT")
+//    {
+//        ti.type = ColumnType::Float;
+//        ti.size = 0;
+//    }
+//    else if (str == "INTEGER" || str == "INTEGER(4)")
+//    {
+//        ti.type = ColumnType::Integer;
+//        ti.size = 4;
+//    }
+//    else if (str == "INTEGER(1)")
+//    {
+//        ti.type = ColumnType::Integer;
+//        ti.size = 1;
+//    }
+//    else if (str == "INTEGER(2)")
+//    {
+//        ti.type = ColumnType::Integer;
+//        ti.size = 1;
+//    }
+//    else if (str == "INTEGER(8)")
+//    {
+//        ti.type = ColumnType::Integer;
+//        ti.size = 8;
+//    }
+//    else
+//    {
+//        return false;
+//    }
+//
+//    if (colTypeInfo != nullptr)
+//    {
+//        *colTypeInfo = ti;
+//    }
+//
+//    return true;
+//}

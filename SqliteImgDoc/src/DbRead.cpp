@@ -168,7 +168,6 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
     }
 }
 
-
 /*virtual*/void CDbRead::GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func)
 {
     stringstream ss;    //ss << "SELECT Pixelwidth,Pixelheight,Pixeltype,Datatype,Data_BinHdr,Data FROM TILESDATA WHERE rowId=(SELECT TileDataId FROM TILESINFO WHERE Pk=?1);";
@@ -223,6 +222,11 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
     {
         std::cout << excp.what();
     }
+}
+
+/*virtual*/void CDbRead::ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns)
+{
+    
 }
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)

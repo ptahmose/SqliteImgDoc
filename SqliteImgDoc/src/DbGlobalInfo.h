@@ -121,6 +121,7 @@ private:
     static std::string TableName_TilesData;
     static std::string TableName_TilesInfo;
     static std::string TableName_TilesSpatialIndex;
+    static std::string TableName_PerTileData;
 
     static std::string ColumnName_TilesInfo_Pk;
     static std::string ColumnName_TilesInfo_TileX;
@@ -191,4 +192,5 @@ public:
     static const std::string& GetDefaultTileInfoColumnName(TilesInfoColumn c);
     static const std::string& GetDefaultTileDataColumnName(TilesDataColumn c);
     static const std::string& GetDefaultSpatialIndexColumnName(TilesSpatialIndexColumn c);
+    static const std::string& GetDefaultTableName(TableType tt);
 };

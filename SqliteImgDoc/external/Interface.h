@@ -81,9 +81,6 @@ namespace SlImgDoc
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
 
-       /* virtual void AddCoordinateData(
-            const ITileCoordinate* coord,
-            std::function<bool(int, CoordinateData&)> funcGetData) = 0;*/
         virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
 
         virtual ~IDbWrite() = default;
@@ -119,9 +116,11 @@ namespace SlImgDoc
     {
     public:
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
-        virtual void ReadTileData(dbIndex ix, TilePixelInfo* pixelInfo, IBlob* data) = 0;
+        virtual void ReadTileData(dbIndex idx, TilePixelInfo* pixelInfo, IBlob* data) = 0;
 
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+
+        virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns) = 0;
 
         virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;

@@ -10,6 +10,11 @@
 using namespace std;
 using namespace SlImgDoc;
 
+/*static*/std::string CDbDocInfo::TableName_TilesData = "TILESDATA";
+/*static*/std::string CDbDocInfo::TableName_TilesInfo = "TILESINFO";
+/*static*/std::string CDbDocInfo::TableName_TilesSpatialIndex = "TILESPATIAL_index";
+/*static*/std::string CDbDocInfo::TableName_PerTileData = "COORDINATEDATA";
+
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_Pk = "Pk";
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_TileX = "TilePosX";
 /*static*/std::string CDbDocInfo::ColumnName_TilesInfo_TileY = "TilePosY";
@@ -45,6 +50,23 @@ CDbDocInfo::CDbDocInfo(
     tableNameSpatialIndex(std::move(tableName_SpatialIndex)),
     tableNameCoordinateData(std::move(tableName_CoordinateData))
 {
+}
+
+/*static*/const std::string& CDbDocInfo::GetDefaultTableName(TableType tt)
+{
+    switch (tt)
+    {
+    case IDbDocInfo::TableType::TilesData:
+        return CDbDocInfo::TableName_TilesData;
+    case IDbDocInfo::TableType::TilesInfo:
+        return CDbDocInfo::TableName_TilesInfo;
+    case IDbDocInfo::TableType::TilesSpatialIndex:
+        return CDbDocInfo::TableName_TilesSpatialIndex;
+    case IDbDocInfo::TableType::CoordinateData:
+        return CDbDocInfo::TableName_PerTileData;
+    }
+
+    return string();
 }
 
 CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index", "COORDINATEDATA")

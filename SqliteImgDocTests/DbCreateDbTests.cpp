@@ -122,3 +122,30 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
 
     EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
+
+TEST(DbCreateDbTests, CreateAndDiscover1)
+{
+    CreateOptions opts;
+    opts.dbFilename = "file:memdb3?mode=memory&cache=shared";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.sizeOfDataBinHdrField = 4;
+    auto db = IDbFactory::CreateNew(opts);
+    auto dbWrite = db->GetWriter();
+
+    LogicalPositionInfo posInfo;
+    posInfo.width = 100;
+    posInfo.height = 100;
+    posInfo.pyrLvl = 0;
+    TileBaseInfo tileBaseInfo;
+    tileBaseInfo.pixelWidth = 100;
+    tileBaseInfo.pixelHeight = 100;
+    tileBaseInfo.pixelType = PixelType::GRAY8;
+    TileCoordinate tc({ { 'C',0 },{'Z',2} });
+    CDataObjCustom dataCustom(4, 1);
+    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+
+    OpenOptions openOpts;
+    openOpts.dbFilename = "file:memdb3?mode=memory&cache=shared";
+    auto db2 = IDbFactory::OpenExisting(openOpts);
+}

@@ -41,6 +41,26 @@ namespace SlImgDoc
             : SqliteImgDocInvalidArgumentException(errMsg.c_str(), innerException) { }
     };
 
+    class SqliteImgDocUnexpectedCallException : public SqliteImgDocException
+    {
+    public:
+        /// Constructor of the SqliteImgDocUnexpectedCallException.
+        /// \param szErrMsg Message describing the error.
+        explicit SqliteImgDocUnexpectedCallException(const char* szErrMsg)
+            : SqliteImgDocException(szErrMsg) { }
+
+        explicit SqliteImgDocUnexpectedCallException(const char* szErrMsg, const std::exception& innerException)
+            : SqliteImgDocException(szErrMsg, innerException) { }
+
+        /// Constructor of the SqliteImgDocUnexpectedCallException.
+       /// \param errMsg Message describing the error.
+        explicit SqliteImgDocUnexpectedCallException(const std::string& errMsg)
+            : SqliteImgDocUnexpectedCallException(errMsg.c_str()) { }
+
+        explicit SqliteImgDocUnexpectedCallException(const std::string& errMsg, const std::exception& innerException)
+            : SqliteImgDocUnexpectedCallException(errMsg.c_str(), innerException) { }
+    };
+
     class SqliteImgDocDbDiscoverException :public SqliteImgDocException
     {
     public:

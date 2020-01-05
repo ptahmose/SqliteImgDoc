@@ -180,6 +180,7 @@ static void CreateTileTable(SQLite::Database* db)
     SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY);
     CCustomQueries::SetupCustomQueries(db->getHandle());
     CDbDiscover discover(db);
+    discover.DoIt();
     auto docInfo = discover.GetDocInfo();
 
     return make_shared<CDb>(db, docInfo);
@@ -223,6 +224,7 @@ SQLite::Database* CDbCreation::DoCreate()
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw;
     }
 
     return nullptr;

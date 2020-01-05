@@ -5,13 +5,47 @@
 #include <regex>
 #include "miscutilities.h"
 #include "../external/SqliteImgDocException.h"
+#include "DbMasterInfoTable.h"
 
 using namespace std;
 using namespace SlImgDoc;
 
+void CDbDiscover::DoIt()
+{
+    auto docInfo = CDbMasterInfoTableHelper::GetDocumentInfo(this->db);
+    if (docInfo.documentType == MasterInfo_DocumentType::Tiles2D)
+    {
+        this->DoTiles2DDiscovery();
+    }
+
+    this->discoveryDone = true;
+}
+
+void CDbDiscover::DoTiles2DDiscovery()
+{
+    auto docInfo2d = CDbMasterInfoTableHelper::GetDocumentInfoTile2D(this->db, 0);
+
+    const auto colNames = this->GetColumnNamesStartingWith(docInfo2d.tables[IDbDocInfo::TableType::TilesInfo], "DIM_");
+    const auto dims = this->GetTileDims(colNames);
+    auto docInfo = std::make_shared<CDbDocInfo>(
+        docInfo2d.tables[IDbDocInfo::TableType::TilesData],
+        docInfo2d.tables[IDbDocInfo::TableType::TilesInfo],
+        docInfo2d.tables[IDbDocInfo::TableType::TilesSpatialIndex],
+        docInfo2d.tables[IDbDocInfo::TableType::CoordinateData]);
+    docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
+
+    std::map<IDbDocInfo::DbParameter, std::uint32_t> dbParams;
+    dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn(docInfo2d.tables[IDbDocInfo::TableType::TilesData], "Data_BinHdr");
+    docInfo->SetDbParameters(std::move(dbParams));
+
+    this->docInfo = docInfo;
+}
+
 std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
 {
-    const auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
+    this->ThrowIfDiscoveryWasNotDone();
+    return this->docInfo;
+    /*const auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
     const auto dims = this->GetTileDims(colNames);
 
     auto docInfo = std::make_shared< CDbDocInfo>();
@@ -21,7 +55,13 @@ std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
     dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
     docInfo->SetDbParameters(std::move(dbParams));
 
-    return docInfo;
+    return docInfo;*/
+}
+
+std::shared_ptr<IDbDocInfo3D> CDbDiscover::GetDocInfo3D()
+{
+    this->ThrowIfDiscoveryWasNotDone();
+    return this->docInfo3d;
 }
 
 std::vector<std::string> CDbDiscover::GetColumnNamesStartingWith(const char* tableName, const char* startsWith)
@@ -88,6 +128,14 @@ bool CDbDiscover::TryParseBlobSize(const std::string& str, std::uint32_t* s)
         const auto& capture = sm[1].str();
         return MiscUtils::TryParseUint32(capture, s);
     }
-    
+
     return false;
+}
+
+void CDbDiscover::ThrowIfDiscoveryWasNotDone()
+{
+    if (!this->discoveryDone)
+    {
+        throw SqliteImgDocUnexpectedCallException("Database-discovery was not done or did not succeed.");
+    }
 }

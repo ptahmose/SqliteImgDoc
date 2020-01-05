@@ -62,6 +62,7 @@ TEST(DbDiscoverTests, Test1)
     auto internalDb = std::dynamic_pointer_cast<IInternalDb>(db);
 
     CDbDiscover discover(&internalDb->GetDb());
+    discover.DoIt();
     auto docInfo = discover.GetDocInfo();
 
     auto dataBinHdrSize = docInfo->GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize);
@@ -76,7 +77,8 @@ TEST(DbDiscoverTests, Test2)
     internalDb->GetDb().exec("ALTER TABLE TILESDATA RENAME COLUMN Data_BinHdr TO Data_BinHdrX");
 
     CDbDiscover discover(&internalDb->GetDb());
+    //discover.DoIt();
     EXPECT_THROW(
-        auto docInfo = discover.GetDocInfo(),
+        /*auto docInfo = discover.GetDocInfo()*/discover.DoIt(),
         SqliteImgDocDbDiscoverException);
 }

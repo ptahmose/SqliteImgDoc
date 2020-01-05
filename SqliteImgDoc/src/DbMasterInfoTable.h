@@ -42,6 +42,7 @@ public:
     };
 
     static const std::string& ToString(MasterInfo_DocumentType dt);
+    static MasterInfo_DocumentType MasterInfoDocumentTypeFromString(const std::string& str);
 public:
     static void AddMasterTable(SQLite::Database* db, const std::string& version);
     static void AddDocumentTiles2D(SQLite::Database* db, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName);
@@ -49,8 +50,8 @@ public:
 
     static DocumentInfo GetDocumentInfo(SQLite::Database* db);
 
-    static DocumentInfoTile2D GetDocumentInfoTile2D(int idx);
-    static DocumentInfoTile3D GetDocumentInfoTile3D(int idx);
+    static DocumentInfoTile2D GetDocumentInfoTile2D(SQLite::Database* db,int idx);
+    static DocumentInfoTile3D GetDocumentInfoTile3D(SQLite::Database* db, int idx);
 private:
     static void AddDocumentTiles2D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName);
 
@@ -59,4 +60,7 @@ private:
     static std::string GetFieldName_TableNameDocumentTilesInfoNo(int no);
     static std::string GetFieldName_TableNameDocumentTilesSpatialIndexNo(int no);
     static std::string GetFieldName_TableNameDocumentPerTileDataNo(int no);
+
+    static void GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, MasterInfo_DocumentType* docType);
+    static void GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, std::string* docType);
 };

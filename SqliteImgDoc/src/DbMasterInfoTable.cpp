@@ -29,21 +29,31 @@ using namespace SQLite;
     throw invalid_argument("Unknown document-type");
 }
 
+/*static*/MasterInfo_DocumentType CDbMasterInfoTableHelper::MasterInfoDocumentTypeFromString(const std::string& str)
+{
+    if (str == CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles2D))
+    {
+        return  MasterInfo_DocumentType::Tiles2D;
+    }
+
+    if (str == CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles3D))
+    {
+        return  MasterInfo_DocumentType::Tiles3D;
+    }
+
+    throw invalid_argument("Unknown document-type");
+}
+
 /*static*/void CDbMasterInfoTableHelper::AddMasterTable(SQLite::Database* db, const std::string& version)
 {
     stringstream ss;
-    ss << "CREATE TABLE[" << CDbMasterInfoTableHelper::TableName_MasterTable << "](";
-    ss << "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "] TEXT(40) UNIQUE," <<
+    ss << "CREATE TABLE[" << CDbMasterInfoTableHelper::TableName_MasterTable << "](" <<
+        "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "] TEXT(40) UNIQUE," <<
         "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString << "] TEXT);" <<
         "INSERT INTO [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] ([" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "]," <<
-        //"[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString << "]) VALUES(?1,?2);";
         "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString << "]) VALUES('" << CDbMasterInfoTableHelper::FieldName_Version << "','" << version << "');";
 
     db->exec(ss.str());
-    //Statement statement(*db, ss.str());
-    //statement.bind(1, CDbMasterInfoTableHelper::FieldName_Version);
-    //statement.bind(2, version);
-    //statement.exec();
 }
 
 /*static*/void CDbMasterInfoTableHelper::AddDocumentTiles2D(SQLite::Database* db, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName)
@@ -53,15 +63,51 @@ using namespace SQLite;
 
 /*static*/CDbMasterInfoTableHelper::DocumentInfo CDbMasterInfoTableHelper::GetDocumentInfo(SQLite::Database* db)
 {
-    throw "not implemented";
+    DocumentInfo docInfo;
+    CDbMasterInfoTableHelper::GetVersionAndDocumentInfo(db, nullptr, &docInfo.documentType);
+    return docInfo;
 }
 
-/*static*/CDbMasterInfoTableHelper::DocumentInfoTile2D CDbMasterInfoTableHelper::GetDocumentInfoTile2D(int idx)
+/*static*/CDbMasterInfoTableHelper::DocumentInfoTile2D CDbMasterInfoTableHelper::GetDocumentInfoTile2D(SQLite::Database* db, int idx)
 {
-    throw "not implemented";
+    const auto& tableNameDocumentTilesData = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesDataNo(0);
+    const auto& tableNameDocumentTilesInfo = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesInfoNo(0);
+    const auto& tableNameDocumentTilesSpatialIndex = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesSpatialIndexNo(0);
+    const auto& tableNameDocumentPerTileData = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo(0);
+    stringstream ss;
+    ss << "SELECT " << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "," << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString <<
+        " FROM [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] WHERE [" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "] IN(";
+    ss << "'" << tableNameDocumentTilesData << "',";
+    ss << "'" << tableNameDocumentTilesInfo << "',";
+    ss << "'" << tableNameDocumentTilesSpatialIndex << "',";
+    ss << "'" << tableNameDocumentPerTileData << "');";
+    SQLite::Statement query(*db, ss.str());
+    DocumentInfoTile2D docInfo2d;
+    while (query.executeStep())
+    {
+        const auto& key = query.getColumn(0).getString();
+        if (tableNameDocumentTilesData==key)
+        {
+            docInfo2d.tables[IDbDocInfo::TableType::TilesData]= query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentTilesInfo == key)
+        {
+            docInfo2d.tables[IDbDocInfo::TableType::TilesInfo] = query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentTilesSpatialIndex == key)
+        {
+            docInfo2d.tables[IDbDocInfo::TableType::TilesSpatialIndex] = query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentPerTileData == key)
+        {
+            docInfo2d.tables[IDbDocInfo::TableType::CoordinateData] = query.getColumn(1).getString();
+        }
+    }
+
+    return docInfo2d;
 }
 
-/*static*/CDbMasterInfoTableHelper::DocumentInfoTile3D CDbMasterInfoTableHelper::GetDocumentInfoTile3D(int idx)
+/*static*/CDbMasterInfoTableHelper::DocumentInfoTile3D CDbMasterInfoTableHelper::GetDocumentInfoTile3D(SQLite::Database* db, int idx)
 {
     throw "not implemented";
 }
@@ -139,4 +185,48 @@ using namespace SQLite;
     stringstream ss;
     ss << CDbMasterInfoTableHelper::FieldName_TableNameDocumentPerTileData << no;
     return ss.str();
+}
+
+/*static*/void CDbMasterInfoTableHelper::GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, MasterInfo_DocumentType* docType)
+{
+    std::string docTypeString;
+    CDbMasterInfoTableHelper::GetVersionAndDocumentInfo(db, version, &docTypeString);
+    MasterInfo_DocumentType dt = CDbMasterInfoTableHelper::MasterInfoDocumentTypeFromString(docTypeString);
+    if (docType != nullptr)
+    {
+        *docType = dt;
+    }
+}
+
+/*static*/void CDbMasterInfoTableHelper::GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, std::string* docType)
+{
+    stringstream ss;
+    ss << "SELECT " << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "," << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString <<
+        " FROM [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] WHERE [" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "] IN(" <<
+        "'" << CDbMasterInfoTableHelper::FieldName_Version << "','" << CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(0) << "');";
+    SQLite::Statement query(*db, ss.str());
+    bool hasVersion = false;
+    bool hasDocType = false;
+    while (query.executeStep())
+    {
+        const auto& key = query.getColumn(0).getString();
+        if (key == CDbMasterInfoTableHelper::FieldName_Version)
+        {
+            if (version != nullptr)
+            {
+                *version = query.getColumn(1).getString();
+            }
+
+            hasVersion = true;
+        }
+        else if (key == CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(0))
+        {
+            if (docType != nullptr)
+            {
+                *docType = query.getColumn(1).getString();
+            }
+
+            hasDocType = true;
+        }
+    }
 }

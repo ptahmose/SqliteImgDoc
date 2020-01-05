@@ -56,6 +56,7 @@ dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw;
     }
 }
 
@@ -98,6 +99,7 @@ dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw;
     }
 }
 

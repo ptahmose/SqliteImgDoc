@@ -6,6 +6,7 @@
 #include "DbGlobalInfo.h"
 #include "../external/SqliteImgDocException.h"
 #include "dbutils.h"
+#include "miscutilities.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -66,7 +67,7 @@ CDbDocInfo::CDbDocInfo(
         return CDbDocInfo::TableName_PerTileData;
     }
 
-    return string();
+    return MiscUtils::empty_string;
 }
 
 CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index", "COORDINATEDATA")

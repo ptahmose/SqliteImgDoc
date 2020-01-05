@@ -6,6 +6,8 @@
 
 using namespace std;
 
+/*static*/std::string MiscUtils::empty_string = string("");
+
 /*static*/bool MiscUtils::TryParseUint64(const char* sz, std::uint64_t* val)
 {
     char* end;

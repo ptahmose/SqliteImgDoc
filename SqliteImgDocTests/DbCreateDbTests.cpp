@@ -126,7 +126,7 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
 TEST(DbCreateDbTests, CreateAndDiscover1)
 {
     CreateOptions opts;
-    opts.dbFilename = "file:memdb3?mode=memory&cache=shared";
+    opts.dbFilename = "file:memdb1?mode=memory&cache=shared";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');
     opts.sizeOfDataBinHdrField = 4;
@@ -146,6 +146,8 @@ TEST(DbCreateDbTests, CreateAndDiscover1)
     dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
 
     OpenOptions openOpts;
-    openOpts.dbFilename = "file:memdb3?mode=memory&cache=shared";
+    openOpts.dbFilename = "file:memdb1?mode=memory&cache=shared";
     auto db2 = IDbFactory::OpenExisting(openOpts);
+    auto dbRead = db2->GetReader();
+    EXPECT_TRUE(dbRead) << "Expecting to have a valid data-base here.";
 }

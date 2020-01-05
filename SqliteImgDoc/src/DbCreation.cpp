@@ -177,8 +177,9 @@ static void CreateTileTable(SQLite::Database* db)
 #endif
 /*static*/std::shared_ptr<IDb> IDbFactory::OpenExisting(const OpenOptions& opts)
 {
-    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY);
+    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY | SQLite::OPEN_URI);
     CCustomQueries::SetupCustomQueries(db->getHandle());
+
     CDbDiscover discover(db);
     discover.DoIt();
     auto docInfo = discover.GetDocInfo();
@@ -198,7 +199,7 @@ SQLite::Database* CDbCreation::DoCreate()
 
     try
     {
-        SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+        SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE | SQLite::OPEN_URI);
         CCustomQueries::SetupCustomQueries(db->getHandle());
 
         CDbMasterInfoTableHelper::AddMasterTable(db, "0.0.1-alpha");

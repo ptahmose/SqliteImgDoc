@@ -19,14 +19,20 @@
 CDbDocInfo3D::CDbDocInfo3D(
     std::string tableName_bricksdata,
     std::string tableName_bricksinfo,
-    std::string tableName_SpatialIndex)
+    std::string tableName_SpatialIndex,
+    std::string tableName_perBrickData)
     : tableNameBricksData(std::move(tableName_bricksdata)),
     tableNameBricksInfo(std::move(tableName_bricksinfo)),
-    tableNameSpatialIndex(std::move(tableName_SpatialIndex))
+    tableNameSpatialIndex(std::move(tableName_SpatialIndex)),
+    tableNamePerTileData(std::move(tableName_perBrickData))
 {
 }
 
-CDbDocInfo3D::CDbDocInfo3D() : CDbDocInfo3D("BRICKSDATA", "BRICKSINFO", "BRICKSSPATIAL_index")
+CDbDocInfo3D::CDbDocInfo3D() : CDbDocInfo3D(
+    CDbDocInfo3D::TableName_BricksData,
+    CDbDocInfo3D::TableName_BricksInfo,
+    CDbDocInfo3D::TableName_BricksSpatialIndex,
+    CDbDocInfo3D::TableName_PerBricksData)
 {
 }
 
@@ -40,6 +46,8 @@ CDbDocInfo3D::CDbDocInfo3D() : CDbDocInfo3D("BRICKSDATA", "BRICKSINFO", "BRICKSS
         return this->tableNameBricksInfo;
     case TableType::TilesSpatialIndex:
         return this->tableNameSpatialIndex;
+    case TableType::PerBrickData:
+        return this->tableNamePerTileData;
     }
 
     throw std::invalid_argument("Unknown enumeration");

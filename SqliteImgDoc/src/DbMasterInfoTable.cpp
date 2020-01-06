@@ -114,7 +114,41 @@ using namespace SQLite;
 
 /*static*/CDbMasterInfoTableHelper::DocumentInfoTile3D CDbMasterInfoTableHelper::GetDocumentInfoTile3D(SQLite::Database* db, int idx)
 {
-    throw "not implemented";
+    const auto& tableNameDocumentTilesData = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesDataNo(0);
+    const auto& tableNameDocumentTilesInfo = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesInfoNo(0);
+    const auto& tableNameDocumentTilesSpatialIndex = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesSpatialIndexNo(0);
+    const auto& tableNameDocumentPerTileData = CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo(0);
+    stringstream ss;
+    ss << "SELECT " << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "," << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString <<
+        " FROM [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] WHERE [" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "] IN(";
+    ss << "'" << tableNameDocumentTilesData << "',";
+    ss << "'" << tableNameDocumentTilesInfo << "',";
+    ss << "'" << tableNameDocumentTilesSpatialIndex << "',";
+    ss << "'" << tableNameDocumentPerTileData << "');";
+    SQLite::Statement query(*db, ss.str());
+    DocumentInfoTile3D docInfo3d;
+    while (query.executeStep())
+    {
+        const auto& key = query.getColumn(0).getString();
+        if (tableNameDocumentTilesData == key)
+        {
+            docInfo3d.tables[IDbDocInfo3D::TableType::TilesData] = query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentTilesInfo == key)
+        {
+            docInfo3d.tables[IDbDocInfo3D::TableType::TilesInfo] = query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentTilesSpatialIndex == key)
+        {
+            docInfo3d.tables[IDbDocInfo3D::TableType::TilesSpatialIndex] = query.getColumn(1).getString();
+        }
+        else if (tableNameDocumentPerTileData == key)
+        {
+            docInfo3d.tables[IDbDocInfo3D::TableType::PerBrickData] = query.getColumn(1).getString();
+        }
+    }
+
+    return docInfo3d;
 }
 
 /*static*/void CDbMasterInfoTableHelper::AddDocumentTiles2D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName)
@@ -131,7 +165,13 @@ using namespace SQLite;
         { IDbDocInfo::TableType::CoordinateData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
     };
 
-    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(db,no, list, sizeof(list) / sizeof(list[0]), [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
+    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(
+        db,
+        no, 
+        list, 
+        sizeof(list) / sizeof(list[0]),
+        CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles2D),
+        [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
     /*stringstream ss;
     int valueNo = 1;
 
@@ -172,7 +212,13 @@ using namespace SQLite;
         { IDbDocInfo3D::TableType::PerBrickData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
     };
 
-    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(db, no, list, sizeof(list) / sizeof(list[0]), [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
+    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(
+        db, 
+        no, 
+        list, 
+        sizeof(list) / sizeof(list[0]),
+        CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles3D),
+        [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
 }
 
 /*static*/std::string CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(int no)

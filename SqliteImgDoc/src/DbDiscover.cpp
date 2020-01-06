@@ -50,7 +50,22 @@ void CDbDiscover::DoTiles2DDiscovery()
 
 void CDbDiscover::DoTiles3DDiscovery()
 {
-    // TODO
+    auto docInfo3d = CDbMasterInfoTableHelper::GetDocumentInfoTile3D(this->db, 0);
+
+    const auto colNames = this->GetColumnNamesStartingWith(docInfo3d.tables[IDbDocInfo3D::TableType::TilesInfo], "DIM_");
+    const auto dims = this->GetTileDims(colNames);
+    auto docInfo = std::make_shared<CDbDocInfo3D>(
+        docInfo3d.tables[IDbDocInfo3D::TableType::TilesData],
+        docInfo3d.tables[IDbDocInfo3D::TableType::TilesInfo],
+        docInfo3d.tables[IDbDocInfo3D::TableType::TilesSpatialIndex],
+        docInfo3d.tables[IDbDocInfo3D::TableType::PerBrickData]);
+    docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
+
+    std::map<IDbDocInfo3D::DbParameter, std::uint32_t> dbParams;
+    dbParams[IDbDocInfo3D::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn(docInfo3d.tables[IDbDocInfo3D::TableType::TilesData], "Data_BinHdr");
+    docInfo->SetDbParameters(std::move(dbParams));
+
+    this->docInfo3d = docInfo;
 }
 
 std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()

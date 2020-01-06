@@ -66,7 +66,7 @@ private:
     static void GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, std::string* docType);
 
     template <typename tTableTypeAndGetFieldName>
-    static void ExecuteInsertInto(SQLite::Database* db,int no,const tTableTypeAndGetFieldName* list, int count, const std::function<std::string(const tTableTypeAndGetFieldName&)>& funcGetTableName)
+    static void ExecuteInsertInto(SQLite::Database* db,int no,const tTableTypeAndGetFieldName* list, int count, const std::string& docTypeValue, const std::function<std::string(const tTableTypeAndGetFieldName&)>& funcGetTableName)
     {
         std::stringstream ss;
         int valueNo = 1;
@@ -89,7 +89,7 @@ private:
         }
 
         statement.bind(valueNo++, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(no));
-        statement.bind(valueNo, CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles2D));
+        statement.bind(valueNo, docTypeValue);
 
         statement.exec();
     }

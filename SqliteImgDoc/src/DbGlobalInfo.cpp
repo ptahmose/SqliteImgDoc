@@ -45,7 +45,6 @@ CDbDocInfo::CDbDocInfo(
     std::string tableName_tilesinfo,
     std::string tableName_SpatialIndex,
     std::string tableName_CoordinateData)
-
     : tableNameTilesData(std::move(tableName_tilesdata)),
     tableNameTilesInfo(std::move(tableName_tilesinfo)),
     tableNameSpatialIndex(std::move(tableName_SpatialIndex)),
@@ -70,7 +69,11 @@ CDbDocInfo::CDbDocInfo(
     return MiscUtils::empty_string;
 }
 
-CDbDocInfo::CDbDocInfo() : CDbDocInfo("TILESDATA", "TILESINFO", "TILESPATIAL_index", "COORDINATEDATA")
+CDbDocInfo::CDbDocInfo() : CDbDocInfo(
+    CDbDocInfo::TableName_TilesData, 
+    CDbDocInfo::TableName_TilesInfo, 
+    CDbDocInfo::TableName_TilesSpatialIndex, 
+    CDbDocInfo::TableName_PerTileData)
 {
 }
 

@@ -157,7 +157,7 @@ TEST(DbCreateDbTests, CreateAndDiscover1)
 TEST(DbCreateDbTests, CreateAndDiscover2)
 {
     CreateOptions opts;
-    opts.dbFilename = "file:memdb1?mode=memory&cache=shared";
+    opts.dbFilename = "file:memdb2?mode=memory&cache=shared";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');
     opts.sizeOfDataBinHdrField = 4;
@@ -177,10 +177,10 @@ TEST(DbCreateDbTests, CreateAndDiscover2)
     dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);*/
 
     OpenOptions openOpts;
-    openOpts.dbFilename = "file:memdb1?mode=memory&cache=shared";
+    openOpts.dbFilename = "file:memdb2?mode=memory&cache=shared";
     auto db2 = IDbFactory::OpenExisting(openOpts);
     auto dbRead = db2->GetReader();
     auto dbRead3d = db2->GetReader3D();
-    EXPECT_TRUE(dbRead) << "Expecting to have a valid data-base here.";
-    EXPECT_FALSE(dbRead3d) << "Expecting NOT to have a valid data-base here.";
+    EXPECT_TRUE(dbRead3d) << "Expecting to have a valid data-base here.";
+    EXPECT_FALSE(dbRead) << "Expecting NOT to have a valid data-base here.";
 }

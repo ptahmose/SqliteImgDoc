@@ -164,17 +164,19 @@ TEST(DbCreateDbTests, CreateAndDiscover2)
     auto db = IDbFactory::CreateNew3D(opts);
     auto dbWrite = db->GetWriter3D();
 
-  /*  LogicalPositionInfo posInfo;
+    LogicalPositionInfo3D posInfo;
     posInfo.width = 100;
     posInfo.height = 100;
+    posInfo.depth = 100;
     posInfo.pyrLvl = 0;
-    TileBaseInfo tileBaseInfo;
+    TileBaseInfo3D tileBaseInfo;
     tileBaseInfo.pixelWidth = 100;
     tileBaseInfo.pixelHeight = 100;
+    tileBaseInfo.pixelDepth = 100;
     tileBaseInfo.pixelType = PixelType::GRAY8;
     TileCoordinate tc({ { 'C',0 },{'Z',2} });
     CDataObjCustom dataCustom(4, 1);
-    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);*/
+    dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, &dataCustom);
 
     OpenOptions openOpts;
     openOpts.dbFilename = "file:memdb2?mode=memory&cache=shared";

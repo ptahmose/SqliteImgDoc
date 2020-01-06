@@ -182,9 +182,20 @@ static void CreateTileTable(SQLite::Database* db)
 
     CDbDiscover discover(db);
     discover.DoIt();
-    auto docInfo = discover.GetDocInfo();
 
-    return make_shared<CDb>(db, docInfo);
+    auto docInfo = discover.GetDocInfo();
+    if (docInfo)
+    {
+        return make_shared<CDb>(db, docInfo);
+    }
+
+    auto docInfo3d = discover.GetDocInfo3D();
+    if (docInfo3d)
+    {
+        return make_shared<CDb>(db, docInfo3d);
+    }
+
+    // TODO: throw
 }
 
 //-------------------------------------------------------------------------------------------------

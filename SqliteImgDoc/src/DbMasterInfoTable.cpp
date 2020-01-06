@@ -61,6 +61,11 @@ using namespace SQLite;
     CDbMasterInfoTableHelper::AddDocumentTiles2D(db, 0, funcGetTableName);
 }
 
+/*static*/void CDbMasterInfoTableHelper::AddDocumentTiles3D(SQLite::Database* db, const std::function<const std::string(IDbDocInfo3D::TableType)>& funcGetTableName)
+{
+    CDbMasterInfoTableHelper::AddDocumentTiles3D(db, 0, funcGetTableName);
+}
+
 /*static*/CDbMasterInfoTableHelper::DocumentInfo CDbMasterInfoTableHelper::GetDocumentInfo(SQLite::Database* db)
 {
     DocumentInfo docInfo;
@@ -86,9 +91,9 @@ using namespace SQLite;
     while (query.executeStep())
     {
         const auto& key = query.getColumn(0).getString();
-        if (tableNameDocumentTilesData==key)
+        if (tableNameDocumentTilesData == key)
         {
-            docInfo2d.tables[IDbDocInfo::TableType::TilesData]= query.getColumn(1).getString();
+            docInfo2d.tables[IDbDocInfo::TableType::TilesData] = query.getColumn(1).getString();
         }
         else if (tableNameDocumentTilesInfo == key)
         {
@@ -114,7 +119,7 @@ using namespace SQLite;
 
 /*static*/void CDbMasterInfoTableHelper::AddDocumentTiles2D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName)
 {
-    static const struct
+    static const struct TableAndGetFieldName
     {
         IDbDocInfo::TableType tableType;
         string(*pfn)(int);
@@ -126,7 +131,8 @@ using namespace SQLite;
         { IDbDocInfo::TableType::CoordinateData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
     };
 
-    stringstream ss;
+    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(db,no, list, sizeof(list) / sizeof(list[0]), [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
+    /*stringstream ss;
     int valueNo = 1;
 
     ss << "INSERT INTO [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] ([" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "]," << "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString << "]) VALUES";
@@ -149,7 +155,24 @@ using namespace SQLite;
     statement.bind(valueNo++, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(no));
     statement.bind(valueNo, CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles2D));
 
-    statement.exec();
+    statement.exec();*/
+}
+
+/*static*/void CDbMasterInfoTableHelper::AddDocumentTiles3D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo3D::TableType)>& funcGetTableName)
+{
+    static const struct TableAndGetFieldName
+    {
+        IDbDocInfo3D::TableType tableType;
+        string(*pfn)(int);
+    } list[] =
+    {
+        { IDbDocInfo3D::TableType::TilesData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesDataNo },
+        { IDbDocInfo3D::TableType::TilesInfo, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesInfoNo },
+        { IDbDocInfo3D::TableType::TilesSpatialIndex, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesSpatialIndexNo },
+        { IDbDocInfo3D::TableType::PerBrickData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
+    };
+
+    CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(db, no, list, sizeof(list) / sizeof(list[0]), [&](const TableAndGetFieldName& x)->string {return funcGetTableName(x.tableType); });
 }
 
 /*static*/std::string CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(int no)

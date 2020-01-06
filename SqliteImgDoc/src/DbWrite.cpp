@@ -13,10 +13,6 @@ using namespace SlImgDoc;
 
 /*virtual*/CDbWrite::~CDbWrite()
 {
-    //if (this->transactionPending == true)
-    //{
-    //    this->RollbackTransaction();
-    //}
 }
 
 dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)

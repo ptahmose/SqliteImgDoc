@@ -20,6 +20,7 @@ public:
     std::shared_ptr<IDbDocInfo3D> GetDocInfo3D();
 private:
     void DoTiles2DDiscovery();
+    void DoTiles3DDiscovery();
 
     std::vector<std::string> GetColumnNamesStartingWith(const char* tableName, const char* startsWith);
     std::vector<SlImgDoc::TileDim> GetTileDims(std::vector<std::string> colNames);

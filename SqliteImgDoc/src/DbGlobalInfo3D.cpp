@@ -4,7 +4,12 @@
 #include "DbGlobalInfo3D.h"
 #include "DbGlobalInfo.h"
 #include "../external/SqliteImgDocException.h"
+#include "miscutilities.h"
 
+/*static*/std::string CDbDocInfo3D::TableName_BricksData = "BRICKSDATA";
+/*static*/std::string CDbDocInfo3D::TableName_BricksInfo = "BRICKSINFO";
+/*static*/std::string CDbDocInfo3D::TableName_BricksSpatialIndex = "BRICKSSPATIAL_index";
+/*static*/std::string CDbDocInfo3D::TableName_PerBricksData = "PERBRICKDATA";
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesInfo_TileZ = "TilePosZ";
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesInfo_TileHeight = "TileDepth";
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesData_PixelDepth = "Pixeldepth";
@@ -121,4 +126,21 @@ CDbDocInfo3D::CDbDocInfo3D() : CDbDocInfo3D("BRICKSDATA", "BRICKSINFO", "BRICKSS
     }
 
     throw std::invalid_argument("Unknown enumeration");
+}
+
+/*static*/const std::string& CDbDocInfo3D::GetDefaultTableName(TableType tt)
+{
+    switch (tt)
+    {
+    case IDbDocInfo3D::TableType::TilesData:
+        return CDbDocInfo3D::TableName_BricksData;
+    case IDbDocInfo3D::TableType::TilesInfo:
+        return CDbDocInfo3D::TableName_BricksInfo;
+    case IDbDocInfo3D::TableType::TilesSpatialIndex:
+        return CDbDocInfo3D::TableName_BricksSpatialIndex;
+    case IDbDocInfo3D::TableType::PerBrickData:
+        return CDbDocInfo3D::TableName_PerBricksData;
+    }
+
+    return MiscUtils::empty_string;
 }

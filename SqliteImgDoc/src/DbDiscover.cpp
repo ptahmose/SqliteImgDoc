@@ -13,9 +13,16 @@ using namespace SlImgDoc;
 void CDbDiscover::DoIt()
 {
     auto docInfo = CDbMasterInfoTableHelper::GetDocumentInfo(this->db);
-    if (docInfo.documentType == MasterInfo_DocumentType::Tiles2D)
+    switch (docInfo.documentType)
     {
+    case MasterInfo_DocumentType::Tiles2D:
         this->DoTiles2DDiscovery();
+        break;;
+    case MasterInfo_DocumentType::Tiles3D:
+        this->DoTiles3DDiscovery();
+        break;
+    default:
+        throw "ERROR";//TODO
     }
 
     this->discoveryDone = true;
@@ -41,21 +48,15 @@ void CDbDiscover::DoTiles2DDiscovery()
     this->docInfo = docInfo;
 }
 
+void CDbDiscover::DoTiles3DDiscovery()
+{
+    // TODO
+}
+
 std::shared_ptr<IDbDocInfo> CDbDiscover::GetDocInfo()
 {
     this->ThrowIfDiscoveryWasNotDone();
     return this->docInfo;
-    /*const auto colNames = this->GetColumnNamesStartingWith("TILESINFO", "DIM_");
-    const auto dims = this->GetTileDims(colNames);
-
-    auto docInfo = std::make_shared< CDbDocInfo>();
-    docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
-
-    std::map<IDbDocInfo::DbParameter, std::uint32_t> dbParams;
-    dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn("TILESDATA", "Data_BinHdr");
-    docInfo->SetDbParameters(std::move(dbParams));
-
-    return docInfo;*/
 }
 
 std::shared_ptr<IDbDocInfo3D> CDbDiscover::GetDocInfo3D()

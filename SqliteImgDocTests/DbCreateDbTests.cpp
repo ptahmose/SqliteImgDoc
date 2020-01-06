@@ -149,5 +149,38 @@ TEST(DbCreateDbTests, CreateAndDiscover1)
     openOpts.dbFilename = "file:memdb1?mode=memory&cache=shared";
     auto db2 = IDbFactory::OpenExisting(openOpts);
     auto dbRead = db2->GetReader();
+    auto dbRead3d = db2->GetReader3D();
     EXPECT_TRUE(dbRead) << "Expecting to have a valid data-base here.";
+    EXPECT_FALSE(dbRead3d) << "Expecting NOT to have a valid data-base here.";
+}
+
+TEST(DbCreateDbTests, CreateAndDiscover2)
+{
+    CreateOptions opts;
+    opts.dbFilename = "file:memdb1?mode=memory&cache=shared";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.sizeOfDataBinHdrField = 4;
+    auto db = IDbFactory::CreateNew3D(opts);
+    auto dbWrite = db->GetWriter3D();
+
+  /*  LogicalPositionInfo posInfo;
+    posInfo.width = 100;
+    posInfo.height = 100;
+    posInfo.pyrLvl = 0;
+    TileBaseInfo tileBaseInfo;
+    tileBaseInfo.pixelWidth = 100;
+    tileBaseInfo.pixelHeight = 100;
+    tileBaseInfo.pixelType = PixelType::GRAY8;
+    TileCoordinate tc({ { 'C',0 },{'Z',2} });
+    CDataObjCustom dataCustom(4, 1);
+    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);*/
+
+    OpenOptions openOpts;
+    openOpts.dbFilename = "file:memdb1?mode=memory&cache=shared";
+    auto db2 = IDbFactory::OpenExisting(openOpts);
+    auto dbRead = db2->GetReader();
+    auto dbRead3d = db2->GetReader3D();
+    EXPECT_TRUE(dbRead) << "Expecting to have a valid data-base here.";
+    EXPECT_FALSE(dbRead3d) << "Expecting NOT to have a valid data-base here.";
 }

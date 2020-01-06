@@ -12,7 +12,8 @@ public:
 	{
 		TilesData,
 		TilesInfo,
-		TilesSpatialIndex
+		TilesSpatialIndex,
+		PerBrickData
 	};
 
 	enum class TilesInfoColumn
@@ -80,8 +81,14 @@ private:
 	std::string tableNameBricksData;
 	std::string tableNameBricksInfo;
 	std::string tableNameSpatialIndex;
+	std::string tableNamePerTileData;
 	std::map<IDbDocInfo3D::DbParameter, std::uint32_t> dbParameters;
 private:
+	static std::string TableName_BricksData;
+	static std::string TableName_BricksInfo;
+	static std::string TableName_BricksSpatialIndex;
+	static std::string TableName_PerBricksData;
+
 	static std::string ColumnName_TilesInfo_TileZ;
 	static std::string ColumnName_TilesInfo_TileHeight;
 
@@ -112,4 +119,7 @@ public:
 	virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
 	virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const;
 	virtual std::uint32_t GetDbParameter(DbParameter parameter) const;
+
+public:
+	static const std::string& GetDefaultTableName(TableType tt);
 };

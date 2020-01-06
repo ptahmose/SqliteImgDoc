@@ -46,7 +46,7 @@ public:
 public:
     static void AddMasterTable(SQLite::Database* db, const std::string& version);
     static void AddDocumentTiles2D(SQLite::Database* db, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName);
-    static void AddDocumentTiles3D(std::function<const std::string(IDbDocInfo3D::TableType)> funcGetTableName);
+    static void AddDocumentTiles3D(SQLite::Database* db, const std::function<const std::string(IDbDocInfo3D::TableType)>& funcGetTableName);
 
     static DocumentInfo GetDocumentInfo(SQLite::Database* db);
 
@@ -54,6 +54,7 @@ public:
     static DocumentInfoTile3D GetDocumentInfoTile3D(SQLite::Database* db, int idx);
 private:
     static void AddDocumentTiles2D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo::TableType)>& funcGetTableName);
+    static void AddDocumentTiles3D(SQLite::Database* db, int no, const std::function<const std::string(IDbDocInfo3D::TableType)>& funcGetTableName);
 
     static std::string GetFieldName_TableNameDocumentTypeNo(int no);
     static std::string GetFieldName_TableNameDocumentTilesDataNo(int no);
@@ -63,4 +64,33 @@ private:
 
     static void GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, MasterInfo_DocumentType* docType);
     static void GetVersionAndDocumentInfo(SQLite::Database* db, std::string* version, std::string* docType);
+
+    template <typename tTableTypeAndGetFieldName>
+    static void ExecuteInsertInto(SQLite::Database* db,int no,const tTableTypeAndGetFieldName* list, int count, const std::function<std::string(const tTableTypeAndGetFieldName&)>& funcGetTableName)
+    {
+        std::stringstream ss;
+        int valueNo = 1;
+
+        ss << "INSERT INTO [" << CDbMasterInfoTableHelper::TableName_MasterTable << "] ([" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_Key << "]," << "[" << CDbMasterInfoTableHelper::TableName_MasterTableColumnName_ValueString << "]) VALUES";
+        for (size_t i = 0; i < count; ++i)
+        {
+            ss << "(?" << valueNo << ",?" << valueNo + 1 << "),";
+            valueNo += 2;
+        }
+
+        ss << "(?" << valueNo << ",?" << valueNo + 1 << ")";
+
+        valueNo = 1;
+        SQLite::Statement statement(*db, ss.str());
+        for (int i=0;i<count;++i)
+        {
+            statement.bind(valueNo++, list[i].pfn(no));
+            statement.bind(valueNo++, funcGetTableName(list[i]));
+        }
+
+        statement.bind(valueNo++, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTypeNo(no));
+        statement.bind(valueNo, CDbMasterInfoTableHelper::ToString(MasterInfo_DocumentType::Tiles2D));
+
+        statement.exec();
+    }
 };

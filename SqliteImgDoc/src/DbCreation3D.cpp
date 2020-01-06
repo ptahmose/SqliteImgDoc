@@ -13,6 +13,7 @@
 #include "DbDiscover.h"
 #include "CCustomQueries.h"
 #include "DbGlobalInfo3D.h"
+#include "DbMasterInfoTable.h"
 
 
 using namespace SlImgDoc;
@@ -27,8 +28,13 @@ SQLite::Database* CDbCreation3D::DoCreate()
 {
     try
     {
-        SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE);
+        SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_CREATE | SQLite::OPEN_READWRITE | SQLite::OPEN_URI);
         CCustomQueries::SetupCustomQueries(db->getHandle());
+
+        CDbMasterInfoTableHelper::AddMasterTable(db, "0.0.1-alpha");
+        CDbMasterInfoTableHelper::AddDocumentTiles3D(
+            db,
+            CDbDocInfo3D::GetDefaultTableName);
 
         auto sqlStatement = this->GetTilesInfoCreateSqlStatement();
         db->exec(sqlStatement);

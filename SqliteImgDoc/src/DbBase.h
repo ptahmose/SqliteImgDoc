@@ -23,7 +23,7 @@ protected:
     void CheckSizeOfBinHdrAndThrow(size_t s, std::uint32_t maxSize);
     void CheckIfAllDimensionGivenAndThrow(const std::vector<SlImgDoc::TileDim>&, const SlImgDoc::ITileCoordinate* coord);
 public:
-    /// The name of the table with the "technical document info"
+ /*   /// The name of the table with the "technical document info"
     static const char* TableName_DocumentInfo;
 
     /// The name of the table with the "tile list"
@@ -33,10 +33,10 @@ public:
     static const char* TableName_TileData;
 
     /// The name of the table with the "spatial index"
-    static const char* VTableName_SpatialTable;
+    static const char* VTableName_SpatialTable;*/
 
-    static const char* DocumentInfoColName_Version;
-    static const char* DocumentInfoColName_CoordinateDimensions;
-    static const char* DocumentInfoColName_IndexedDimensions;
+    //static const char* DocumentInfoColName_Version;
+    //static const char* DocumentInfoColName_CoordinateDimensions;
+    //static const char* DocumentInfoColName_IndexedDimensions;
 };
 

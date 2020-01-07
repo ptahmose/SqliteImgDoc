@@ -120,7 +120,7 @@ namespace SlImgDoc
 
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
 
-        virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns) = 0;
+        virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
         virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;

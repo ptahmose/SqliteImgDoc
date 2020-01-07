@@ -6,15 +6,15 @@
 using namespace std;
 using namespace SlImgDoc;
 
-/*static*/const char* CDbBase::TableName_DocumentInfo = "DOCINFO";
-/*static*/const char* CDbBase::TableName_TileTable = "TILES";
-/*static*/const char* CDbBase::TableName_TileData = "TILEDATA";
-/*static*/const char* CDbBase::VTableName_SpatialTable = "TILESPATIAL_index";
+///*static*/const char* CDbBase::TableName_DocumentInfo = "DOCINFO";
+///*static*/const char* CDbBase::TableName_TileTable = "TILES";
+///*static*/const char* CDbBase::TableName_TileData = "TILEDATA";
+///*static*/const char* CDbBase::VTableName_SpatialTable = "TILESPATIAL_index";
 
 
-/*static*/const char* CDbBase::DocumentInfoColName_Version = "Version";
-/*static*/const char* CDbBase::DocumentInfoColName_CoordinateDimensions = "CoordDims";
-/*static*/const char* CDbBase::DocumentInfoColName_IndexedDimensions = "IndexedDims";
+///*static*/const char* CDbBase::DocumentInfoColName_Version = "Version";
+///*static*/const char* CDbBase::DocumentInfoColName_CoordinateDimensions = "CoordDims";
+///*static*/const char* CDbBase::DocumentInfoColName_IndexedDimensions = "IndexedDims";
 
 void CDbBase::CheckSizeOfBinHdrAndThrow(size_t sizeBinHdr, std::uint32_t maxSize)
 {

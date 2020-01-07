@@ -38,7 +38,7 @@ namespace SlImgDoc
 
     struct VariadicData
     {
-        std::string DataType;
+        std::string DataType; // FLOAT, INTEGER(1),INTEGER(2),INTEGER(4),INTEGER(8)
         union
         {
             double  doubleValue;

@@ -53,4 +53,24 @@ TEST(PerTilesDataTests, Test1)
         }
     });
 
+    auto dbr = db->GetReader();
+
+    vector<string> cols{ "AcquisitionTime","FocusPosition" };
+
+    vector<KeyVariadicValuePair> results;
+    dbr->ReadPerTileData(idx, cols,
+        [&](const KeyVariadicValuePair& kv)->bool {results.push_back(kv); return true; });
+
+    ASSERT_EQ(results.size(), 2) << "Expected to have two results.";
+    const auto& it = find_if(
+        results.cbegin(), 
+        results.cend(), 
+        [&](const KeyVariadicValuePair& kvvp)->bool {return kvvp.Name == cols[0]; });
+    EXPECT_DOUBLE_EQ(it->Data.doubleValue, 42);
+
+    const auto& it2 = find_if(
+        results.cbegin(),
+        results.cend(),
+        [&](const KeyVariadicValuePair& kvvp)->bool {return kvvp.Name == cols[1]; });
+    EXPECT_DOUBLE_EQ(it2->Data.doubleValue, 43);
 }

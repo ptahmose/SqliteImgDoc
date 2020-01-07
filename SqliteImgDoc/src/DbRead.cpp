@@ -6,6 +6,7 @@
 #include "CCustomQueries.h"
 //#define SQLITE_ENABLE_RTREE
 #include <sqlite3.h>
+#include "miscutilities.h"
 //#include <sqlite3ext.h>
 
 using namespace std;
@@ -221,12 +222,51 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw;
     }
 }
 
-/*virtual*/void CDbRead::ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns)
+/*virtual*/void CDbRead::ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const KeyVariadicValuePair&)> func)
 {
-    
+    stringstream ss;
+    ss << "SELECT ";
+    MiscUtils::AddCommaSeparatedAndEnclose(ss, columns.cbegin(), columns.cend(), "[", "]");
+    ss << " FROM [" << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::CoordinateData) << "] " <<
+        "WHERE [" << this->GetDocInfo().GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk) << "]=?1";
+    SQLite::Statement query(this->GetDb(), ss.str());
+    query.bind(1, idx);
+
+    const auto& perTileDataColumnInfo = this->GetDocInfo().GetCoordinateDataColumnInfo();
+    try
+    {
+        while (query.executeStep())
+        {
+            int colCnt = query.getColumnCount();
+            for (int i=0;i<colCnt;++i)
+            {
+                const auto& colName = query.getColumnName(i);
+                const auto& it = find_if(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), [&](const ColumnTypeAllInfo& info)->bool {return info.columnName == colName; });
+
+                auto kv = MiscUtils::ReadValue(query, i, *it);
+                bool b = func(kv);
+                if (!b)
+                {
+                    break;
+                }
+            }
+            
+           /* dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }*/
+        }
+    }
+    catch (SQLite::Exception & excp)
+    {
+        std::cout << excp.what();
+    }
 }
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)

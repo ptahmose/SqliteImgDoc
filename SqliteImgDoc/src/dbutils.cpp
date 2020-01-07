@@ -52,7 +52,7 @@
     else if (str == "INTEGER(2)")
     {
         ti.type = ColumnType::Integer;
-        ti.size = 1;
+        ti.size = 2;
     }
     else if (str == "INTEGER(8)")
     {

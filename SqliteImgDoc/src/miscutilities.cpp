@@ -5,6 +5,7 @@
 #include <limits>
 
 using namespace std;
+using namespace SlImgDoc;
 
 /*static*/std::string MiscUtils::empty_string = string("");
 
@@ -55,4 +56,41 @@ using namespace std;
     }
 
     return false;
+}
+
+/*static*/SlImgDoc::KeyVariadicValuePair MiscUtils::ReadValue(SQLite::Statement& statement, int colIdx, const ColumnTypeAllInfo& colInfo)
+{
+    KeyVariadicValuePair kv;
+    switch (colInfo.type)
+    {
+    case ColumnType::Integer:
+        switch (colInfo.size)
+        {
+        case 1:
+            kv.Data.ui8Value = (std::uint8_t)statement.getColumn(colIdx).getUInt();
+            kv.Data.DataType = "INTEGER(1)";
+            break;
+        case 2:
+            kv.Data.ui16Value = (std::uint16_t)statement.getColumn(colIdx).getUInt();
+            kv.Data.DataType = "INTEGER(2)";
+            break;
+        case 4:
+            kv.Data.ui32Value = statement.getColumn(colIdx).getUInt();
+            kv.Data.DataType = "INTEGER(4)";
+            break;
+        case 8:
+            kv.Data.ui16Value = (std::uint64_t)statement.getColumn(colIdx).getUInt();
+            kv.Data.DataType = "INTEGER(8)";
+            break;
+        }
+
+        break;
+    case ColumnType::Float:
+        kv.Data.doubleValue = statement.getColumn(colIdx).getDouble();
+        kv.Data.DataType = "Float";
+        kv.Name = colInfo.columnName;
+        break;
+    }
+
+    return kv;
 }

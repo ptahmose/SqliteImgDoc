@@ -82,7 +82,7 @@ using namespace SlImgDoc;
             kv.Name = colInfo.columnName;
             break;
         case 8:
-            kv.Data.ui64Value = (std::uint64_t)statement.getColumn(colIdx).getUInt();
+            kv.Data.ui64Value = (std::uint64_t)statement.getColumn(colIdx).getInt64();
             kv.Data.DataType = VariadicData::DataType_UINTEGER8;
             kv.Name = colInfo.columnName;
             break;

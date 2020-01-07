@@ -74,6 +74,47 @@ using namespace SlImgDoc;
     return true;
 }
 
+/*static*/bool DbUtils::TryParsesSqliteTableInfo(const std::string& str, ColumnTypeInfo* colTypeInfo)
+{
+    ColumnTypeInfo ti;
+    if (str == VariadicData::DataType_FLOAT || str == "DOUBLE")
+    {
+        ti.type = ColumnType::Float;
+        ti.size = 0;
+    }
+    else if (str == VariadicData::DataType_INTEGER || str == VariadicData::DataType_INTEGER4)
+    {
+        ti.type = ColumnType::Integer;
+        ti.size = 4;
+    }
+    else if (str == VariadicData::DataType_INTEGER1)
+    {
+        ti.type = ColumnType::Integer;
+        ti.size = 1;
+    }
+    else if (str == VariadicData::DataType_INTEGER2)
+    {
+        ti.type = ColumnType::Integer;
+        ti.size = 2;
+    }
+    else if (str == VariadicData::DataType_INTEGER8)
+    {
+        ti.type = ColumnType::Integer;
+        ti.size = 8;
+    }
+    else
+    {
+        return false;
+    }
+
+    if (colTypeInfo != nullptr)
+    {
+        *colTypeInfo = ti;
+    }
+
+    return true;
+}
+
 /*static*/std::string DbUtils::ColumnTypeInfoToStringRepresentation(const ColumnTypeInfo& cti)
 {
     switch (cti.type)

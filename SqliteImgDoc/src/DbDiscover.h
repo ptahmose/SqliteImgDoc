@@ -39,4 +39,6 @@ private:
     bool TryParseBlobSize(const std::string& str, std::uint32_t* s);
 
     void ThrowIfDiscoveryWasNotDone();
+
+    void GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo);
 };

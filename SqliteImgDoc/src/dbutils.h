@@ -10,5 +10,6 @@ class DbUtils
 public:
     static void Bind(SQLite::Statement& statement, int idx, const SlImgDoc::VariadicData& data);
     static bool TryParse(const std::string& str, ColumnTypeInfo* colTypeInfo);
+    static bool TryParsesSqliteTableInfo(const std::string& str, ColumnTypeInfo* colTypeInfo);
     static std::string ColumnTypeInfoToStringRepresentation(const ColumnTypeInfo& cti);
 };

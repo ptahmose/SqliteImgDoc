@@ -6,6 +6,7 @@
 #include "miscutilities.h"
 #include "../external/SqliteImgDocException.h"
 #include "DbMasterInfoTable.h"
+#include "dbutils.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -41,11 +42,43 @@ void CDbDiscover::DoTiles2DDiscovery()
         docInfo2d.tables[IDbDocInfo::TableType::CoordinateData]);
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
 
+    this->GetPerTilesDataColumnsInfo(*docInfo);
+
     std::map<IDbDocInfo::DbParameter, std::uint32_t> dbParams;
     dbParams[IDbDocInfo::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn(docInfo2d.tables[IDbDocInfo::TableType::TilesData], "Data_BinHdr");
     docInfo->SetDbParameters(std::move(dbParams));
 
     this->docInfo = docInfo;
+}
+
+void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo)
+{
+    stringstream ss;
+    ss << "PRAGMA table_info(" << docInfo.GetTableName(IDbDocInfo::TableType::CoordinateData) << ")";
+    SQLite::Statement query(*this->db, ss.str());
+    const int colIdx_name = query.getColumnIndex("name");
+    const int colIdx_type = query.getColumnIndex("type");
+
+    vector<ColumnTypeAllInfo> colTypeAllInfos;
+    while (query.executeStep())
+    {
+        const auto& colName = query.getColumn(colIdx_name).getText();
+        if (colName != docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk))
+        {
+            const auto& type = query.getColumn(colIdx_type).getText();
+            ColumnTypeAllInfo colTypeInfo;
+            bool b = DbUtils::TryParsesSqliteTableInfo(type, &colTypeInfo);
+            if (!b)
+            {
+                throw "ERROR"; // TODO
+            }
+
+            colTypeInfo.columnName = colName;
+            colTypeAllInfos.emplace_back(colTypeInfo);
+        }
+    }
+
+    docInfo.SetCoordinateColumns(colTypeAllInfos.cbegin(), colTypeAllInfos.cend());
 }
 
 void CDbDiscover::DoTiles3DDiscovery()

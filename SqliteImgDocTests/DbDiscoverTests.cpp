@@ -77,9 +77,8 @@ TEST(DbDiscoverTests, Test2)
     internalDb->GetDb().exec("ALTER TABLE TILESDATA RENAME COLUMN Data_BinHdr TO Data_BinHdrX");
 
     CDbDiscover discover(&internalDb->GetDb());
-    //discover.DoIt();
     EXPECT_THROW(
-        /*auto docInfo = discover.GetDocInfo()*/discover.DoIt(),
+        discover.DoIt(),
         SqliteImgDocDbDiscoverException);
 }
 

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "dbutils.h"
 
+using namespace SlImgDoc;
+
 /*static*/void DbUtils::Bind(SQLite::Statement& statement, int idx, const SlImgDoc::VariadicData& data)
 {
     ColumnTypeInfo cti;
@@ -34,27 +36,27 @@
 /*static*/bool DbUtils::TryParse(const std::string& str, ColumnTypeInfo* colTypeInfo)
 {
     ColumnTypeInfo ti;
-    if (str == "FLOAT")
+    if (str == VariadicData::DataType_FLOAT)
     {
         ti.type = ColumnType::Float;
         ti.size = 0;
     }
-    else if (str == "INTEGER" || str == "INTEGER(4)")
+    else if (str == VariadicData::DataType_UINTEGER || str == VariadicData::DataType_UINTEGER4)
     {
         ti.type = ColumnType::Integer;
         ti.size = 4;
     }
-    else if (str == "INTEGER(1)")
+    else if (str == VariadicData::DataType_UINTEGER1)
     {
         ti.type = ColumnType::Integer;
         ti.size = 1;
     }
-    else if (str == "INTEGER(2)")
+    else if (str == VariadicData::DataType_UINTEGER2)
     {
         ti.type = ColumnType::Integer;
         ti.size = 2;
     }
-    else if (str == "INTEGER(8)")
+    else if (str == VariadicData::DataType_UINTEGER8)
     {
         ti.type = ColumnType::Integer;
         ti.size = 8;

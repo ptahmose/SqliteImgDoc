@@ -324,8 +324,10 @@ std::string CDbCreation::GetPerTileDataTableSqlStatement() const
         {
         case ColumnType::Integer:
             ss << ",[" << ci.columnName << "] INTEGER(" << ci.size << ")";
+            break;
         case ColumnType::Float:
             ss << ",[" << ci.columnName << "] DOUBLE";
+            break;
         }
     }
 

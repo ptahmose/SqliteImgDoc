@@ -68,26 +68,30 @@ using namespace SlImgDoc;
         {
         case 1:
             kv.Data.ui8Value = (std::uint8_t)statement.getColumn(colIdx).getUInt();
-            kv.Data.DataType = "INTEGER(1)";
+            kv.Data.DataType = VariadicData::DataType_UINTEGER1;
+            kv.Name = colInfo.columnName;
             break;
         case 2:
             kv.Data.ui16Value = (std::uint16_t)statement.getColumn(colIdx).getUInt();
-            kv.Data.DataType = "INTEGER(2)";
+            kv.Data.DataType = VariadicData::DataType_UINTEGER2;
+            kv.Name = colInfo.columnName;
             break;
         case 4:
             kv.Data.ui32Value = statement.getColumn(colIdx).getUInt();
-            kv.Data.DataType = "INTEGER(4)";
+            kv.Data.DataType = VariadicData::DataType_UINTEGER4;
+            kv.Name = colInfo.columnName;
             break;
         case 8:
-            kv.Data.ui16Value = (std::uint64_t)statement.getColumn(colIdx).getUInt();
-            kv.Data.DataType = "INTEGER(8)";
+            kv.Data.ui64Value = (std::uint64_t)statement.getColumn(colIdx).getUInt();
+            kv.Data.DataType = VariadicData::DataType_UINTEGER8;
+            kv.Name = colInfo.columnName;
             break;
         }
 
         break;
     case ColumnType::Float:
         kv.Data.doubleValue = statement.getColumn(colIdx).getDouble();
-        kv.Data.DataType = "Float";
+        kv.Data.DataType = VariadicData::DataType_FLOAT;
         kv.Name = colInfo.columnName;
         break;
     }

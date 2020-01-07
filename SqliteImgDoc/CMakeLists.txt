@@ -42,6 +42,7 @@ add_library (SqliteImgDoc STATIC
 						src/dbutils.cpp
 						src/DbMasterInfoTable.h
 						src/DbMasterInfoTable.cpp
+						src/CoordinateData.cpp
 						external/DataBinHdr.h 
 						external/IDataObj.h 
 						external/BlobOnHeap.h 

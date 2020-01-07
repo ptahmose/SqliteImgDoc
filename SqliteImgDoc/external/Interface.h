@@ -112,22 +112,34 @@ namespace SlImgDoc
         IBlobData* dataBinHdr;
     };
 
-    class SQLITEIMGDOC_API IDbRead
+    class SQLITEIMGDOC_API IDbReadCommon
+    {
+    public:
+        virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
+        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        virtual void EnumPerTileColumns(std::function<bool(const ColumnDescription&)> func) = 0;
+
+        virtual ~IDbReadCommon() = default;
+
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
+    };
+
+    class SQLITEIMGDOC_API IDbRead : public IDbReadCommon
     {
     public:
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
         virtual void ReadTileData(dbIndex idx, TilePixelInfo* pixelInfo, IBlob* data) = 0;
 
-        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
 
-        virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
+        //virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
         virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
 
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
-        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
+        //std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead() {};
     };

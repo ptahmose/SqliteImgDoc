@@ -7,6 +7,7 @@
 //#define SQLITE_ENABLE_RTREE
 #include <sqlite3.h>
 #include "miscutilities.h"
+#include "dbutils.h"
 //#include <sqlite3ext.h>
 
 using namespace std;
@@ -26,7 +27,7 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPoin
     return result;
 }
 
-std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
+std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* clause)
 {
     std::vector<dbIndex> result;
     this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
@@ -266,6 +267,22 @@ std::vector<dbIndex> IDbRead::Query(const IDimCoordinateQueryClause* clause)
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+    }
+}
+
+/*virtual*/void CDbRead::EnumPerTileColumns(std::function<bool(const SlImgDoc::ColumnDescription&)> func)
+{
+    const auto& perTileDataColumnInfo = this->GetDocInfo().GetCoordinateDataColumnInfo();
+    for (const auto i:perTileDataColumnInfo)
+    {
+        ColumnDescription cd;
+        cd.Name = i.columnName;
+        cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(i);
+        bool b = func(cd);
+        if (!b)
+        {
+            break;
+        }
     }
 }
 

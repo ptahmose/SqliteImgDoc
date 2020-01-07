@@ -16,13 +16,11 @@ public:
 
     virtual void ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, SlImgDoc::LogicalPositionInfo* info);
     virtual void ReadTileData(SlImgDoc::dbIndex ix, SlImgDoc::TilePixelInfo* pixelInfo, SlImgDoc::IBlob* data);
-
-    virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(SlImgDoc::dbIndex)> func);
-
-    virtual void ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func);    
-
     virtual void GetTilesIntersectingRect(const SlImgDoc::RectangleD& rect, std::function<bool(SlImgDoc::dbIndex)> func);
     virtual void GetTilesIntersectingWithLine(const SlImgDoc::LineThruTwoPointsD& rect, std::function<bool(SlImgDoc::dbIndex)> func);
-private:
+public:
+    virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(SlImgDoc::dbIndex)> func);
+    virtual void ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func);
+    virtual void EnumPerTileColumns(std::function<bool(const SlImgDoc::ColumnDescription&)> func);
 
 };

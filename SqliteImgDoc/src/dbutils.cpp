@@ -73,3 +73,28 @@ using namespace SlImgDoc;
 
     return true;
 }
+
+/*static*/std::string DbUtils::ColumnTypeInfoToStringRepresentation(const ColumnTypeInfo& cti)
+{
+    switch (cti.type)
+    {
+    case ColumnType::Float:
+        return VariadicData::DataType_FLOAT;
+    case ColumnType::Integer:
+        switch (cti.size)
+        {
+        case 1:
+            return VariadicData::DataType_INTEGER1;
+        case 2:
+            return VariadicData::DataType_INTEGER2;
+        case 4:
+            return VariadicData::DataType_INTEGER4;
+        case 8:
+            return VariadicData::DataType_INTEGER8;
+        }
+
+        break;
+    }
+
+    throw "unknown";
+}

@@ -10,8 +10,3 @@ using namespace SlImgDoc;
 /*static*/const std::string VariadicData::DataType_INTEGER2 = "INTEGER(2)";
 /*static*/const std::string VariadicData::DataType_INTEGER4 = "INTEGER(4)";
 /*static*/const std::string VariadicData::DataType_INTEGER8 = "INTEGER(8)";
-/*static*/const std::string VariadicData::DataType_UINTEGER = "UINTEGER";
-/*static*/const std::string VariadicData::DataType_UINTEGER1 = "UINTEGER(1)";;
-/*static*/const std::string VariadicData::DataType_UINTEGER2 = "UINTEGER(2)";
-/*static*/const std::string VariadicData::DataType_UINTEGER4 = "UINTEGER(4)";
-/*static*/const std::string VariadicData::DataType_UINTEGER8 = "UINTEGER(8)";

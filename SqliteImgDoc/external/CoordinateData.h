@@ -40,11 +40,6 @@ namespace SlImgDoc
     {
         static const std::string DataType_INVALID;
         static const std::string DataType_FLOAT;
-        static const std::string DataType_UINTEGER1;
-        static const std::string DataType_UINTEGER2;
-        static const std::string DataType_UINTEGER4;
-        static const std::string DataType_UINTEGER;
-        static const std::string DataType_UINTEGER8;
         static const std::string DataType_INTEGER1;
         static const std::string DataType_INTEGER2;
         static const std::string DataType_INTEGER4;
@@ -53,20 +48,16 @@ namespace SlImgDoc
 
         VariadicData() : DataType(VariadicData::DataType_INVALID) {}
         VariadicData(double dbl) { this->doubleValue = dbl; this->DataType = VariadicData::DataType_FLOAT; }
-        VariadicData(std::uint8_t v) { this->ui8Value = v; this->DataType = VariadicData::DataType_UINTEGER1; }
-        VariadicData(std::uint16_t v) { this->ui16Value = v; this->DataType = VariadicData::DataType_UINTEGER2; }
-        VariadicData(std::uint32_t v) { this->ui32Value = v; this->DataType = VariadicData::DataType_UINTEGER4; }
-        VariadicData(std::uint64_t v) { this->ui64Value = v; this->DataType = VariadicData::DataType_UINTEGER8; }
+        VariadicData(std::int8_t v) { this->i8Value = v; this->DataType = VariadicData::DataType_INTEGER1; }
+        VariadicData(std::int16_t v) { this->i16Value = v; this->DataType = VariadicData::DataType_INTEGER2; }
+        VariadicData(std::int32_t v) { this->i32Value = v; this->DataType = VariadicData::DataType_INTEGER4; }
+        VariadicData(std::int64_t v) { this->i64Value = v; this->DataType = VariadicData::DataType_INTEGER8; }
 
 
         std::string DataType; // FLOAT, INTEGER(1),INTEGER(2),INTEGER(4),INTEGER(8)
         union
         {
             double  doubleValue;
-            std::uint8_t ui8Value;
-            std::uint16_t ui16Value;
-            std::uint32_t ui32Value;
-            std::uint64_t ui64Value;
             std::int8_t i8Value;
             std::int16_t i16Value;
             std::int32_t i32Value;
@@ -79,11 +70,6 @@ namespace SlImgDoc
         bool IsInteger2() const { return this->DataType == VariadicData::DataType_INTEGER2; }
         bool IsInteger4() const { return this->DataType == VariadicData::DataType_INTEGER4; }
         bool IsInteger8() const { return this->DataType == VariadicData::DataType_INTEGER8; }
-        bool IsUInteger1() const { return this->DataType == VariadicData::DataType_UINTEGER1; }
-        bool IsUInteger2() const { return this->DataType == VariadicData::DataType_UINTEGER2; }
-        bool IsUInteger4() const { return this->DataType == VariadicData::DataType_UINTEGER4; }
-        bool IsUInteger8() const { return this->DataType == VariadicData::DataType_UINTEGER8; }
-
     };
 
     struct KeyVariadicValuePair

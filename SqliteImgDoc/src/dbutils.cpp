@@ -13,16 +13,16 @@ using namespace SlImgDoc;
         switch (cti.size)
         {
         case 1:
-            statement.bind(idx, data.ui8Value);
+            statement.bind(idx, data.i8Value);
             break;
         case 2:
-            statement.bind(idx, data.ui16Value);
+            statement.bind(idx, data.i16Value);
             break;
         case 4:
-            statement.bind(idx, data.ui32Value);
+            statement.bind(idx, data.i32Value);
             break;
         case 8:
-            statement.bind(idx, (long long)data.ui64Value);
+            statement.bind(idx, (long long)data.i64Value);
             break;
         }
 
@@ -41,22 +41,22 @@ using namespace SlImgDoc;
         ti.type = ColumnType::Float;
         ti.size = 0;
     }
-    else if (str == VariadicData::DataType_UINTEGER || str == VariadicData::DataType_UINTEGER4)
+    else if (str == VariadicData::DataType_INTEGER || str == VariadicData::DataType_INTEGER4)
     {
         ti.type = ColumnType::Integer;
         ti.size = 4;
     }
-    else if (str == VariadicData::DataType_UINTEGER1)
+    else if (str == VariadicData::DataType_INTEGER1)
     {
         ti.type = ColumnType::Integer;
         ti.size = 1;
     }
-    else if (str == VariadicData::DataType_UINTEGER2)
+    else if (str == VariadicData::DataType_INTEGER2)
     {
         ti.type = ColumnType::Integer;
         ti.size = 2;
     }
-    else if (str == VariadicData::DataType_UINTEGER8)
+    else if (str == VariadicData::DataType_INTEGER8)
     {
         ti.type = ColumnType::Integer;
         ti.size = 8;

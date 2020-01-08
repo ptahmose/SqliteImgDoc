@@ -278,7 +278,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     }*/
 }
 
-/*virtual*/void CDbRead::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func)
+/*virtual*/void CDbRead::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func) const
 {
     const auto& perTileDataColumnInfo = this->GetDocInfo().GetCoordinateDataColumnInfo();
     this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);

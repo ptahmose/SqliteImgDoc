@@ -125,11 +125,18 @@ namespace SlImgDoc
     public:
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
-        virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) = 0;
+        virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
         virtual ~IDbReadCommon() = default;
 
         std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
+        std::vector<ColumnDescription> GetPerTileColumns() const
+        {
+            std::vector<ColumnDescription> colDescr;
+            this->EnumPerTileColumns([&](const ColumnDescription& cd)->bool {colDescr.emplace_back(cd); return true; });
+            return colDescr;
+        }
+
     };
 
     class SQLITEIMGDOC_API IDbRead : public IDbReadCommon

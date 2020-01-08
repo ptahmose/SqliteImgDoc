@@ -347,7 +347,7 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
         columns, func);
 }
 
-/*virtual*/void CDbRead3D::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func)
+/*virtual*/void CDbRead3D::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func) const
 {
     const auto& perTileDataColumnInfo = this->GetDocInfo3D().GetCoordinateDataColumnInfo();
     this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);

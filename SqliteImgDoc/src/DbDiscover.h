@@ -41,4 +41,6 @@ private:
     void ThrowIfDiscoveryWasNotDone();
 
     void GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo);
+    void GetPerTilesDataColumnsInfo(CDbDocInfo3D& docInfo);
+    std::vector<ColumnTypeAllInfo> GetPerTilesDataColumnsInfo(const std::string& tableName, const std::string& pkColName);
 };

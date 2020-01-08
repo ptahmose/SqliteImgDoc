@@ -53,7 +53,7 @@ void CDbDiscover::DoTiles2DDiscovery()
 
 void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo)
 {
-    stringstream ss;
+    /*stringstream ss;
     ss << "PRAGMA table_info(" << docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData) << ")";
     SQLite::Statement query(*this->db, ss.str());
     const int colIdx_name = query.getColumnIndex("name");
@@ -78,7 +78,45 @@ void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo)
         }
     }
 
-    docInfo.SetCoordinateColumns(colTypeAllInfos.cbegin(), colTypeAllInfos.cend());
+    docInfo.SetCoordinateColumns(colTypeAllInfos.cbegin(), colTypeAllInfos.cend());*/
+    auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk));
+    docInfo.SetCoordinateColumns(c.cbegin(), c.cend()); 
+}
+
+void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo3D& docInfo)
+{
+    auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo3D::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk));
+    docInfo.SetCoordinateColumns(c.cbegin(), c.cend());
+}
+
+std::vector<ColumnTypeAllInfo> CDbDiscover::GetPerTilesDataColumnsInfo(const std::string& tableName, const std::string& pkColName)
+{
+    stringstream ss;
+    ss << "PRAGMA table_info(" << tableName << ")";
+    SQLite::Statement query(*this->db, ss.str());
+    const int colIdx_name = query.getColumnIndex("name");
+    const int colIdx_type = query.getColumnIndex("type");
+
+    vector<ColumnTypeAllInfo> colTypeAllInfos;
+    while (query.executeStep())
+    {
+        const auto& colName = query.getColumn(colIdx_name).getText();
+        if (colName != pkColName)
+        {
+            const auto& type = query.getColumn(colIdx_type).getText();
+            ColumnTypeAllInfo colTypeInfo;
+            bool b = DbUtils::TryParsesSqliteTableInfo(type, &colTypeInfo);
+            if (!b)
+            {
+                throw "ERROR"; // TODO
+            }
+
+            colTypeInfo.columnName = colName;
+            colTypeAllInfos.emplace_back(colTypeInfo);
+        }
+    }
+
+    return colTypeAllInfos;
 }
 
 void CDbDiscover::DoTiles3DDiscovery()
@@ -93,6 +131,8 @@ void CDbDiscover::DoTiles3DDiscovery()
         docInfo3d.tables[IDbDocInfo3D::TableType::TilesSpatialIndex],
         docInfo3d.tables[IDbDocInfo3D::TableType::PerBrickData]);
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
+
+    this->GetPerTilesDataColumnsInfo(*docInfo);
 
     std::map<IDbDocInfo3D::DbParameter, std::uint32_t> dbParams;
     dbParams[IDbDocInfo3D::DbParameter::DataBinHdrSize] = this->GetSchemaSizeOfColumn(docInfo3d.tables[IDbDocInfo3D::TableType::TilesData], "Data_BinHdr");

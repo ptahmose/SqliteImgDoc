@@ -47,7 +47,7 @@ protected:
     }
 
     template<typename ForwardIterator>
-    void EnumPerTilesColumns(ForwardIterator begin, ForwardIterator end, const std::function<bool(const SlImgDoc::ColumnDescription&)>& func)
+    void EnumPerTilesColumns(ForwardIterator begin, ForwardIterator end, const std::function<bool(const SlImgDoc::ColumnDescription&)>& func) const
     {
         for (ForwardIterator it = begin; it != end; ++it)
         {

@@ -345,3 +345,4 @@ out/
 _deps/
 build/
 cmake-build-debug/
+SqliteImgDoc/doc

@@ -5,7 +5,7 @@ This is an experiment - in order to evaluate the feasibility of using [SQLite](h
 ## Design considerations
 
 The images we are dealing with are organized as large mosaics with a pyramid.
-![pyramid image](https://github.com/ptahmose/SqliteImgDoc/tree/CoordinateTable/doc/pyramid.png)
+![pyramid image](doc/pyramid.png)
 
 ### Prerequisites
 

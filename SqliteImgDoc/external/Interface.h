@@ -74,14 +74,22 @@ namespace SlImgDoc
         virtual ~IDbWriteTransaction() = default;
     };
 
+    class SQLITEIMGDOC_API IDbWriteCommon
+    {
+    public:
+        virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
+
+        virtual ~IDbWriteCommon() = default;
+    };
+
     /// A sqliteimgdoc api. see https://stackoverflow.com/questions/11205230/virtual-inheritance-and-interfaces
-    class SQLITEIMGDOC_API IDbWrite : public virtual IDbWriteTransaction
+    class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
 
-        virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
+        //virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
 
         virtual ~IDbWrite() = default;
     };
@@ -94,11 +102,11 @@ namespace SlImgDoc
         std::uint8_t pixelType;
     };
 
-    class SQLITEIMGDOC_API IDbWrite3D : public virtual IDbWriteTransaction
+    class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
-        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
-        virtual void AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
+        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
+        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
 
         virtual ~IDbWrite3D() = default;
     };

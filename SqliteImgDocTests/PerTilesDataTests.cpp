@@ -454,3 +454,83 @@ TEST(PerTilesDataTests, EnumPerTilesDataColumns2)
         ASSERT_TRUE(it->DataType == d.DataType);
     }
 }
+
+//-----------------------------------------------------------------------------
+
+TEST(PerTilesDataTests, BricksBasicDouble)
+{
+    CreateOptions opts;
+    opts.dbFilename = ":memory:";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.dimensions.emplace('T');
+    opts.dimensions.emplace('M');
+
+    opts.perTileData.descriptions.push_back(ColumnDescription{ "AcquisitionTime","FLOAT" });
+    opts.perTileData.descriptions.push_back(ColumnDescription{ "FocusPosition","FLOAT" });
+
+    auto db = IDbFactory::CreateNew3D(opts);
+    auto dbw = db->GetWriter3D();
+
+    TileCoordinate coord({ { 'C',0 },{ 'Z',0 },{'T',0},{'M',0} });
+    LogicalPositionInfo3D posInfo;
+    posInfo.posX = posInfo.posY = posInfo.posZ = 0;
+    posInfo.width = 10;
+    posInfo.height = 10;
+    posInfo.depth= 10;
+    posInfo.pyrLvl = 0;
+    TileBaseInfo3D tileBaseInfo;
+    tileBaseInfo.pixelWidth = 10;
+    tileBaseInfo.pixelHeight = 10;
+    tileBaseInfo.pixelDepth = 10;
+    tileBaseInfo.pixelType = PixelType::GRAY8;
+    CDataObjCustom dataCustom(1, 1);
+
+    auto idx = dbw->AddBrick(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+
+    dbw->AddPerTileData(
+        idx,
+        [](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
+    {
+        switch (no)
+        {
+        case 0:
+            kv.Data.DataType = VariadicData::DataType_FLOAT;
+            kv.Name = "AcquisitionTime";
+            kv.Data.doubleValue = 42;
+            return true;
+        case 1:
+            kv.Data.DataType = VariadicData::DataType_FLOAT;
+            kv.Name = "FocusPosition";
+            kv.Data.doubleValue = 43;
+            return true;
+        default:
+            return false;
+        }
+    });
+
+    auto dbr = db->GetReader3D();
+
+    vector<string> cols{ "AcquisitionTime","FocusPosition" };
+
+    vector<KeyVariadicValuePair> results;
+    dbr->ReadPerTileData(idx, cols,
+        [&](const KeyVariadicValuePair& kv)->bool {results.push_back(kv); return true; });
+
+    ASSERT_EQ(results.size(), 2) << "Expected to have two results.";
+    const auto& it = find_if(
+        results.cbegin(),
+        results.cend(),
+        [&](const KeyVariadicValuePair& kvvp)->bool {return kvvp.Name == cols[0]; });
+    ASSERT_FALSE(it == results.cend());
+    ASSERT_TRUE(it->Data.IsFloat());
+    EXPECT_DOUBLE_EQ(it->Data.doubleValue, 42);
+
+    const auto& it2 = find_if(
+        results.cbegin(),
+        results.cend(),
+        [&](const KeyVariadicValuePair& kvvp)->bool {return kvvp.Name == cols[1]; });
+    ASSERT_FALSE(it2 == results.cend());
+    ASSERT_TRUE(it2->Data.IsFloat());
+    EXPECT_DOUBLE_EQ(it2->Data.doubleValue, 43);
+}

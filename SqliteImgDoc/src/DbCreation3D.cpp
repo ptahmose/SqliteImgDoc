@@ -42,6 +42,13 @@ SQLite::Database* CDbCreation3D::DoCreate()
         db->exec(sqlStatement);
         sqlStatement = this->GetTilesSpatialIndexCreateSqlStatement();
         db->exec(sqlStatement);
+
+        sqlStatement = this->GetPerTileDataTableSqlStatement();
+        if (!sqlStatement.empty())
+        {
+            db->exec(sqlStatement);
+        }
+
         return db;
     }
     catch (SQLite::Exception & excp)
@@ -103,5 +110,38 @@ std::string CDbCreation3D::GetTilesSpatialIndexCreateSqlStatement() const
         this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MaxY) << "," <<       // Maximum Y coordinate"
         this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MinZ) << "," <<       // Minimum Y coordinate"
         this->docInfo.GetTilesSpatialIndexColumnName(IDbDocInfo3D::TilesSpatialIndexColumn::MaxZ) << ");";        // Maximum Y coordinate"
+    return ss.str();
+}
+
+std::string CDbCreation3D::GetPerTileDataTableSqlStatement() const
+{
+    const auto& coordinateDataColInfo = this->docInfo.GetCoordinateDataColumnInfo();
+    if (coordinateDataColInfo.empty())
+    {
+        return string();
+    }
+
+    auto ss = stringstream();
+    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo3D::TableType::PerBrickData) << "](";
+    ss << this->docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk) << " INTEGER";
+
+    for (const auto& ci : this->docInfo.GetCoordinateDataColumnInfo())
+    {
+        switch (ci.type)
+        {
+        case ColumnType::Integer:
+            ss << ",[" << ci.columnName << "] INTEGER(" << ci.size << ")";
+            break;
+        case ColumnType::Float:
+            ss << ",[" << ci.columnName << "] DOUBLE";
+            break;
+        }
+    }
+
+    ss << ",FOREIGN KEY(" << this->docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk) << ") REFERENCES " <<
+        this->docInfo.GetTableName(IDbDocInfo3D::TableType::TilesInfo) << "(" << this->docInfo.GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::Pk) << ")";
+
+    ss << ");";
+
     return ss.str();
 }

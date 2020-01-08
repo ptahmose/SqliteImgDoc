@@ -19,9 +19,10 @@ private:
 public:
     CDbWrite3D(std::shared_ptr<CDb> db) : CDbWriteBase(db) {}
 
-    virtual void AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data);
-    virtual void AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data);
+    virtual SlImgDoc::dbIndex AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data);
+    virtual SlImgDoc::dbIndex AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data);
 
+    virtual void AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData);
 
     virtual ~CDbWrite3D();
 private:

@@ -6,14 +6,16 @@
 #include <iostream>
 #include <sstream>
 #include <memory>
+#include "dbutils.h"
 
 using namespace std;
+using namespace SlImgDoc;
 
 /*virtual*/CDbWrite3D::~CDbWrite3D()
 {
 }
 
-/*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
+/*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
 
@@ -47,14 +49,16 @@ using namespace std;
 
         auto id = this->GetDb().getLastInsertRowid();
         this->AddToSpatialIndexTable(id, info);
+        return id;
     }
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw "error";
     }
 }
 
-/*virtual*/void CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
+/*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
 
@@ -90,10 +94,12 @@ using namespace std;
 
         auto id = this->GetDb().getLastInsertRowid();
         this->AddToSpatialIndexTable(id, info);
+        return id;
     }
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
+        throw "error";
     }
 }
 
@@ -274,4 +280,59 @@ void CDbWrite3D::EnsureAddTilesSpatialIndexRowStatement()
         //this->addTilesSpatialIndexRowStatement = std::make_unique<SQLite::Statement>(this->GetDb(), ss.str()); // C++14
         this->addTilesSpatialIndexRowStatement = std::unique_ptr<SQLite::Statement>(new SQLite::Statement(this->GetDb(), ss.str()));
     }
+}
+
+/*virtual*/void CDbWrite3D::AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData)
+{
+    stringstream ss;
+    ss << "INSERT INTO " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::PerBrickData) << "(";
+    ss << this->GetDocInfo3D().GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk);
+
+    int coordDataCnt;
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        KeyVariadicValuePair kv;
+        bool b = funcGetData(coordDataCnt, kv);
+        if (b == false)
+        {
+            break;
+        }
+
+        ss << "," << kv.Name;
+    }
+
+    ss << ") VALUES(";
+
+    bool isFirst = true;
+    for (int i = 0; i < coordDataCnt + 1; ++i)
+    {
+        if (isFirst != true)
+        {
+            ss << ",";
+        }
+
+        ss << "?" << i + 1;
+        isFirst = false;
+    }
+
+    ss << ");";
+
+    SQLite::Statement statement(this->GetDb(), ss.str());
+    statement.bind(1, index);
+
+    for (coordDataCnt = 0;; ++coordDataCnt)
+    {
+        KeyVariadicValuePair kv;
+        bool b = funcGetData(coordDataCnt, kv);
+        if (b == false)
+        {
+            break;
+        }
+
+        ColumnTypeInfo cti;
+        DbUtils::TryParse(kv.Data.DataType, &cti);
+        DbUtils::Bind(statement, coordDataCnt + 2, kv.Data);
+    }
+
+    statement.exec();
 }

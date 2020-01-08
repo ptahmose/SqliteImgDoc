@@ -26,15 +26,14 @@ protected:
         {
             while (query.executeStep())
             {
-                int colCnt = query.getColumnCount();
+                const int colCnt = query.getColumnCount();
                 for (int i = 0; i < colCnt; ++i)
                 {
                     const auto& colName = query.getColumnName(i);
                     const auto& it = find_if(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), [&](const ColumnTypeAllInfo& info)->bool {return info.columnName == colName; });
 
                     auto kv = MiscUtils::ReadValue(query, i, *it);
-                    bool b = func(kv);
-                    if (!b)
+                    if (!func(kv))
                     {
                         break;
                     }

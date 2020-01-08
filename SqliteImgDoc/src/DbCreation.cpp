@@ -149,6 +149,9 @@ static void CreateTileTable(SQLite::Database* db)
     paramsMap[IDbDocInfo3D::DbParameter::DataBinHdrSize] = opts.sizeOfDataBinHdrField;
     docInfo->SetDbParameters(std::move(paramsMap));
 
+    auto cc = DbDocInfoUtils::Convert(opts.perTileData);
+    docInfo->SetCoordinateColumns(cc.cbegin(), cc.cend());
+
     CDbCreation3D dbCreator(*docInfo, opts);
     auto db = dbCreator.DoCreate();
 

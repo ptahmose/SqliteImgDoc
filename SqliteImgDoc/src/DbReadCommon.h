@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include "../external/Interface.h"
 #include "DbBase.h"
 #include "miscutilities.h"

@@ -34,9 +34,16 @@ endif()
 
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 
-set_target_properties(SqliteImgDocTests PROPERTIES
-           CXX_STANDARD 11
-           CXX_EXTENSIONS OFF)
+# Cygwin seems to need some special treatment -> https://stackoverflow.com/questions/18784112/googletest-1-6-with-cygwin-1-7-compile-error-fileno-was-not-declared-in-this
+ if(NOT CYGWIN)
+    set_target_properties(SqliteImgDocTests PROPERTIES
+               CXX_STANDARD 11
+               CXX_EXTENSIONS OFF)
+else()
+    set_target_properties(SqliteImgDocTests PROPERTIES
+               CXX_STANDARD 11
+               CXX_EXTENSIONS ON)
+endif()
 
 
 add_test( SqliteImgDocTests  SqliteImgDocTests  )

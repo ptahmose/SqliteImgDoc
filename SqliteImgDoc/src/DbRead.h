@@ -1,18 +1,15 @@
 #pragma once
 
+#include <utility>
 #include "DbBase.h"
 #include "DbGlobalInfo.h"
 #include "../external/CoordinateData.h"
 
 class CDbRead : CDbBase, public SlImgDoc::IDbRead
 {
-private:
-   // std::shared_ptr<IDbDocInfo> docInfo;
 public:
-   /* CDbRead(SQLite::Database* db, std::shared_ptr<IDbDocInfo> dbInfo) : CDbBase(db), docInfo(dbInfo)
-    {
-    }*/
-    CDbRead(std::shared_ptr<CDb> db) : CDbBase(db){}
+    CDbRead() = delete;
+    CDbRead(std::shared_ptr<CDb> db) : CDbBase(std::move(db)) {}
 
     virtual void ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, SlImgDoc::LogicalPositionInfo* info);
     virtual void ReadTileData(SlImgDoc::dbIndex ix, SlImgDoc::TilePixelInfo* pixelInfo, SlImgDoc::IBlob* data);
@@ -22,5 +19,4 @@ public:
     virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(SlImgDoc::dbIndex)> func);
     virtual void ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func);
     virtual void EnumPerTileColumns(std::function<bool(const SlImgDoc::ColumnDescription&)> func);
-
 };

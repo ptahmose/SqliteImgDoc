@@ -37,7 +37,7 @@ using namespace SlImgDoc;
 
 /*static*/bool MiscUtils::TryParseUint32(const char* sz, std::uint32_t* val)
 {
-    // note: no idea what wrong, but on Linux std::strtoul behaves strange because if does not detect overflows, e.g. 
+    // note: no idea what's wrong, but on Linux std::strtoul behaves strange because if does not detect overflows, e.g. 
     // for "4294967296" I get 0 and errno is NOT set to ERANGE
     uint64_t val64;
     if (!MiscUtils::TryParseUint64(sz, &val64))

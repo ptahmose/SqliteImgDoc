@@ -53,39 +53,13 @@ void CDbDiscover::DoTiles2DDiscovery()
 
 void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo)
 {
-    /*stringstream ss;
-    ss << "PRAGMA table_info(" << docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData) << ")";
-    SQLite::Statement query(*this->db, ss.str());
-    const int colIdx_name = query.getColumnIndex("name");
-    const int colIdx_type = query.getColumnIndex("type");
-
-    vector<ColumnTypeAllInfo> colTypeAllInfos;
-    while (query.executeStep())
-    {
-        const auto& colName = query.getColumn(colIdx_name).getText();
-        if (colName != docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk))
-        {
-            const auto& type = query.getColumn(colIdx_type).getText();
-            ColumnTypeAllInfo colTypeInfo;
-            bool b = DbUtils::TryParsesSqliteTableInfo(type, &colTypeInfo);
-            if (!b)
-            {
-                throw "ERROR"; // TODO
-            }
-
-            colTypeInfo.columnName = colName;
-            colTypeAllInfos.emplace_back(colTypeInfo);
-        }
-    }
-
-    docInfo.SetCoordinateColumns(colTypeAllInfos.cbegin(), colTypeAllInfos.cend());*/
-    auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk));
+    const auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk));
     docInfo.SetCoordinateColumns(c.cbegin(), c.cend()); 
 }
 
 void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo3D& docInfo)
 {
-    auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo3D::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk));
+    const auto c = this->GetPerTilesDataColumnsInfo(docInfo.GetTableName(IDbDocInfo3D::TableType::PerBrickData), docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk));
     docInfo.SetCoordinateColumns(c.cbegin(), c.cend());
 }
 

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <map>
 #include "../external/ITileCoordinate.h"
+#include "DbGlobalInfo.h"
 
 class IDbDocInfo3D
 {
@@ -50,7 +51,11 @@ public:
         MaxY,
         MinZ,
         MaxZ
+    };
 
+    enum class PerTileDataColumn
+    {
+        Pk
     };
 
     enum class DbParameter
@@ -71,7 +76,13 @@ public:
 
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const = 0;
 
+    virtual const std::string& GetPerTilesDataColumnName(PerTileDataColumn c) const = 0;
+
     virtual std::uint32_t GetDbParameter(DbParameter parameter) const = 0;
+
+    virtual bool GetCoordinateDataColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const = 0;
+
+    virtual const std::vector<ColumnTypeAllInfo>& GetCoordinateDataColumnInfo() const = 0;
 };
 
 class CDbDocInfo3D :public IDbDocInfo3D
@@ -83,6 +94,7 @@ private:
     std::string tableNameSpatialIndex;
     std::string tableNamePerTileData;
     std::map<IDbDocInfo3D::DbParameter, std::uint32_t> dbParameters;
+    std::vector<ColumnTypeAllInfo> coordinateDataColumns;
 private:
     static std::string TableName_BricksData;
     static std::string TableName_BricksInfo;
@@ -96,6 +108,8 @@ private:
 
     static std::string ColumnName_TilesSpatialIndex_MinZ;
     static std::string ColumnName_TilesSpatialIndex_MaxZ;
+
+    static std::string ColumnName_PerTilesData_Pk;
 public:
     CDbDocInfo3D(std::string tableName_bricksdata, std::string tableName_bricksinfo, std::string tableName_SpatialIndex, std::string tableName_perBrickData);
     CDbDocInfo3D();
@@ -105,6 +119,13 @@ public:
     {
         this->dimensions.clear();
         std::copy(begin, end, std::back_inserter(this->dimensions));
+    }
+
+    template<typename ForwardIterator>
+    void SetCoordinateColumns(ForwardIterator begin, ForwardIterator end)
+    {
+        this->coordinateDataColumns.clear();
+        std::copy(begin, end, std::back_inserter(this->coordinateDataColumns));
     }
 
     void SetDbParameters(std::map<IDbDocInfo3D::DbParameter, std::uint32_t>&& dbParams)
@@ -118,8 +139,10 @@ public:
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const;
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const;
+    virtual const std::string& GetPerTilesDataColumnName(PerTileDataColumn c) const;
     virtual std::uint32_t GetDbParameter(DbParameter parameter) const;
-
+    virtual bool GetCoordinateDataColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const;
+    virtual const std::vector<ColumnTypeAllInfo>& GetCoordinateDataColumnInfo() const;
 public:
     static const std::string& GetDefaultTableName(TableType tt);
 };

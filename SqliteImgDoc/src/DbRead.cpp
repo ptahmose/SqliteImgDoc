@@ -229,10 +229,25 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
 
 /*virtual*/void CDbRead::ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const KeyVariadicValuePair&)> func)
 {
-    stringstream ss;
+    struct PerTileDataAdapter
+    {
+        const CDbRead& r;
+        PerTileDataAdapter(const CDbRead& r) :r(r) {}
+
+        const string& GetTableName() const { return this->r.GetDocInfo().GetTableName(IDbDocInfo::TableType::PerBrickData); }
+        const string& GetPkColumnName() const { return this->r.GetDocInfo().GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk); }
+        const std::vector<ColumnTypeAllInfo>& GetPerTileDataColumnInfo() const { return this->r.GetDocInfo().GetCoordinateDataColumnInfo(); }
+    };
+
+    PerTileDataAdapter adapter(*this);
+    this->ReadPerTileDataCommon(
+        adapter,
+        idx,
+        columns, func);
+    /*stringstream ss;
     ss << "SELECT ";
     MiscUtils::AddCommaSeparatedAndEnclose(ss, columns.cbegin(), columns.cend(), "[", "]");
-    ss << " FROM [" << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::CoordinateData) << "] " <<
+    ss << " FROM [" << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::PerBrickData) << "] " <<
         "WHERE [" << this->GetDocInfo().GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk) << "]=?1";
     SQLite::Statement query(this->GetDb(), ss.str());
     query.bind(1, idx);
@@ -255,35 +270,29 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
                     break;
                 }
             }
-            
-           /* dbIndex idx = query.getColumn(0).getInt64();
-            bool b = func(idx);
-            if (!b)
-            {
-                break;
-            }*/
         }
     }
     catch (SQLite::Exception & excp)
     {
         std::cout << excp.what();
-    }
+    }*/
 }
 
-/*virtual*/void CDbRead::EnumPerTileColumns(std::function<bool(const SlImgDoc::ColumnDescription&)> func)
+/*virtual*/void CDbRead::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func)
 {
     const auto& perTileDataColumnInfo = this->GetDocInfo().GetCoordinateDataColumnInfo();
-    for (const auto i:perTileDataColumnInfo)
-    {
-        ColumnDescription cd;
-        cd.Name = i.columnName;
-        cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(i);
-        bool b = func(cd);
-        if (!b)
-        {
-            break;
-        }
-    }
+    this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);
+    /* for (const auto i:perTileDataColumnInfo)
+     {
+         ColumnDescription cd;
+         cd.Name = i.columnName;
+         cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(i);
+         bool b = func(cd);
+         if (!b)
+         {
+             break;
+         }
+     }*/
 }
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)

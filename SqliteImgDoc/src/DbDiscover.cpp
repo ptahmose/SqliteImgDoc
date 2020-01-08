@@ -39,7 +39,7 @@ void CDbDiscover::DoTiles2DDiscovery()
         docInfo2d.tables[IDbDocInfo::TableType::TilesData],
         docInfo2d.tables[IDbDocInfo::TableType::TilesInfo],
         docInfo2d.tables[IDbDocInfo::TableType::TilesSpatialIndex],
-        docInfo2d.tables[IDbDocInfo::TableType::CoordinateData]);
+        docInfo2d.tables[IDbDocInfo::TableType::PerBrickData]);
     docInfo->SetTileDimensions(dims.cbegin(), dims.cend());
 
     this->GetPerTilesDataColumnsInfo(*docInfo);
@@ -54,7 +54,7 @@ void CDbDiscover::DoTiles2DDiscovery()
 void CDbDiscover::GetPerTilesDataColumnsInfo(CDbDocInfo& docInfo)
 {
     stringstream ss;
-    ss << "PRAGMA table_info(" << docInfo.GetTableName(IDbDocInfo::TableType::CoordinateData) << ")";
+    ss << "PRAGMA table_info(" << docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData) << ")";
     SQLite::Statement query(*this->db, ss.str());
     const int colIdx_name = query.getColumnIndex("name");
     const int colIdx_type = query.getColumnIndex("type");

@@ -300,7 +300,7 @@ std::string CDbCreation::GetPerTileDataTableSqlStatement() const
     }
 
     auto ss = stringstream();
-    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::CoordinateData) << "](";
+    ss << "CREATE TABLE[" << this->docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData) << "](";
 
     /* const auto tileDims = this->docInfo.GetTileDimensions();
      bool isFirst = true;

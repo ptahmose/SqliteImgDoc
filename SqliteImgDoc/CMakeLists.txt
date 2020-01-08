@@ -24,6 +24,7 @@ add_library (SqliteImgDoc STATIC
 						src/DbGlobalInfo3D.cpp 
 						src/DbRead.cpp 
 						src/DbRead.h 
+						src/DbReadCommon.h 
 						src/DbRead3D.cpp 
 						src/DbRead3D.h 
 						src/DbWrite.cpp 

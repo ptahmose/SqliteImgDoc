@@ -62,7 +62,7 @@ CDbDocInfo::CDbDocInfo(
         return CDbDocInfo::TableName_TilesInfo;
     case IDbDocInfo::TableType::TilesSpatialIndex:
         return CDbDocInfo::TableName_TilesSpatialIndex;
-    case IDbDocInfo::TableType::CoordinateData:
+    case IDbDocInfo::TableType::PerBrickData:
         return CDbDocInfo::TableName_PerTileData;
     }
 
@@ -87,7 +87,7 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo(
         return this->tableNameTilesInfo;
     case TableType::TilesSpatialIndex:
         return this->tableNameSpatialIndex;
-    case TableType::CoordinateData:
+    case TableType::PerBrickData:
         return this->tableNameCoordinateData;
     }
 

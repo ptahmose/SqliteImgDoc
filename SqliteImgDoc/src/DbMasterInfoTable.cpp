@@ -105,7 +105,7 @@ using namespace SQLite;
         }
         else if (tableNameDocumentPerTileData == key)
         {
-            docInfo2d.tables[IDbDocInfo::TableType::CoordinateData] = query.getColumn(1).getString();
+            docInfo2d.tables[IDbDocInfo::TableType::PerBrickData] = query.getColumn(1).getString();
         }
     }
 
@@ -162,7 +162,7 @@ using namespace SQLite;
         { IDbDocInfo::TableType::TilesData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesDataNo },
         { IDbDocInfo::TableType::TilesInfo, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesInfoNo },
         { IDbDocInfo::TableType::TilesSpatialIndex, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentTilesSpatialIndexNo },
-        { IDbDocInfo::TableType::CoordinateData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
+        { IDbDocInfo::TableType::PerBrickData, CDbMasterInfoTableHelper::GetFieldName_TableNameDocumentPerTileDataNo }
     };
 
     CDbMasterInfoTableHelper::ExecuteInsertInto<TableAndGetFieldName>(

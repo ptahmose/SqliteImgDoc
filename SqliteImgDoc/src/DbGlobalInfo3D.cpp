@@ -15,6 +15,7 @@
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesData_PixelDepth = "Pixeldepth";
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesSpatialIndex_MinZ = "minZ";
 /*static*/std::string CDbDocInfo3D::ColumnName_TilesSpatialIndex_MaxZ = "maxZ";
+/*static*/std::string CDbDocInfo3D::ColumnName_PerTilesData_Pk = "Pk";
 
 CDbDocInfo3D::CDbDocInfo3D(
     std::string tableName_bricksdata,
@@ -151,4 +152,32 @@ CDbDocInfo3D::CDbDocInfo3D() : CDbDocInfo3D(
     }
 
     return MiscUtils::empty_string;
+}
+
+/*virtual*/const std::string& CDbDocInfo3D::GetPerTilesDataColumnName(PerTileDataColumn c) const
+{
+    switch (c)
+    {
+    case PerTileDataColumn::Pk:
+        return CDbDocInfo3D::ColumnName_PerTilesData_Pk;
+    }
+
+    throw std::invalid_argument("Unknown enumeration");
+}
+/*virtual*/bool CDbDocInfo3D::GetCoordinateDataColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const
+{
+    const auto& it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
+    if (it == this->dimensions.cend())
+    {
+        return false;
+    }
+
+    columnName = "The";
+    columnName += *it;
+    return true;
+}
+
+/*virtual*/const std::vector<ColumnTypeAllInfo>& CDbDocInfo3D::GetCoordinateDataColumnInfo() const
+{
+    return this->coordinateDataColumns;
 }

@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "CCustomQueries.h"
 #include <sqlite3.h>
+#include "dbutils.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -23,12 +24,12 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
     return result;
 }
 
-std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
-{
-    std::vector<dbIndex> result;
-    this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
-    return result;
-}
+//std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
+//{
+//    std::vector<dbIndex> result;
+//    this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+//    return result;
+//}
 
 /*virtual*/void CDbRead3D::ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info)
 {
@@ -325,4 +326,41 @@ std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
     {
         std::cout << excp.what();
     }
+}
+
+/*virtual*/void CDbRead3D::ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func)
+{
+    struct PerTileDataAdapter
+    {
+        const CDbRead3D& r;
+        PerTileDataAdapter(const CDbRead3D& r) :r(r) {}
+
+        const string& GetTableName() const { return this->r.GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::PerBrickData); }
+        const string& GetPkColumnName() const { return this->r.GetDocInfo3D().GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk); }
+        const std::vector<ColumnTypeAllInfo>& GetPerTileDataColumnInfo() const { return this->r.GetDocInfo3D().GetCoordinateDataColumnInfo(); }
+    };
+
+    PerTileDataAdapter adapter(*this);
+    this->ReadPerTileDataCommon(
+        adapter,
+        idx,
+        columns, func);
+}
+
+/*virtual*/void CDbRead3D::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func)
+{
+    const auto& perTileDataColumnInfo = this->GetDocInfo3D().GetCoordinateDataColumnInfo();
+    this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);
+    /*
+    for (const auto i : perTileDataColumnInfo)
+    {
+        ColumnDescription cd;
+        cd.Name = i.columnName;
+        cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(i);
+        bool b = func(cd);
+        if (!b)
+        {
+            break;
+        }
+    }*/
 }

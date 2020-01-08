@@ -40,7 +40,7 @@ public:
         TilesData,
         TilesInfo,
         TilesSpatialIndex,
-        CoordinateData
+        PerBrickData
     };
 
     enum class TilesInfoColumn

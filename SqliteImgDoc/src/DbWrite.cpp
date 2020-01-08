@@ -320,7 +320,7 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
 /*virtual*/void CDbWrite::AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData)
 {
     stringstream ss;
-    ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::CoordinateData) << "(";
+    ss << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::PerBrickData) << "(";
     ss << this->GetDocInfo().GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk);
 
     int coordDataCnt;

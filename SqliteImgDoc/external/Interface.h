@@ -117,7 +117,7 @@ namespace SlImgDoc
     public:
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
-        virtual void EnumPerTileColumns(std::function<bool(const ColumnDescription&)> func) = 0;
+        virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) = 0;
 
         virtual ~IDbReadCommon() = default;
 
@@ -154,13 +154,13 @@ namespace SlImgDoc
         IBlobData* dataBinHdr;  ///< If non-null, pointer to an object which will receive the DataBinHdr.
     };
 
-    class SQLITEIMGDOC_API IDbRead3D
+    class SQLITEIMGDOC_API IDbRead3D : public IDbReadCommon
     {
     public:
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info) = 0;
         virtual void ReadTileData(dbIndex ix, TilePixelInfo3D* pixelInfo, IBlob* data) = 0;
 
-        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
 
         virtual void GetTilesIntersectingCuboid(const CuboidD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane, std::function<bool(dbIndex)> func) = 0;

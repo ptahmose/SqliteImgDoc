@@ -12,6 +12,7 @@ add_library (SqliteImgDoc STATIC
 						src/Db.h 
 						src/DbBase.cpp 
 						src/DbBase.h 
+						src/DbCreationCommon.h
 						src/DbCreation.cpp 
 						src/DbCreation.h 
 						src/DbCreation3D.cpp 

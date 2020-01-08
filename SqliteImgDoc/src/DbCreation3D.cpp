@@ -115,6 +115,21 @@ std::string CDbCreation3D::GetTilesSpatialIndexCreateSqlStatement() const
 
 std::string CDbCreation3D::GetPerTileDataTableSqlStatement() const
 {
+    struct Adapter
+    {
+        const CDbCreation3D& r;
+        Adapter(const CDbCreation3D& r) :r(r) {};
+
+        const std::vector<ColumnTypeAllInfo>& GetPerTileColumnInfo() const { return this->r.docInfo.GetCoordinateDataColumnInfo(); }
+        std::string GetTableNamePerTileData() const { return this->r.docInfo.GetTableName(IDbDocInfo3D::TableType::PerBrickData); }
+        std::string GetColumnNamePk() const { return this->r.docInfo.GetPerTilesDataColumnName(IDbDocInfo3D::PerTileDataColumn::Pk); }
+        std::string GetTableNameTilesInfo() const { return this->r.docInfo.GetTableName(IDbDocInfo3D::TableType::TilesInfo); }
+        std::string GetColumnNamePkTilesInfo() const { return this->r.docInfo.GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::Pk); }
+    };
+
+    return this->GetPerTileDataTableSqlStatementCommon(Adapter(*this));
+    /*
+
     const auto& coordinateDataColInfo = this->docInfo.GetCoordinateDataColumnInfo();
     if (coordinateDataColInfo.empty())
     {
@@ -144,4 +159,6 @@ std::string CDbCreation3D::GetPerTileDataTableSqlStatement() const
     ss << ");";
 
     return ss.str();
+
+    */
 }

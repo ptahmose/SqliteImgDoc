@@ -2,8 +2,9 @@
 #include <SQLiteCpp/Database.h>
 #include "../external/Interface.h"
 #include "DbGlobalInfo.h"
+#include "DbCreationCommon.h"
 
-class CDbCreation
+class CDbCreation : public CDbCreationCommon
 {
 private:
     const IDbDocInfo& docInfo;

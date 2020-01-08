@@ -1,10 +1,11 @@
 #pragma once
 #include "../external/Interface.h"
 #include "DbGlobalInfo.h"
+#include "DbCreationCommon.h"
 
 class IDbDocInfo3D;
 
-class CDbCreation3D
+class CDbCreation3D : public CDbCreationCommon
 {
 private:
     const IDbDocInfo3D& docInfo;

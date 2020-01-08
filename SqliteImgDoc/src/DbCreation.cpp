@@ -296,6 +296,20 @@ std::string CDbCreation::GetTilesSpatialIndexCreateSqlStatement() const
 
 std::string CDbCreation::GetPerTileDataTableSqlStatement() const
 {
+    struct Adapter
+    {
+        const CDbCreation& r;
+        Adapter(const CDbCreation& r) :r(r) {};
+
+        const std::vector<ColumnTypeAllInfo>& GetPerTileColumnInfo() const { return this->r.docInfo.GetCoordinateDataColumnInfo(); }
+        std::string GetTableNamePerTileData() const { return this->r.docInfo.GetTableName(IDbDocInfo::TableType::PerBrickData); }
+        std::string GetColumnNamePk() const { return this->r.docInfo.GetPerTilesDataColumnName(IDbDocInfo::PerTileDataColumn::Pk); }
+        std::string GetTableNameTilesInfo() const { return this->r.docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo); }
+        std::string GetColumnNamePkTilesInfo() const { return this->r.docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk); }
+    };
+
+    return this->GetPerTileDataTableSqlStatementCommon(Adapter(*this));
+#if false
     const auto& coordinateDataColInfo = this->docInfo.GetCoordinateDataColumnInfo();
     if (coordinateDataColInfo.empty())
     {
@@ -340,6 +354,7 @@ std::string CDbCreation::GetPerTileDataTableSqlStatement() const
     ss << ");";
 
     return ss.str();
+#endif
 }
 
 /// Checks the create-options for validity. In the case that the data is determined to be invalid,

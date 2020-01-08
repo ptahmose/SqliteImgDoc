@@ -34,7 +34,6 @@ add_library (SqliteImgDoc STATIC
 						src/DbWrite3D.h 
 						src/DbWriteBase.cpp 
 						src/DbWriteBase.h 
-						src/framework.h 
 						src/pch.cpp 
 						src/pch.h 
 						src/IInternalDb.h 

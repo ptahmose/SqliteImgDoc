@@ -3,6 +3,7 @@
 #include "../external/Interface.h"
 #include "DbBase.h"
 #include "miscutilities.h"
+#include "dbutils.h"
 
 class CDbReadCommon : public CDbBase
 {
@@ -51,7 +52,7 @@ protected:
     {
         for (ForwardIterator it = begin; it != end; ++it)
         {
-            ColumnDescription cd;
+            SlImgDoc::ColumnDescription cd;
             cd.Name = it->columnName;
             cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(*it);
             bool b = func(cd);

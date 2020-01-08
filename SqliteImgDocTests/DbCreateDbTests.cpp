@@ -123,7 +123,7 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
     EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
-TEST(DbCreateDbTests, CreateAndDiscover1)
+TEST(DbCreateDbTests, CreateAndDiscover2D)
 {
     CreateOptions opts;
     opts.dbFilename = "file:memdb1?mode=memory&cache=shared";
@@ -154,7 +154,7 @@ TEST(DbCreateDbTests, CreateAndDiscover1)
     EXPECT_FALSE(dbRead3d) << "Expecting NOT to have a valid data-base here.";
 }
 
-TEST(DbCreateDbTests, CreateAndDiscover2)
+TEST(DbCreateDbTests, CreateAndDiscover3D)
 {
     CreateOptions opts;
     opts.dbFilename = "file:memdb2?mode=memory&cache=shared";

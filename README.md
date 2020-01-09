@@ -11,7 +11,24 @@ For a viewer capable of fast zooming and panning, it is important to quickly ret
 
 The bitmap data itself is being stored inside the SQLite-database (as a [BLOB](https://www.sqlite.org/datatype3.html)). This is a very controversial approach, and there is a lot of discussion what the best architecture for dealing with large blobs in databases is (e.g. [here](https://dba.stackexchange.com/questions/2445/should-binary-files-be-stored-in-the-database), [here](https://www.sqlite.org/intern-v-extern-blob.html)). So, getting some real-world experience here is one goal of this experiment.
 
+The same techniques (ie. image pyramids and tiling) are applied to 3D-volumetric data.
 
+This library focuses solely on the storage aspect; image processing aspects are out-of-scope and they are expected to be implemented on another layer.
+
+## Q & A
+
+**Why should image data be stored in a database? What is wrong with traditional file-formats like TIFF?**
+
+Some of the advantages expected from using RDBMS (and SQLite in particular) are:
+* consistent and unambigous data structure
+* The database enables us to have the data indexed so that queries are fast. In particular, those indexes are managed by the database and they are persistent.
+* Query operations can be formulated in SQL.
+* Transparency and self-documentation - the data is easily accessible and the storage format is future proof (see [here](https://sqlite.org/locrsf.html)).
+* Relying on [tested-and-true technology](https://sqlite.org/mostdeployed.html).
+
+**Why is the code in C++? Wouldn't C#, Python, Javascript, Go, D,... be preferable?**
+
+Short answer - no. Main reasons being that interfacing with SQLite is best done in C/C++; C++ is mature, time-tested and offers excellent performance and it is portable to literally any platform. It is expected that bindings for languages of your choice can be built on top of the C++-layer.
 
 ### Prerequisites
 
@@ -78,16 +95,8 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Jürgen Bohl** - *Initial work* - [jbohl@h-quer.de](mailto:jbohl@h-quer.de)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc

@@ -1,6 +1,6 @@
 # SQLiteImgDoc
 
-This is an experiment - in order to evaluate the feasibility of using [SQLite](https://www.sqlite.org/index.html) as the persistance-layer (or file-format) for multi-dimensional images (as encountered e.g. in microscopy, cf. [OME-TIFF](https://docs.openmicroscopy.org/ome-model/6.0.0/ome-tiff/index.html) or [BioFormats](https://www.openmicroscopy.org/bio-formats/)).
+This is an experiment - in order to evaluate the feasibility of using [SQLite](https://www.sqlite.org/index.html) as the persistence-layer (or file-format) for multi-dimensional images (as encountered e.g. in microscopy, cf. [OME-TIFF](https://docs.openmicroscopy.org/ome-model/6.0.0/ome-tiff/index.html) or [BioFormats](https://www.openmicroscopy.org/bio-formats/)).
 
 ## Design considerations
 
@@ -14,6 +14,10 @@ The bitmap data itself is being stored inside the SQLite-database (as a [BLOB](h
 The same techniques (ie. image pyramids and tiling) are applied to 3D-volumetric data.
 
 This library focuses solely on the storage aspect; image processing aspects are out-of-scope and they are expected to be implemented on another layer.
+
+## data model
+
+
 
 ## Q & A
 
@@ -30,7 +34,7 @@ Some of the advantages expected from using RDBMS (and SQLite in particular) are:
 
 Short answer - no. Main reasons being that interfacing with SQLite is best done in C/C++; C++ is mature, time-tested and offers excellent performance and it is portable to literally any platform. It is expected that bindings for languages of your choice can be built on top of the C++-layer.
 
-### Prerequisites
+## Prerequisites
 
 What things you need to install the software and how to install them
 

@@ -17,6 +17,22 @@ This library focuses solely on the storage aspect; image processing aspects are 
 
 ## data model
 
+Currently, two data models are implemented and available via the interfaces `IDbRead`/`IDbRead3D` (and `IDbWrite`/`IDbWrite3D`)
+* for multi-dimensional, tiled 2D-images with pyramid
+* and for multi-dimensional, tiled 3D-images (refered to as **bricks** hereafter) with pyramid
+
+In both cases, the tiles/bricks are paraxial.
+
+A tile/brick is described by
+
+field              |       description
+-------------------|------------------
+logical position   | coordinates and width/height of the tile
+tile coordinate    | an arbitrary sized attribute
+
+The **tile coordinate** are attributes with a specific number of dimensions, allowing to group the tiles.
+
+All tiles are positioned in X-Y-direction in a common cartesian coordinate system. In case of bricks the **logical position** includes a Z-coordinate and a depth.
 
 
 ## Q & A

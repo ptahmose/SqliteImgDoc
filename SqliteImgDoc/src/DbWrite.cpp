@@ -15,7 +15,7 @@ using namespace SlImgDoc;
 {
 }
 
-/*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, std::uint8_t datatype,const IDataObjBase* data)
+/*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype,const IDataObjBase* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
 
@@ -215,7 +215,7 @@ dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc
 //    }
 //}
 
-std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
+std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, SlImgDoc::DataTypes datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
     //auto dataBinHDrSize = this->GetDocInfo().GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize);
     //if (sizeBinHdr > dataBinHDrSize)
@@ -233,7 +233,7 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
         this->addTilesDataRowStatement->bind(1, width);
         this->addTilesDataRowStatement->bind(2, height);
         this->addTilesDataRowStatement->bind(3, pixeltype);
-        this->addTilesDataRowStatement->bind(4, datatype);
+        this->addTilesDataRowStatement->bind(4, static_cast<underlying_type<DataTypes>::type>(datatype));
         this->addTilesDataRowStatement->bind(5, binHdr, sizeBinHdr);
         const void* p; size_t s;
         data->GetData(&p, &s);

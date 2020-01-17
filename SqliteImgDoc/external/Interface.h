@@ -86,7 +86,7 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
-        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, std::uint8_t datatype, const IDataObjBase* data) = 0;
+        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
         //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
         //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
 
@@ -106,7 +106,7 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
-        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, std::uint8_t datatype, const IDataObjBase* data) = 0;
+        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
         //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
         //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
 

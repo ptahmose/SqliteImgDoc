@@ -15,7 +15,7 @@ using namespace SlImgDoc;
 {
 }
 
-/*virtual*/dbIndex CDbWrite3D::AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, std::uint8_t datatype, const IDataObjBase* data)
+/*virtual*/dbIndex CDbWrite3D::AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
 
@@ -181,7 +181,7 @@ using namespace SlImgDoc;
 //    }
 //}
 
-std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height, std::uint32_t depth, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
+std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height, std::uint32_t depth, std::uint8_t pixeltype, SlImgDoc::DataTypes datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
     this->CheckSizeOfBinHdrAndThrow(sizeBinHdr, this->GetDocInfo3D().GetDbParameter(IDbDocInfo3D::DbParameter::DataBinHdrSize));
 
@@ -193,7 +193,7 @@ std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height,
         this->addTilesDataRowStatement->bind(2, height);
         this->addTilesDataRowStatement->bind(3, depth);
         this->addTilesDataRowStatement->bind(4, pixeltype);
-        this->addTilesDataRowStatement->bind(5, datatype);
+        this->addTilesDataRowStatement->bind(5, static_cast<underlying_type<DataTypes>::type>(datatype));
         this->addTilesDataRowStatement->bind(6, binHdr, sizeBinHdr);
         const void* p; size_t s;
         data->GetData(&p, &s);

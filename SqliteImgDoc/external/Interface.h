@@ -86,8 +86,9 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
-        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
-        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
+        virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, std::uint8_t datatype, const IDataObjBase* data) = 0;
+        //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
+        //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
 
         //virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
 
@@ -105,18 +106,28 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbWrite3D : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
     public:
-        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
-        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
+        virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, std::uint8_t datatype, const IDataObjBase* data) = 0;
+        //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
+        //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
 
         virtual ~IDbWrite3D() = default;
     };
 
     struct TilePixelInfo
     {
+        /// The width of the tile in pixels.
         int pixelWidth;
+
+        /// The height of the tile in pixels.
         int pixelHeight;
+
+        /// The pixel type.
         std::uint8_t pixelType;
+
+        /// The data-type of the tile. See DataTypes for defined values.
         int dataType;
+
+        /// The binary header - this blob contains (data-type specific) information about the pixel data.
         IBlobData* dataBinHdr;
     };
 

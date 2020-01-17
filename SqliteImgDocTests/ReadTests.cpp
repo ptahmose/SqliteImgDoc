@@ -46,7 +46,7 @@ static shared_ptr<IDb> CreateTestDatabase()
             {
                 tc.Set('T', t);
 
-                dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+                dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
             }
         }
     }

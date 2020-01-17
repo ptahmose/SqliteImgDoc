@@ -46,7 +46,7 @@ static shared_ptr<IDb> CreateTestDatabase()
             {
                 tc.Set('T', t);
 
-                dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+                dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
             }
         }
     }
@@ -113,7 +113,7 @@ TEST(DbDiscoverTests, PerTileDataDoubleAndIntegerOpenExisting)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     vector< KeyVariadicValuePair> input;
     input.emplace_back(KeyVariadicValuePair{ "DOUBLE",VariadicData(42.5) });

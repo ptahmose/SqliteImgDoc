@@ -40,7 +40,7 @@ TEST(DbCreateDbTests, InvalidSizeOfDataBinHdr1)
     TileCoordinate tc({ { 'C',0 },{ 'Z',0 } });
     CDataObjCustom dataCustom(19, 1);
 
-    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
+    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
 TEST(DbCreateDbTests, InvalidSizeOfDataBinHdr2)
@@ -68,7 +68,7 @@ TEST(DbCreateDbTests, InvalidSizeOfDataBinHdr2)
     TileCoordinate tc({ { 'C',0 },{ 'Z',0 } });
     CDataObjCustom dataCustom(19, 1);
 
-    EXPECT_THROW(dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
+    EXPECT_THROW(dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM ,&dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
 TEST(DbCreateDbTests, InsufficientCoordinate1)
@@ -94,7 +94,7 @@ TEST(DbCreateDbTests, InsufficientCoordinate1)
     TileCoordinate tc({ { 'C',0 } });
     CDataObjCustom dataCustom(19, 1);
 
-    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
+    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
 TEST(DbCreateDbTests, InsufficientCoordinate2)
@@ -120,7 +120,7 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
     TileCoordinate tc({ { 'C',0 },{'X',2} });
     CDataObjCustom dataCustom(19, 1);
 
-    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
+    EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
 TEST(DbCreateDbTests, CreateAndDiscover2D)
@@ -143,7 +143,7 @@ TEST(DbCreateDbTests, CreateAndDiscover2D)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     TileCoordinate tc({ { 'C',0 },{'Z',2} });
     CDataObjCustom dataCustom(4, 1);
-    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     OpenOptions openOpts;
     openOpts.dbFilename = "file:memdb1?mode=memory&cache=shared";
@@ -176,7 +176,7 @@ TEST(DbCreateDbTests, CreateAndDiscover3D)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     TileCoordinate tc({ { 'C',0 },{'Z',2} });
     CDataObjCustom dataCustom(4, 1);
-    dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+    dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM ,&dataCustom);
 
     OpenOptions openOpts;
     openOpts.dbFilename = "file:memdb2?mode=memory&cache=shared";
@@ -250,7 +250,7 @@ TEST(DbCreateDbTests, CreateAndDiscover3D_2)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     TileCoordinate tc({ { 'C',0 },{'Z',2} });
     CDataObjCustom dataCustom(4, 1);
-    dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+    dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     OpenOptions openOpts;
     openOpts.dbFilename = opts.dbFilename;

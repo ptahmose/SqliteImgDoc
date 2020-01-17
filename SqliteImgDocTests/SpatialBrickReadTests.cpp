@@ -49,7 +49,7 @@ static shared_ptr<IDb> CreateBrickTestDatabase(int rows, int columns, int stacks
                 posInfo.posZ = z * sizeZ;
 
                 tc.Set('M', m);
-                dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+                dbWrite->AddBrick(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
                 m++;
             }
         }

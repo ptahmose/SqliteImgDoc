@@ -61,7 +61,7 @@ public:
         this->data = (uint8_t*)malloc(this->size);
         this->hdr.width = w;
         this->hdr.height = h;
-        this->hdr.pixeltype = PixelType::RGB24;
+        //this->hdr.pixeltype = PixelType::RGB24;
         this->hdr.stride = w;
 
         for (int i = 0; i < this->size; ++i)
@@ -73,6 +73,11 @@ public:
     {
         if (p != nullptr) { *p = this->data; }
         if (s != nullptr) { *s = this->size; }
+    }
+    virtual void GetHeader(const void** p, size_t* s) const
+    {
+        if (p != nullptr) { *p = &this->hdr; }
+        if (s != nullptr) { *s = sizeof(this->hdr); }
     }
     virtual const BinHdrUncompressedBitmap& GetBinHdr() const
     {
@@ -90,6 +95,11 @@ static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int siz
     posInfo.pyrLvl = 0;
     CSimpleDataObjUncmp dataObj(sizeX, sizeY);
 
+    TileBaseInfo baseInfo;
+    baseInfo.pixelWidth = sizeX;
+    baseInfo.pixelHeight= sizeY;
+    baseInfo.pixelType = PixelType::RGB24;
+
     dbw->BeginTransaction();
     for (int i = 0; i < 10; ++i)
     {
@@ -102,7 +112,7 @@ static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int siz
                 posInfo.posX = c * sizeX;
                 posInfo.posY = r * sizeY;
 
-                dbw->AddTile(&simpleCoord, &posInfo, &dataObj);
+                dbw->AddTile(&simpleCoord, &posInfo, &baseInfo, DataTypes::UNCOMPRESSED_BITMAP, &dataObj);
                 simpleCoord.m++;
             }
         }
@@ -177,6 +187,11 @@ static void WriteMosaicAndPerTileData(IDbWrite* dbw, int rows, int columns, int 
     posInfo.pyrLvl = 0;
     CSimpleDataObjUncmp dataObj(sizeX, sizeY);
 
+    TileBaseInfo baseInfo;
+    baseInfo.pixelWidth = sizeX;
+    baseInfo.pixelHeight = sizeY;
+    baseInfo.pixelType = PixelType::RGB24;
+
     dbw->BeginTransaction();
     for (int i = 0; i < 10; ++i)
     {
@@ -189,23 +204,23 @@ static void WriteMosaicAndPerTileData(IDbWrite* dbw, int rows, int columns, int 
                 posInfo.posX = c * sizeX;
                 posInfo.posY = r * sizeY;
 
-                auto rowid = dbw->AddTile(&simpleCoord, &posInfo, &dataObj);
+                auto rowid = dbw->AddTile(&simpleCoord, &posInfo, &baseInfo,DataTypes::UNCOMPRESSED_BITMAP, &dataObj);
 
                 dbw->AddPerTileData(
                     rowid,
-                    [r,c](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
+                    [r, c](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
                 {
                     switch (no)
                     {
                     case 0:
                         kv.Data.DataType = "FLOAT";
                         kv.Name = "AcquisitionTime";
-                        kv.Data.doubleValue = 42+r;
+                        kv.Data.doubleValue = 42 + r;
                         return true;
                     case 1:
                         kv.Data.DataType = "FLOAT";
                         kv.Name = "FocusPosition";
-                        kv.Data.doubleValue = 43+c;
+                        kv.Data.doubleValue = 43 + c;
                         return true;
                     default:
                         return false;

@@ -20,14 +20,14 @@ public:
 
 struct BinHdrBase
 {
-    std::uint8_t type;
+    //std::uint16_t type;
 };
 
 struct BinHdrBitmapBase : BinHdrBase
 {
     std::uint32_t width;
     std::uint32_t height;
-    std::uint8_t pixeltype;
+    //std::uint8_t pixeltype;
 };
 
 struct BinHdrUncompressedBitmap : BinHdrBitmapBase

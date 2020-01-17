@@ -44,7 +44,7 @@ static shared_ptr<IDb> CreateMosaicTestDatabase(int rows, int columns, int sizeX
             posInfo.posY = r * sizeY;
 
             tc.Set('M', m);
-            dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, &dataCustom);
+            dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
             m++;
         }
     }

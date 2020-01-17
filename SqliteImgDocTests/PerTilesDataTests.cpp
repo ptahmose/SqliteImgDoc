@@ -30,7 +30,7 @@ TEST(PerTilesDataTests, BasicDouble)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     dbw->AddPerTileData(
         idx,
@@ -109,7 +109,7 @@ TEST(PerTilesDataTests, DoubleAndInteger)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     vector< KeyVariadicValuePair> input;
     input.emplace_back(KeyVariadicValuePair{ "DOUBLE",VariadicData(42.5) });
@@ -212,7 +212,7 @@ TEST(PerTilesDataTests, DoubleAndIntegerMax)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     vector< KeyVariadicValuePair> input;
     input.emplace_back(KeyVariadicValuePair{ "DOUBLE",VariadicData(numeric_limits<double>::max()) });
@@ -315,7 +315,7 @@ TEST(PerTilesDataTests, DoubleAndIntegerMin)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
     vector< KeyVariadicValuePair> input;
     input.emplace_back(KeyVariadicValuePair{ "DOUBLE",VariadicData(numeric_limits<double>::min()) });
@@ -486,7 +486,7 @@ TEST(PerTilesDataTests, BricksBasicDouble)
     tileBaseInfo.pixelType = PixelType::GRAY8;
     CDataObjCustom dataCustom(1, 1);
 
-    auto idx = dbw->AddBrick(&coord, &posInfo, &tileBaseInfo, &dataCustom);
+    auto idx = dbw->AddBrick(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM ,&dataCustom);
 
     dbw->AddPerTileData(
         idx,

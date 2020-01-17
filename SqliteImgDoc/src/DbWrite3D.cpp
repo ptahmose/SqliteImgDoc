@@ -15,50 +15,7 @@ using namespace SlImgDoc;
 {
 }
 
-/*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
-{
-    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
-
-    try
-    {
-        auto idSbBlk = this->AddBrickUncompressed(data);
-
-        const auto dims = this->GetDocInfo().GetTileDimensions();
-
-        this->EnsureAddTilesInfoRowStatement();
-        this->addTilesInfoRowStatement->reset();
-
-        for (int i = 1; i <= dims.size(); ++i)
-        {
-            int v;
-            coord->TryGetCoordinate(dims[i - 1], &v);
-            this->addTilesInfoRowStatement->bind(i, v);
-        }
-
-        int i = dims.size() + 1;
-        this->addTilesInfoRowStatement->bind(i++, info->posX);
-        this->addTilesInfoRowStatement->bind(i++, info->posY);
-        this->addTilesInfoRowStatement->bind(i++, info->posZ);
-        this->addTilesInfoRowStatement->bind(i++, info->width);
-        this->addTilesInfoRowStatement->bind(i++, info->height);
-        this->addTilesInfoRowStatement->bind(i++, info->depth);
-        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
-        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
-
-        this->addTilesInfoRowStatement->exec();
-
-        auto id = this->GetDb().getLastInsertRowid();
-        this->AddToSpatialIndexTable(id, info);
-        return id;
-    }
-    catch (SQLite::Exception & excp)
-    {
-        std::cout << excp.what();
-        throw "error";
-    }
-}
-
-/*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
+/*virtual*/dbIndex CDbWrite3D::AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, std::uint8_t datatype, const IDataObjBase* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
 
@@ -66,7 +23,7 @@ using namespace SlImgDoc;
     {
         const void* ptrHdrData; size_t sizeHdrData;
         data->GetHeader(&ptrHdrData, &sizeHdrData);
-        auto idSbBlk = this->AddBrickData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelDepth ,tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
+        auto idSbBlk = this->AddBrickData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelDepth, tileInfo->pixelType, datatype, sizeHdrData, ptrHdrData, data);
 
         const auto dims = this->GetDocInfo3D().GetTileDimensions();
 
@@ -103,38 +60,126 @@ using namespace SlImgDoc;
     }
 }
 
-std::int64_t CDbWrite3D::AddBrickUncompressed(const IDataObjUncompressedBrick* data)
-{
-    try
-    {
-        this->EnsureAddTilesDataRowStatement();
-        this->addTilesDataRowStatement->reset();
+///*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data)
+//{
+//    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
+//
+//    try
+//    {
+//        auto idSbBlk = this->AddBrickUncompressed(data);
+//
+//        const auto dims = this->GetDocInfo().GetTileDimensions();
+//
+//        this->EnsureAddTilesInfoRowStatement();
+//        this->addTilesInfoRowStatement->reset();
+//
+//        for (int i = 1; i <= dims.size(); ++i)
+//        {
+//            int v;
+//            coord->TryGetCoordinate(dims[i - 1], &v);
+//            this->addTilesInfoRowStatement->bind(i, v);
+//        }
+//
+//        int i = dims.size() + 1;
+//        this->addTilesInfoRowStatement->bind(i++, info->posX);
+//        this->addTilesInfoRowStatement->bind(i++, info->posY);
+//        this->addTilesInfoRowStatement->bind(i++, info->posZ);
+//        this->addTilesInfoRowStatement->bind(i++, info->width);
+//        this->addTilesInfoRowStatement->bind(i++, info->height);
+//        this->addTilesInfoRowStatement->bind(i++, info->depth);
+//        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
+//        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
+//
+//        this->addTilesInfoRowStatement->exec();
+//
+//        auto id = this->GetDb().getLastInsertRowid();
+//        this->AddToSpatialIndexTable(id, info);
+//        return id;
+//    }
+//    catch (SQLite::Exception & excp)
+//    {
+//        std::cout << excp.what();
+//        throw "error";
+//    }
+//}
 
-        const auto hdr = data->GetBinHdr();
+///*virtual*/SlImgDoc::dbIndex CDbWrite3D::AddBrick(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo3D* info, const SlImgDoc::TileBaseInfo3D* tileInfo, const IDataObjCustom* data)
+//{
+//    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo3D().GetTileDimensions(), coord);
+//
+//    try
+//    {
+//        const void* ptrHdrData; size_t sizeHdrData;
+//        data->GetHeader(&ptrHdrData, &sizeHdrData);
+//        auto idSbBlk = this->AddBrickData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelDepth ,tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
+//
+//        const auto dims = this->GetDocInfo3D().GetTileDimensions();
+//
+//        this->EnsureAddTilesInfoRowStatement();
+//        this->addTilesInfoRowStatement->reset();
+//
+//        for (int i = 1; i <= dims.size(); ++i)
+//        {
+//            int v;
+//            coord->TryGetCoordinate(dims[i - 1], &v);
+//            this->addTilesInfoRowStatement->bind(i, v);
+//        }
+//
+//        int i = dims.size() + 1;
+//        this->addTilesInfoRowStatement->bind(i++, info->posX);
+//        this->addTilesInfoRowStatement->bind(i++, info->posY);
+//        this->addTilesInfoRowStatement->bind(i++, info->posZ);
+//        this->addTilesInfoRowStatement->bind(i++, info->width);
+//        this->addTilesInfoRowStatement->bind(i++, info->height);
+//        this->addTilesInfoRowStatement->bind(i++, info->depth);
+//        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
+//        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
+//
+//        this->addTilesInfoRowStatement->exec();
+//
+//        auto id = this->GetDb().getLastInsertRowid();
+//        this->AddToSpatialIndexTable(id, info);
+//        return id;
+//    }
+//    catch (SQLite::Exception & excp)
+//    {
+//        std::cout << excp.what();
+//        throw "error";
+//    }
+//}
 
-        std::uint8_t binhdr[32];
-        for (int i = 0; i < sizeof(binhdr); ++i) { binhdr[i] = (uint8_t)i; }
-
-        this->addTilesDataRowStatement->bind(1, hdr.width);
-        this->addTilesDataRowStatement->bind(2, hdr.height);
-        this->addTilesDataRowStatement->bind(3, hdr.depth);
-        this->addTilesDataRowStatement->bind(4, hdr.pixeltype);
-        this->addTilesDataRowStatement->bind(5, SlImgDoc::DataTypes::UNCOMPRESSED_BRICK);
-        this->addTilesDataRowStatement->bind(6, binhdr, sizeof(binhdr));
-        const void* p; size_t s;
-        data->GetData(&p, &s);
-        this->addTilesDataRowStatement->bindNoCopy(7, p, (int)s);
-
-        this->addTilesDataRowStatement->exec();
-
-        return this->GetDb().getLastInsertRowid();
-    }
-    catch (SQLite::Exception & excp)
-    {
-        std::cout << excp.what();
-        throw;
-    }
-}
+//std::int64_t CDbWrite3D::AddBrickUncompressed(const IDataObjUncompressedBrick* data)
+//{
+//    try
+//    {
+//        this->EnsureAddTilesDataRowStatement();
+//        this->addTilesDataRowStatement->reset();
+//
+//        const auto hdr = data->GetBinHdr();
+//
+//        std::uint8_t binhdr[32];
+//        for (int i = 0; i < sizeof(binhdr); ++i) { binhdr[i] = (uint8_t)i; }
+//
+//        this->addTilesDataRowStatement->bind(1, hdr.width);
+//        this->addTilesDataRowStatement->bind(2, hdr.height);
+//        this->addTilesDataRowStatement->bind(3, hdr.depth);
+//        //this->addTilesDataRowStatement->bind(4, hdr.pixeltype);
+//        this->addTilesDataRowStatement->bind(5, SlImgDoc::DataTypes::UNCOMPRESSED_BRICK);
+//        this->addTilesDataRowStatement->bind(6, binhdr, sizeof(binhdr));
+//        const void* p; size_t s;
+//        data->GetData(&p, &s);
+//        this->addTilesDataRowStatement->bindNoCopy(7, p, (int)s);
+//
+//        this->addTilesDataRowStatement->exec();
+//
+//        return this->GetDb().getLastInsertRowid();
+//    }
+//    catch (SQLite::Exception & excp)
+//    {
+//        std::cout << excp.what();
+//        throw;
+//    }
+//}
 
 std::int64_t CDbWrite3D::AddBrickData(std::uint32_t width, std::uint32_t height, std::uint32_t depth, std::uint8_t pixeltype, std::uint8_t datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {

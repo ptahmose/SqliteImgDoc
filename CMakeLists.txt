@@ -31,7 +31,7 @@ set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "" FORCE)
 add_subdirectory(extlibs/SQLiteCpp)
 
-
+add_subdirectory(extlibs/libCZI)
 
 
 message(STATUS ${SQLITECPP_INCLUDE_DIRS} )

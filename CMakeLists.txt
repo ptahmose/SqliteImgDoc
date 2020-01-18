@@ -32,6 +32,7 @@ set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "" FORCE)
 add_subdirectory(extlibs/SQLiteCpp)
 
 add_subdirectory(extlibs/libCZI)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libCZI/Src/libCZI)
 
 
 message(STATUS ${SQLITECPP_INCLUDE_DIRS} )
@@ -110,3 +111,5 @@ message(STATUS ${GTEST_INCLUDE_DIRS} )
 add_subdirectory ("SqliteImgDocTests")
 
 add_subdirectory("CmdSqliteImgDoc")
+
+add_subdirectory("ConvCZI")

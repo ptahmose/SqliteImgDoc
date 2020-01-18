@@ -14,7 +14,7 @@ add_executable(ConvCZI
                 inc_libczi.h)
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(ConvCZI  SqliteImgDoc SQLiteCpp sqlite3 libCZIStatic)
+target_link_libraries(ConvCZI  SqliteImgDoc SQLiteCpp sqlite3 libCZIStatic JxrDecodeStatic)
 
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)

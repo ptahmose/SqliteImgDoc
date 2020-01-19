@@ -12,4 +12,7 @@ ENDIF(UNIX)
 add_subdirectory(JxrDecode)
 add_subdirectory(libCZI)
 
-add_subdirectory(CZICmd)
+option(LIBCZI_BUILD_CZICMD "Build application 'CZICmd'." ON)
+if (LIBCZI_BUILD_CZICMD)
+    add_subdirectory(CZICmd)
+endif(LIBCZI_BUILD_CZICMD)

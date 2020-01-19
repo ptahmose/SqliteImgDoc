@@ -31,6 +31,8 @@ set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "" FORCE)
 add_subdirectory(extlibs/SQLiteCpp)
 
+
+set(LIBCZI_BUILD_CZICMD OFF CACHE BOOL "" FORCE)
 add_subdirectory(extlibs/libCZI)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/libCZI/Src/libCZI)
 

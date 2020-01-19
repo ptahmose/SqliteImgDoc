@@ -9,6 +9,9 @@ IF(UNIX)
    SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -D__ANSI__ -fPIC -D_FILE_OFFSET_BITS=64")
 ENDIF(UNIX)
 
+option(LIBCZI_BUILD_DYNLIB "Build dynamic library 'libCZI'." ON)
+option(LIBCZI_BUILD_STATICLIB "Build static library 'libCZI'." ON)
+
 add_subdirectory(JxrDecode)
 add_subdirectory(libCZI)
 

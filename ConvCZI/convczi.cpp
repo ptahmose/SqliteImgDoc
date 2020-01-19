@@ -134,6 +134,8 @@ int main(int argc, char** argv)
     LogicalPositionInfo logicalPosInfo;
     auto db = IDbFactory::CreateNew(createOpts);
     auto dbWrite = db->GetWriter();
+
+    dbWrite->BeginTransaction();
     czireader->EnumerateSubBlocks(
         [&](int idx, const SubBlockInfo& info)->bool
     {
@@ -156,4 +158,5 @@ int main(int argc, char** argv)
         return true;
     });
 
+    dbWrite->CommitTransaction();
 }

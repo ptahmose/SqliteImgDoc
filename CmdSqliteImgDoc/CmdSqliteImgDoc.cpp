@@ -98,7 +98,7 @@ static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int siz
     TileBaseInfo baseInfo;
     baseInfo.pixelWidth = sizeX;
     baseInfo.pixelHeight= sizeY;
-    baseInfo.pixelType = PixelType::RGB24;
+    baseInfo.pixelType = PixelType::BGR24;
 
     dbw->BeginTransaction();
     for (int i = 0; i < 10; ++i)
@@ -190,7 +190,7 @@ static void WriteMosaicAndPerTileData(IDbWrite* dbw, int rows, int columns, int 
     TileBaseInfo baseInfo;
     baseInfo.pixelWidth = sizeX;
     baseInfo.pixelHeight = sizeY;
-    baseInfo.pixelType = PixelType::RGB24;
+    baseInfo.pixelType = PixelType::BGR24;
 
     dbw->BeginTransaction();
     for (int i = 0; i < 10; ++i)

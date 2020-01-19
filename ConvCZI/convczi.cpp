@@ -81,13 +81,28 @@ class DataObjOnSubBlk :public IDataObjBase
 private:
     const shared_ptr<ISubBlock>& sbBlk;
     BinHdrUncompressedBitmap hdr;
+    DataTypes dataType;
 public:
     DataObjOnSubBlk(const shared_ptr<ISubBlock>& sbblk) :sbBlk(sbblk)
     {
-        hdr.width = sbBlk->GetSubBlockInfo().physicalSize.w;
-        hdr.height = sbBlk->GetSubBlockInfo().physicalSize.h;
-        hdr.stride = sbBlk->GetSubBlockInfo().physicalSize.w * 2;
+        hdr.width = this->sbBlk->GetSubBlockInfo().physicalSize.w;
+        hdr.height = this->sbBlk->GetSubBlockInfo().physicalSize.h;
+        hdr.stride = this->sbBlk->GetSubBlockInfo().physicalSize.w * 2;
+        switch (this->sbBlk->GetSubBlockInfo().mode)
+        {
+        case CompressionMode::UnCompressed:
+            this->dataType = DataTypes::UNCOMPRESSED_BITMAP;
+            break;
+        case CompressionMode::JpgXr:
+            this->dataType = DataTypes::JPGXRCOMPRESSED_BITMAP;
+            break;
+        default:
+            throw invalid_argument("Unknown mode");
+        }
     }
+
+    DataTypes GetDataType() const { return this->dataType; }
+
     virtual void GetData(const void** p, size_t* s) const
     {
         const void* ptr; size_t size;
@@ -152,7 +167,7 @@ int main(int argc, char** argv)
         auto sbBlk = czireader->ReadSubBlock(idx);
 
         DataObjOnSubBlk dataobj(sbBlk);
-        dbWrite->AddTile(&tc, &logicalPosInfo, &tileBaseInfo, DataTypes::UNCOMPRESSED_BITMAP, &dataobj);
+        dbWrite->AddTile(&tc, &logicalPosInfo, &tileBaseInfo, dataobj.GetDataType(), &dataobj);
 
 
         return true;

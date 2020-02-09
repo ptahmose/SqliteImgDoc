@@ -16,6 +16,8 @@ add_executable(ConvCZI
 # Link test executable against gtest & gtest_main
 target_link_libraries(ConvCZI  SqliteImgDoc SQLiteCpp sqlite3 libCZIStatic JxrDecodeStatic)
 
+target_include_directories(ConvCZI PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../extlibs/cxxopts/>)
+
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)
    # Linux

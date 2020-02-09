@@ -9,6 +9,10 @@ private:
 public:
     CmdlineOpts();
 
+    bool ParseArguments(int argc, char** argv);
+
+    void PrintHelp();
+
     const std::string& GetCziFilename() const;
     const std::string& GetDstFilename() const;
 };

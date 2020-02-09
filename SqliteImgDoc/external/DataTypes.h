@@ -11,6 +11,7 @@ namespace SlImgDoc
 
         /// The uncompressed bitmap
         UNCOMPRESSED_BITMAP = 1,
+
         JPGXRCOMPRESSED_BITMAP = 2,
 
         UNCOMPRESSED_BRICK = 32,

@@ -121,6 +121,10 @@ public:
 int main(int argc, char** argv)
 {
     CmdlineOpts opts;
+    if (!opts.ParseArguments(argc, argv))
+    {
+        return EXIT_FAILURE;
+    }
 
     auto stream = CreateStreamFromFile(CUtils::convertUtf8ToUCS2(opts.GetCziFilename()).c_str());
     auto czireader = CreateCZIReader();

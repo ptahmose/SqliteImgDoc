@@ -3,14 +3,13 @@
 using namespace std;
 using namespace SlImgDoc;
 
-
-TEST(DbCreateDbTests, ParameterValidationTest1)
+TEST(DbCreateDbTests, ParameterValidationTest_InvalidSizeOfDataBinHdrWhenCreatingDb)
 {
     CreateOptions opts;
     opts.dbFilename = ":memory:";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');
-    opts.sizeOfDataBinHdrField = -1;
+    opts.sizeOfDataBinHdrField = -1;    // this must be greater than zero, so we expect this to fail
     EXPECT_THROW(IDbFactory::CreateNew(opts), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 
     opts.sizeOfDataBinHdrField = 0;
@@ -19,6 +18,7 @@ TEST(DbCreateDbTests, ParameterValidationTest1)
 
 TEST(DbCreateDbTests, InvalidSizeOfDataBinHdr1)
 {
+    // we create the database with a databin-header of size 18
     CreateOptions opts;
     opts.dbFilename = ":memory:";
     opts.dimensions.emplace('C');
@@ -38,6 +38,8 @@ TEST(DbCreateDbTests, InvalidSizeOfDataBinHdr1)
     tileBaseInfo.pixelType = PixelType::GRAY8;
 
     TileCoordinate tc({ { 'C',0 },{ 'Z',0 } });
+
+    // ...and then try to use a 19 bytes databin-header-object, which is expect to fail
     CDataObjCustom dataCustom(19, 1);
 
     EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";

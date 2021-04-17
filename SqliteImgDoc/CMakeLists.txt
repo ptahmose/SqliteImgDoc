@@ -1,4 +1,4 @@
-﻿# CMakeList.txt : CMake project for CMakeProject1, include source and define
+﻿# CMakeList.txt : CMake project for SqliteImgDoc, include source and define
 # project specific logic here.
 #
 #cmake_minimum_required (VERSION 3.8)
@@ -65,6 +65,9 @@ add_library (SqliteImgDoc STATIC
 target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 #set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)
 set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 11 CXX_EXTENSIONS OFF)
+
+# this preprocessor define needs to be defined when building "SqliteImgDoc" and by users of it (if linking the static library)
+target_compile_definitions(SqliteImgDoc PUBLIC _SQLITEIMGDOCSTATICLIB=1)
 
 ##target_compile_features(SqliteImgDoc PRIVATE cxx_std_17)
 #target_compile_features(SqliteImgDoc PRIVATE CXX_STANDARD 11 CXX_EXTENSIONS OFF)

@@ -1,4 +1,4 @@
-# CMakeList.txt : CMake project for CMakeProject1, include source and define
+# CMakeList.txt : CMake project for SqliteImgDocTests, include source and define
 # project specific logic here.
 #
 #cmake_minimum_required (VERSION 3.8)
@@ -29,10 +29,6 @@ elseif(UNIX AND APPLE)
    # Mac OS
    target_link_libraries(SqliteImgDocTests SQLiteCpp pthread)
 endif()
-
-
-
-##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 
 # Cygwin seems to need some special treatment -> https://stackoverflow.com/questions/18784112/googletest-1-6-with-cygwin-1-7-compile-error-fileno-was-not-declared-in-this
  if(NOT CYGWIN)

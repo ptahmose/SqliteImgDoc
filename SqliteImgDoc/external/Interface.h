@@ -39,11 +39,15 @@ namespace SlImgDoc
 
         std::string dbFilename;
 
+        /// The set of "dimensions" (to be used as coordinate of a subblock). Allowed values are characters A-Z.
+        /// Upper and lowercase characters are **not** distinguished.
         std::unordered_set<char> dimensions;
 
-        /// Size of the DataBinHdr-field in bytes.
+        /// Size of the DataBinHdr-field in bytes. This must be greater than zero.
         int  sizeOfDataBinHdrField;
 
+        /// Information describing additional "per tile information" - that is, columns can be defined, allowing to
+        /// give custom data for each subblock.
         PerTileDataCreateOptions perTileData;
 
         void SetDefaultValues()
@@ -150,6 +154,7 @@ namespace SlImgDoc
 
     };
 
+    /// The interface for reading databases containing 2D-subblocks.
     class SQLITEIMGDOC_API IDbRead : public IDbReadCommon
     {
     public:
@@ -180,6 +185,7 @@ namespace SlImgDoc
         IBlobData* dataBinHdr;  ///< If non-null, pointer to an object which will receive the DataBinHdr.
     };
 
+    /// The interface for reading databases containing 3D-subblocks.
     class SQLITEIMGDOC_API IDbRead3D : public IDbReadCommon
     {
     public:

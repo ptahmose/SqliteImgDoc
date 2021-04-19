@@ -158,19 +158,20 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbRead : public IDbReadCommon
     {
     public:
+
+        /// Reads the tile information for the specified index.
+        /// \param          idx   The db-index specifying the tile.
+        /// \param [in,out] coord If non-null, the coordinate information will be put here.
+        /// \param [in,out] info  If non-null, the local tile information will be put here.
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo* info) = 0;
+
         virtual void ReadTileData(dbIndex idx, TilePixelInfo* pixelInfo, IBlob* data) = 0;
-
-        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
-
-        //virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
         virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
 
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
-        //std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
         virtual ~IDbRead() {};
     };
@@ -216,6 +217,7 @@ namespace SlImgDoc
         virtual ~IDb() {}
     };
 
+    /// Factory functions for creating a database-object are found here.
     class SQLITEIMGDOC_API IDbFactory
     {
     public:

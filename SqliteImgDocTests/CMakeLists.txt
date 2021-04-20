@@ -60,10 +60,10 @@ target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImg
 
 if(UNIX AND NOT APPLE)
    # Linux
-   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread dl)
+   target_link_libraries(SqliteImgDocTests PUBLIC SQLiteCpp pthread dl)
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(SqliteImgDocTests SQLiteCpp pthread)
+   target_link_libraries(SqliteImgDocTests PUBLIC  SQLiteCpp pthread)
 endif()
 
 # Cygwin seems to need some special treatment -> https://stackoverflow.com/questions/18784112/googletest-1-6-with-cygwin-1-7-compile-error-fileno-was-not-declared-in-this

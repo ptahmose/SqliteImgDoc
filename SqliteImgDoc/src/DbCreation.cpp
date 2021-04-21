@@ -198,7 +198,7 @@ static void CreateTileTable(SQLite::Database* db)
         return make_shared<CDb>(db, docInfo3d);
     }
 
-    // TODO: throw
+    return std::shared_ptr<IDb>();
 }
 
 //-------------------------------------------------------------------------------------------------

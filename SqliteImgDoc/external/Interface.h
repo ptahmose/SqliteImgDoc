@@ -135,10 +135,17 @@ namespace SlImgDoc
         IBlobData* dataBinHdr;
     };
 
+    /// The "read interface" (the common part for both 2D and 3D documents).
     class SQLITEIMGDOC_API IDbReadCommon
     {
     public:
+
+        /// Reads "per tile data".
+        /// \param idx     The index of the tile to read "per tile data" for.
+        /// \param columns The list of column-names for the "per tile data" to be queried.
+        /// \param func    Functor which will be called reporting the requested data. The return value determines whether to continue to report data.
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
+
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
         virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
@@ -173,7 +180,7 @@ namespace SlImgDoc
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
 
-        virtual ~IDbRead() {};
+        virtual ~IDbRead() = default;
     };
 
     struct TilePixelInfo3D
@@ -205,16 +212,31 @@ namespace SlImgDoc
         virtual ~IDbRead3D() = default;
     };
 
+    /// A Db-object represents an attached database.
     class SQLITEIMGDOC_API IDb
     {
     public:
+        /// Try to get a "write object" for a 2D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The writer-object (for 2D-document).
         virtual std::shared_ptr<IDbWrite> GetWriter() = 0;
+
+        /// Try to get a "read object" for a 2D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The read-object (for 2D-document).
         virtual std::shared_ptr<IDbRead> GetReader() = 0;
 
+        /// Try to get a "write object" for a 2D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The writer-object (for 3D-document).
         virtual std::shared_ptr<IDbWrite3D> GetWriter3D() = 0;
+
+        /// Try to get a "read object" for a 3D-document. This method may return an empty shared_ptr
+        /// if such an object cannot be constructed.
+        /// \returns The read-object (for 3D-document).
         virtual std::shared_ptr<IDbRead3D> GetReader3D() = 0;
 
-        virtual ~IDb() {}
+        virtual ~IDb() = default;
     };
 
     /// Factory functions for creating a database-object are found here.
@@ -223,6 +245,11 @@ namespace SlImgDoc
     public:
         static std::shared_ptr<IDb> CreateNew(const CreateOptions& opts);
         static std::shared_ptr<IDb> CreateNew3D(const CreateOptions& opts);
+
+        /// Opens an existing sqlite-image-document file (as specified with the OpenOptions).
+        /// If the document cannot be opened, an empty shared_ptr is returned.
+        /// \param opts Options for controlling the operation.
+        /// \returns The newly created db-object if the operation was successful; an empty shared_ptr otherwise.
         static std::shared_ptr<IDb> OpenExisting(const OpenOptions& opts);
 
     };

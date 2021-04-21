@@ -22,9 +22,16 @@ namespace SlImgDoc
 {
     typedef long long dbIndex;
 
+    /// This interface is used when a method is returning a blob. It will be called, passing in the data.
+    /// The IBlobData-object can then decide how to deal with the data.
     class IBlobData
     {
     public:
+
+        /// Sets the content of the blob-object.
+        /// \param ptrData Pointer to the data.
+        /// \param size    The size of the data.
+        /// \returns True if it succeeds, false if it fails.
         virtual bool Set(const void* ptrData, size_t size) = 0;
     };
 
@@ -91,11 +98,7 @@ namespace SlImgDoc
     {
     public:
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
-        //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data) = 0;
-        //virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, const IDataObjCustom* data) = 0;
-
-        //virtual void AddPerTileData(dbIndex index, std::function<bool(int, KeyVariadicValuePair&)> funcGetData) = 0;
-
+    
         virtual ~IDbWrite() = default;
     };
 
@@ -111,9 +114,7 @@ namespace SlImgDoc
     {
     public:
         virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
-        //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const IDataObjUncompressedBrick* data) = 0;
-        //virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, const IDataObjCustom* data) = 0;
-
+    
         virtual ~IDbWrite3D() = default;
     };
 

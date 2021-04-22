@@ -41,14 +41,14 @@ static void ConvertDimCoordinate(const CDimCoordinate& dimCoordinate, TileCoordi
 {
     dimCoordinate.EnumValidDimensions(
         [&](DimensionIndex dim, int v)->bool
-    {
-        if (dim != DimensionIndex::B)
         {
-            tc.Set(Utils::DimensionToChar(dim), v);
-        }
+            if (dim != DimensionIndex::B)
+            {
+                tc.Set(Utils::DimensionToChar(dim), v);
+            }
 
-        return true;
-    });
+            return true;
+        });
 }
 
 static void Convert(const SubBlockInfo& sbBlkInfo, TileBaseInfo& tileBaseInfo)
@@ -138,15 +138,23 @@ int main(int argc, char** argv)
 
     subBlkStatistics.dimBounds.EnumValidDimensions(
         [&](DimensionIndex dim, int start, int end)->bool
-    {
-        if (dim != DimensionIndex::B)
         {
-            char d = Utils::DimensionToChar(dim);
-            createOpts.dimensions.emplace(d);
-        }
+            if (dim != DimensionIndex::B)
+            {
+                char d = Utils::DimensionToChar(dim);
+                createOpts.dimensions.emplace(d);
+            }
 
-        return true;
-    });
+            return true;
+        });
+
+    // if there is a valid M-index, then we want to add a "m-dimension"
+    bool includeMindex = false;
+    if (subBlkStatistics.IsMIndexValid())
+    {
+        createOpts.dimensions.emplace('M');
+        includeMindex = true;
+    }
 
     TileCoordinate tc;
     TileBaseInfo tileBaseInfo;
@@ -157,25 +165,28 @@ int main(int argc, char** argv)
     dbWrite->BeginTransaction();
     czireader->EnumerateSubBlocks(
         [&](int idx, const SubBlockInfo& info)->bool
-    {
-        ConvertDimCoordinate(info.coordinate, tc);
+        {
+            ConvertDimCoordinate(info.coordinate, tc);
+            if (includeMindex)
+            {
+                tc.Set('M',info.mIndex);
+            }
 
-        logicalPosInfo.posX = info.logicalRect.x;
-        logicalPosInfo.posY = info.logicalRect.y;
-        logicalPosInfo.width = info.logicalRect.w;
-        logicalPosInfo.height = info.logicalRect.h;
-        logicalPosInfo.pyrLvl = CalcPyramidLayerNo(info.logicalRect, info.physicalSize, 2);
+            logicalPosInfo.posX = info.logicalRect.x;
+            logicalPosInfo.posY = info.logicalRect.y;
+            logicalPosInfo.width = info.logicalRect.w;
+            logicalPosInfo.height = info.logicalRect.h;
+            logicalPosInfo.pyrLvl = CalcPyramidLayerNo(info.logicalRect, info.physicalSize, 2);
 
-        Convert(info, tileBaseInfo);
+            Convert(info, tileBaseInfo);
 
-        auto sbBlk = czireader->ReadSubBlock(idx);
+            auto sbBlk = czireader->ReadSubBlock(idx);
 
-        DataObjOnSubBlk dataobj(sbBlk);
-        dbWrite->AddTile(&tc, &logicalPosInfo, &tileBaseInfo, dataobj.GetDataType(), &dataobj);
+            DataObjOnSubBlk dataobj(sbBlk);
+            dbWrite->AddTile(&tc, &logicalPosInfo, &tileBaseInfo, dataobj.GetDataType(), &dataobj);
 
-
-        return true;
-    });
+            return true;
+        });
 
     dbWrite->CommitTransaction();
 }

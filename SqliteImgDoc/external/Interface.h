@@ -35,11 +35,13 @@ namespace SlImgDoc
         virtual bool Set(const void* ptrData, size_t size) = 0;
     };
 
+    /// The parameters and options to be used when creating a new sqlite-image-document.
     class CreateOptions
     {
     public:
         const int DefaultSizeOfDataBinHdrField = 32;
     public:
+        /// Initializes a new instance of the CreateOptions class with default parameters.
         CreateOptions() : sizeOfDataBinHdrField(DefaultSizeOfDataBinHdrField)
         {
         }
@@ -63,6 +65,7 @@ namespace SlImgDoc
         }
     };
 
+    /// The options and parameters for opening an existing document.
     class OpenOptions
     {
     public:

@@ -5,6 +5,7 @@ using namespace SlImgDoc;
 
 TEST(PerTilesDataTests, BasicDouble)
 {
+    // create a "in-memory" document, using C, Z, T, M as tile coordinates
     CreateOptions opts;
     opts.dbFilename = ":memory:";
     opts.dimensions.emplace('C');
@@ -12,12 +13,15 @@ TEST(PerTilesDataTests, BasicDouble)
     opts.dimensions.emplace('T');
     opts.dimensions.emplace('M');
 
+    // instruct to have two "per tile columns" of type "FLOAT"
     opts.perTileData.descriptions.push_back(ColumnDescription{ "AcquisitionTime","FLOAT" });
     opts.perTileData.descriptions.push_back(ColumnDescription{ "FocusPosition","FLOAT" });
 
+    // create the document, and get a writer-object for it
     auto db = IDbFactory::CreateNew(opts);
     auto dbw = db->GetWriter();
 
+    // add one tile, with coordinate C=0, Z=0, T=0, M=0 (and datatype=CUSTOM)
     TileCoordinate coord({ { 'C',0 },{ 'Z',0 },{'T',0},{'M',0} });
     LogicalPositionInfo posInfo;
     posInfo.posX = posInfo.posY = 0;
@@ -32,6 +36,8 @@ TEST(PerTilesDataTests, BasicDouble)
 
     auto idx = dbw->AddTile(&coord, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
 
+    // when adding the tile above, we get its index (of the newly added entry), now we set the 
+    //  two "custom per tile columns" for this new added tile
     dbw->AddPerTileData(
         idx,
         [](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
@@ -53,10 +59,13 @@ TEST(PerTilesDataTests, BasicDouble)
         }
     });
 
+    // ok, so now get a reader-object
     auto dbr = db->GetReader();
 
     vector<string> cols{ "AcquisitionTime","FocusPosition" };
 
+    // Request to read those two columns (using the PK we got above).
+    // All results we get we put into the results-vector.
     vector<KeyVariadicValuePair> results;
     dbr->ReadPerTileData(idx, cols,
         [&](const KeyVariadicValuePair& kv)->bool {results.push_back(kv); return true; });

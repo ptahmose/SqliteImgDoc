@@ -98,3 +98,24 @@ using namespace SlImgDoc;
 
     return kv;
 }
+
+/*static*/const char* MiscUtils::ConditionalOperatorToString(SlImgDoc::ConditionalOperator op)
+{
+    switch (op)
+    {
+    case ConditionalOperator::Equal:
+        return "=";
+    case ConditionalOperator::NotEqual:
+        return "<>";
+    case ConditionalOperator::LessThan:
+        return "<";
+    case ConditionalOperator::LessThanOrEqual:
+        return "<=";
+    case ConditionalOperator::GreaterThan:
+        return ">";
+    case ConditionalOperator::GreaterThanOrEqual:
+        return ">=";
+    }
+
+    throw invalid_argument("invalid operator encountered");
+}

@@ -13,6 +13,8 @@
 #include "BlobOnHeap.h"
 #include "IDimCoordinateQueryClause.h"
 #include "DimCoordinateQueryClause.h"
+#include "ITileInfoQueryClause.h"
+#include "TileInfoQueryClause.h"
 #include "DataTypes.h"
 #include "DataObjImpl.h"
 #include "SqliteImgDocException.h"
@@ -143,7 +145,6 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbReadCommon
     {
     public:
-
         /// Reads "per tile data".
         /// \param idx     The index of the tile to read "per tile data" for.
         /// \param columns The list of column-names for the "per tile data" to be queried.
@@ -151,25 +152,25 @@ namespace SlImgDoc
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
         virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        virtual void Query(const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery, std::function<bool(dbIndex)> func) = 0;
         virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
         virtual ~IDbReadCommon() = default;
 
         std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
+        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery);
         std::vector<ColumnDescription> GetPerTileColumns() const
         {
             std::vector<ColumnDescription> colDescr;
             this->EnumPerTileColumns([&](const ColumnDescription& cd)->bool {colDescr.emplace_back(cd); return true; });
             return colDescr;
         }
-
     };
 
     /// The interface for reading databases containing 2D-subblocks.
     class SQLITEIMGDOC_API IDbRead : public IDbReadCommon
     {
     public:
-
         /// Reads the tile information for the specified index.
         /// \param          idx   The db-index specifying the tile.
         /// \param [in,out] coord If non-null, the coordinate information will be put here.

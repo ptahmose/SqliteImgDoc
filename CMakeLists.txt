@@ -3,8 +3,6 @@
 #
 cmake_minimum_required (VERSION 3.7)
 
-#set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded")
-
 project ("SqliteImgDoc")
 
 message(STATUS "HELLO WORLD")

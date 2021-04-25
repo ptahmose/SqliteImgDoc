@@ -268,6 +268,11 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
     }
 }
 
+/*virtual*/void CDbRead3D::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
+{
+    
+}
+
 /*virtual*/void CDbRead3D::GetTilesIntersectingCuboid(const SlImgDoc::CuboidD& rect, std::function<bool(SlImgDoc::dbIndex)> func)
 {
     stringstream ss;

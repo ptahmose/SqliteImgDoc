@@ -5,6 +5,7 @@
 #include <sstream>
 #include <SQLiteCpp/SQLiteCpp.h>
 #include "DbGlobalInfo.h"
+#include "../external/ITileInfoQueryClause.h"
 
 class MiscUtils
 {
@@ -32,4 +33,6 @@ public:
     }
 
     static SlImgDoc::KeyVariadicValuePair ReadValue(SQLite::Statement& statement, int colIdx,const ColumnTypeAllInfo& colInfo);
+
+    static const char* ConditionalOperatorToString(SlImgDoc::ConditionalOperator op);
 };

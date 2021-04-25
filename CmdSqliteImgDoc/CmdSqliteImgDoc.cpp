@@ -97,7 +97,7 @@ static void WriteMosaic(IDbWrite* dbw, int rows, int columns, int sizeX, int siz
 
     TileBaseInfo baseInfo;
     baseInfo.pixelWidth = sizeX;
-    baseInfo.pixelHeight= sizeY;
+    baseInfo.pixelHeight = sizeY;
     baseInfo.pixelType = PixelType::BGR24;
 
     dbw->BeginTransaction();
@@ -204,28 +204,28 @@ static void WriteMosaicAndPerTileData(IDbWrite* dbw, int rows, int columns, int 
                 posInfo.posX = c * sizeX;
                 posInfo.posY = r * sizeY;
 
-                auto rowid = dbw->AddTile(&simpleCoord, &posInfo, &baseInfo,DataTypes::UNCOMPRESSED_BITMAP, &dataObj);
+                auto rowid = dbw->AddTile(&simpleCoord, &posInfo, &baseInfo, DataTypes::UNCOMPRESSED_BITMAP, &dataObj);
 
                 dbw->AddPerTileData(
                     rowid,
                     [r, c](int no, SlImgDoc::KeyVariadicValuePair& kv)->bool
-                {
-                    switch (no)
                     {
-                    case 0:
-                        kv.Data.DataType = "FLOAT";
-                        kv.Name = "AcquisitionTime";
-                        kv.Data.doubleValue = 42 + r;
-                        return true;
-                    case 1:
-                        kv.Data.DataType = "FLOAT";
-                        kv.Name = "FocusPosition";
-                        kv.Data.doubleValue = 43 + c;
-                        return true;
-                    default:
-                        return false;
-                    }
-                });
+                        switch (no)
+                        {
+                        case 0:
+                            kv.Data.DataType = "FLOAT";
+                            kv.Name = "AcquisitionTime";
+                            kv.Data.doubleValue = 42 + r;
+                            return true;
+                        case 1:
+                            kv.Data.DataType = "FLOAT";
+                            kv.Name = "FocusPosition";
+                            kv.Data.doubleValue = 43 + c;
+                            return true;
+                        default:
+                            return false;
+                        }
+                    });
 
                 simpleCoord.m++;
             }
@@ -274,12 +274,29 @@ void TestCoordinateData1()
      });*/
 }
 
+static void TestRead3()
+{
+    OpenOptions opts;
+    opts.dbFilename = "D:\\Dev\\GitHub\\SqliteImgDoc\\out\\build\\x64-Debug\\ConvCZI\\Example2.db";
+    auto readDb = IDbFactory::OpenExisting(opts);
+    auto read = readDb->GetReader();
+    CDimCoordinateQueryClause queryClause;
+    queryClause.AddRangeClause('S', IDimCoordinateQueryClause::RangeClause{ 0,0 });
+    queryClause.AddRangeClause('C', IDimCoordinateQueryClause::RangeClause{ 0,0 });
+    queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 0,0 });
+    // queryClause.AddRangeClause('M', IDimCoordinateQueryClause::RangeClause{ 0,0 });
+    TileInfoQueryClause tileInfoQuery(ConditionalOperator::Equal, 5);
+    auto r = read->Query(&queryClause, &tileInfoQuery);
+
+}
+
 int main()
 {
     // TestRead();
     //TestRead2();
     //TestCreateAndWrite();
-    TestCoordinateData1();
+    //TestCoordinateData1();
+    TestRead3();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

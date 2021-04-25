@@ -8,5 +8,5 @@
 class QueryBuildUtils
 {
 public:
-    static SQLite::Statement Build(SQLite::Database& db,IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery);
+    static SQLite::Statement Build(SQLite::Database& db,const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery);
 };

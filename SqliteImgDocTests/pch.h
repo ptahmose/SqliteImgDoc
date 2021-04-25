@@ -14,3 +14,5 @@
 #include "../SqliteImgDoc/src/IInternalDb.h"
 #include "../SqliteImgDoc/src/DbDiscover.h"
 #include "../SqliteImgDoc/src/CCustomQueries.h"
+
+#include "../SqliteImgDoc/src/QueryBuildUtils.h"

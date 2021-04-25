@@ -50,8 +50,9 @@ add_executable( SqliteImgDocTests
                     CustomQueriesTests.cpp
                     DbCreateDbTests.cpp
                     PerTilesDataTests.cpp
+                    "QueryBuildUtilsTests.cpp"
                     pch.cpp
-                    pch.h)
+                    pch.h )
 
 target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
 

@@ -3,12 +3,11 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
-#include "CCustomQueries.h"
-//#define SQLITE_ENABLE_RTREE
 #include <sqlite3.h>
+#include "CCustomQueries.h"
 #include "miscutilities.h"
 #include "dbutils.h"
-//#include <sqlite3ext.h>
+#include "QueryBuildUtils.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -399,6 +398,25 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
 {
+    auto query = QueryBuildUtils::Build(this->GetDb(), this->GetDocInfo(), clause, tileInfoQuery);
+
+    try
+    {
+        while (query.executeStep())
+        {
+            dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
+    }
+    catch (SQLite::Exception& excp)
+    {
+        std::cout << excp.what();
+    }
+#if false
     stringstream ss;
     ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
 
@@ -539,4 +557,5 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     {
         std::cout << excp.what();
     }
+#endif
 }

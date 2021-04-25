@@ -7,7 +7,7 @@
 using namespace std;
 using namespace SlImgDoc;
 
-/*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
+/*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
 {
     std::stringstream ss;
     ss << "SELECT " << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";

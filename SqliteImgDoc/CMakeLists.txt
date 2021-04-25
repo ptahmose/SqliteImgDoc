@@ -62,7 +62,7 @@ add_library (SqliteImgDoc STATIC
 						external/SqliteImgDocException.h
 						external/BlobData.h 
 						"external/ITileInfoQueryClause.h" 
-						"external/TileInfoQueryClause.h")
+						"external/TileInfoQueryClause.h" "src/QueryBuildUtils.h" "src/QueryBuildUtils.cpp")
 
 target_link_libraries(SqliteImgDoc PRIVATE SQLiteCpp)
 #set_target_properties(SqliteImgDoc PROPERTIES CXX_STANDARD 17 CXX_EXTENSIONS OFF)

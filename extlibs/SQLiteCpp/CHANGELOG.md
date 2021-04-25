@@ -2,12 +2,12 @@ Mar 30 2012
 - Start of a new thin C++ SQLite wrapper
 
 Apr 2 2012
-- The wrapper is functionnal
+- The wrapper is functional
 - Added documentation and examples
 - Publication on GitHub
 
 Version 0.1.0 - Apr 4 2012
-- Added a Database::exec() methode to execute simple SQL statement
+- Added a Database::exec() method to execute simple SQL statement
 - Added a version number like in sqlite3.h, starting with 0.1.0
 
 Version 0.2.0 - Apr 11 2012
@@ -75,7 +75,7 @@ Version 1.3.0 - November 1 2015
 - Added Backup class
 
 Version 1.3.1 - February 10 2016
-- Swith Linux/Mac build to the provided SQLite3 C library
+- Switch Linux/Mac build to the provided SQLite3 C library
 - Update SQLite3 from 3.8.8.3 to latest 3.10.2 (2016-01-20)
 - Remove warnings
 - Remove biicode support (defunct service, servers will shutdown the 16th of February 2016)
@@ -99,7 +99,7 @@ Version 2.1.0 - July 18 2017
 - Update SQLite3 from 3.13 to latest 3.19.3 (2017-06-08)
 - Fixed Incompatibility in 3.19.0 (to use older SQLite version set the CMake variable SQLITE_USE_LEGACY_STRUCT) #125
 - Fixed link error (inline in cpp) and compiler warnings (unused variable...) #96
-- Added ability to open encrypted databases #107
+- Added ability to open encrypted databases (using SQLCipher, eg. libsqlcipher-dev) #107
 - Added convenience functions for constructing objects from a row #114
 - Added CMake install step #118
 - Fix warnings #119
@@ -110,11 +110,89 @@ Version 2.1.0 - July 18 2017
 Version 2.2.0 - Sept 19 2017
 - Update SQLite3 from 3.19.3 to latest 3.20.1 (2017-08-24) #143
 - Added tryExecuteStep and tryReset #142
-- Removed virtual kewords from destructors #140
+- Removed virtual keywords from destructors #140
 - Removed misplaced noexcept keyword #139
 - Improved Exception class C++ conformance #138
 - Fix warnings #134
-- Deprecated Statement::IsOk() to Statement::HasRow()
+- Deprecated Statement::isOk() to Statement::hasRow()
 
-Version ?
+Version 2.3.0 - March 3 2019
+- Update SQLite3 from 3.20.1 to latest 3.27.2 (2019-02-25) #183 #187
 - Add Statement binding for long int values #147
+- Allows long int for bind when used with name #148
+- More cmake instructions for Linux #151
+- Add comparison with sqlite_orm #141
+- Fix Statement::bind truncates long integer to 32 bits on x86_64 Linux #155
+- Add a move constructor to Database #157
+- Added tests for all MSVC compilers available on AppVeyor (2013, 2015, 2017) #169
+- Update VariadicBind.h #172
+- Better CMake compatibility #170
+- Add implicit cast operator to char and short types #179 #180
+
+Version 2.4.0 - August 25 2019
+- Update SQLite3 from 3.27.2 to 3.29.0 (2019-07-10) #217
+- #191 CMake Warning line 299
+- #190 Implement move constructors
+- #192 Add wrapper for bind parameter count
+- #197 Add tuple_bind and execute_many (requested by #24)
+- #199 Fix #156 misleading error message in exception from Statement::exec
+- #201 Add Statement::getExpandedSQL() to get the SQL text of prepared statement with bound parameters expanded
+- #211 Implement Database::backup()
+- #215 Disable implicit fallthrough warning when building internal sqlite3
+- #216 Set PROJECT_VERSION to fix CMP0048 Policy warnings
+
+Version 2.5.0 - December 31 2019
+- Update SQLite3 from 3.29.0 to 3.30.1 (2019-10-10)
+- 100% Unit Test coverage
+- #212 fix sqlite3 compile properties (jzt)
+- #219 Disable cast-function-type warning when building internal sqlite (zxey)
+- #230 Fixed installation on other than Ubuntu GNU/Linux distributions (xvitaly)
+- #228 use transitive compile definitions via cmake (BioDataAnalysis/emmenlau)
+- #232 Added support of packaged GTest for running unit tests (xvitaly)
+- #231 Added SOVERSION field for shared library (xvitaly)
+- #229 Explicitly find and link against system sqlite library (xvitaly)
+- #235 Added support for cmake dependencies and version information (BioDataAnalysis/emmenlau)
+- #249 Added SQLite header parsing functionality and associated tests (patrick--)
+
+- #251 Added example for getHeaderInfo()
+
+Version 3.0.0 - January 31 2020
+- C++11 is now required
+- CMake 3.1 minimum
+- Visual Studio 2015 minimum
+- Update Googletest to latest release 1.10
+- Add Github Actions continuous integration solution
+- Add Valgrind memcheck tool to Travis CI
+- Remove Statement::isOk() deprecated in 2.2.0 when renamed to Statement::hasRow()
+- Replace Database::backup() "C" implementation by calling the Backup class
+- #252 Run Valgrind memcheck on Travis CI
+- #253 Keep inline functions for GCov code coverage
+- #254 Re-enable Coverity static analysis
+- #256 Fix linking with system library (libsqlite3)
+- #242 Added a `getIndex` method and used it (KOLANICH)
+- #257 Improve Statement unit tests coverage (bind by name with a std::string)
+- #234 support for external sqlite3 (BioDataAnalysis/emmenlau)
+- #243 adding a pure attribute to getIndex() (KOLANICH)
+
+Version 3.1.0 - August 11 2020
+- Update SQLite3 from 3.30.1 to 3.32.3 (2020-06-18)
+- #274 Install both cmake files into same lib directory from tcraigtyler
+- #275 Add a method on Statement to get the declared type of a column. from daniel-schmidt
+- #284 Add SQLITE_OPEN_FULLMUTEX flag from rwrx
+- #286 Add CMake option to toggle stack protection from chrisdalke
+- #287 Fixed installation on other than Ubuntu distributions from xvitaly
+- #288 Allow building of sqlite JSON1 extension when building internal sqlite library from zxey
+
+Version 3.1.1 - August 19 2020
+- #292 Fix compilation if using SQLITE_HAS_CODEC from sum01
+- #293 Remove FindSQLiteCpp.cmake from sum01
+
+Version 3.x - 2021
+- #300 #316 Updated SQLite3 from 3.32.3 to 3.34.0 (2020-12-01)
+- #236 Disable explicit setting of MSVC runtime from BioDataAnalysis/emmenlau
+- #308 Fix build warning due to string truncation from stauffer-garmin
+- #311 Add Database::tryExec() from kcowolf
+- #313 [CMake] Add SQLITECPP_INCLUDE_SCRIPT option from past-due
+- #314 Add Database constructor for filesystem::path (#296) from ptrks
+- #295 Compile internal SQLite library with -ffunction-sections from smichaku
+- #299 Added Savepoint support from catalogm

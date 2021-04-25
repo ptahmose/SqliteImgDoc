@@ -3,8 +3,9 @@ SQLiteC++
 
 [![release](https://img.shields.io/github/release/SRombauts/SQLiteCpp.svg)](https://github.com/SRombauts/SQLiteCpp/releases)
 [![license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/SRombauts/SQLiteCpp/blob/master/LICENSE.txt)
-[![Travis CI Linux Build Status](https://travis-ci.org/SRombauts/SQLiteCpp.svg)](https://travis-ci.org/SRombauts/SQLiteCpp "Travis CI Linux Build Status")
+[![Travis CI Linux Build Status](https://travis-ci.org/SRombauts/SQLiteCpp.svg?branch=master)](https://travis-ci.org/SRombauts/SQLiteCpp "Travis CI Linux Build Status")
 [![AppVeyor Windows Build status](https://ci.appveyor.com/api/projects/status/github/SRombauts/SQLiteCpp?svg=true)](https://ci.appveyor.com/project/SbastienRombauts/SQLiteCpp "AppVeyor Windows Build status")
+[![GitHub Actions Build status](https://github.com/SRombauts/SQLiteCpp/workflows/build/badge.svg)](https://github.com/SRombauts/SQLiteCpp/actions "GitHhub Actions Build status")
 [![Coveralls](https://img.shields.io/coveralls/SRombauts/SQLiteCpp.svg)](https://coveralls.io/github/SRombauts/SQLiteCpp "Coveralls test coverage")
 [![Coverity](https://img.shields.io/coverity/scan/14508.svg)](https://scan.coverity.com/projects/srombauts-sqlitecpp "Coverity Scan Build Status")
 [![Join the chat at https://gitter.im/SRombauts/SQLiteCpp](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/SRombauts/SQLiteCpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
@@ -20,7 +21,7 @@ with a few intuitive and well documented C++ classes.
 
 ### License:
 
-Copyright (c) 2012-2017 Sébastien Rombauts (sebastien.rombauts@gmail.com)
+Copyright (c) 2012-2020 Sébastien Rombauts (sebastien.rombauts@gmail.com)
 <a href="https://www.paypal.me/SRombauts" title="Pay Me a Beer! Donate with PayPal :)"><img src="https://www.paypalobjects.com/webstatic/paypalme/images/pp_logo_small.png" width="118"></a>
 
 Distributed under the MIT License (MIT) (See accompanying file LICENSE.txt
@@ -44,8 +45,8 @@ http://www.sqlite.org/about.html
 ### The goals of SQLiteC++ are:
 
 - to offer the best of the existing simple C++ SQLite wrappers
-- to be elegantly written with good C++ design, STL, exceptions and RAII idiom
-- to keep dependencies to a minimum (STL and SQLite3)
+- to be elegantly written with good C++11 design, STL, exceptions and RAII idiom
+- to keep dependencies to a minimum (C++11 STL and SQLite3)
 - to be portable
 - to be light and fast
 - to be thread-safe only as much as SQLite "Multi-thread" mode (see below)
@@ -57,30 +58,33 @@ http://www.sqlite.org/about.html
 
 It is designed using the Resource Acquisition Is Initialization (RAII) idiom
 (see http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization),
-and throwing exceptions in case of SQLite errors (exept in destructors,
+and throwing exceptions in case of SQLite errors (except in destructors,
 where assert() are used instead).
 Each SQLiteC++ object must be constructed with a valid SQLite database connection,
 and then is always valid until destroyed.
 
-### Supported platforms:
+### Supported platforms:
 
-Developements and tests are done under the following OSs:
-- Ubuntu 14.04 (Travis CI)
-- Windows XP/10
+Now requires a C++11 compiler. Use branch [sqlitecpp-2.x](https://github.com/SRombauts/SQLiteCpp/tree/sqlitecpp-2.x) for latest pre-C++11 developments.
+
+Developments and tests are done under the following OSs:
+- Ubuntu 14.04, 16.04 and 18.04 (Travis CI)
+- Windows 10, and Windows Server 2012 R2 & Windows Server 2016 (AppVeyor)
 - OS X 10.11 (Travis CI)
+- Github Actions
+- Valgrind memcheck tool
 
 And the following IDEs/Compilers
-- GCC 4.8.4, 4.9.3, 5.3.0 and 6.1.1 (C++03, C++11, C++14, C++1z)
-- Clang 3.5 and 3.8
-- Xcode 8
-- Visual Studio Community 2015
-- Eclipse CDT under Linux
+- GCC 4.8.4, 5.3.0 and 7.1.1 (C++11, C++14, C++17)
+- Clang 5
+- Xcode 8 & 9
+- Visual Studio Community 2019, 2017, and 2015 (AppVeyor)
 
 ### Dependencies
 
-- an STL implementation (even an old one, like the one provided with VC6 should work)
+- a modern C++11 STL implementation with GCC, Clang, or Visual Studio 2015
 - exception support (the class Exception inherits from std::runtime_error)
-- the SQLite library (3.7.15 minimum from 2012-12-12) either by linking to it dynamicaly or statically (install the libsqlite3-dev package under Debian/Ubuntu/Mint Linux),
+- the SQLite library (3.7.15 minimum from 2012-12-12) either by linking to it dynamically or statically (install the libsqlite3-dev package under Debian/Ubuntu/Mint Linux),
   or by adding its source file in your project code base (source code provided in src/sqlite3 for Windows),
   with the SQLITE_ENABLE_COLUMN_METADATA macro defined (see http://www.sqlite.org/compile.html#enable_column_metadata).
 
@@ -95,7 +99,19 @@ The "CMakeLists.txt" file defining the static library is provided in the root di
 so you simply have to add_subdirectory(SQLiteCpp) to you main CMakeLists.txt
 and link to the "SQLiteCpp" wrapper library.
 
-Thus this SQLiteCpp repository can be directly used as a Git submoldule.
+Example for Linux: 
+```cmake
+add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/thirdparty/SQLiteCpp)
+
+add_executable(main src/main.cpp)
+target_link_libraries(main
+  SQLiteCpp
+  sqlite3
+  pthread
+  dl
+  )
+``` 
+Thus this SQLiteCpp repository can be directly used as a Git submodule.
 See the [SQLiteCpp_Example](https://github.com/SRombauts/SQLiteCpp_Example) side repository for a standalone "from scratch" example.
 
 Under Debian/Ubuntu/Mint Linux, you can install the libsqlite3-dev package if you don't want to use the embedded sqlite3 library.
@@ -111,8 +127,22 @@ git submodule init
 git submodule update
 ```
 
+#### Using SQLiteCpp on a system-wide installation
+
+If you installed this package to your system, a `SQLiteCppConfig.cmake` file will be generated & installed to your system.  
+This file lets you link against the SQLiteCpp library for use in your Cmake project.
+
+Here's an example of using this in your CMakeLists.txt
+```cmake
+# You can optionally define a minimum version in this call
+find_package(SQLiteCpp REQUIRED)
+# For this example, lets say you created an target with add_executable (or add_library) called "my_target"
+# You can optionally declare PUBLIC or PRIVATE linkage here, depending on your needs.
+target_link_libraries(my_target PRIVATE SQLiteCpp)
+```
+
 #### CMake and tests
-A CMake configuration file is also provided for multiplatform support and testing.
+A CMake configuration file is also provided for multi-platform support and testing.
 
 Typical generic build for MS Visual Studio under Windows (from [build.bat](build.bat)):
 
@@ -120,7 +150,7 @@ Typical generic build for MS Visual Studio under Windows (from [build.bat](build
 mkdir build
 cd build
 
-cmake ..        # cmake .. -G "Visual Studio 10"    # for Visual Studio 2010
+cmake ..        # cmake .. -G "Visual Studio 16 2019"    # for Visual Studio 2019
 @REM Generate a Visual Studio solution for latest version found
 cmake -DSQLITECPP_BUILD_EXAMPLES=ON -DSQLITECPP_BUILD_TESTS=ON ..
 
@@ -147,13 +177,13 @@ cmake --build .
 ctest --output-on-failure
 ```
 
-#### CMake options
+#### CMake options
 
   * For more options on customizing the build, see the [CMakeLists.txt](https://github.com/SRombauts/SQLiteCpp/blob/master/CMakeLists.txt) file.
 
 #### Troubleshooting
 
-Under Linux, if you get muliple linker errors like "undefined reference to sqlite3_xxx",
+Under Linux, if you get multiple linker errors like "undefined reference to sqlite3_xxx",
 it's that you lack the "sqlite3" library: install the libsqlite3-dev package.
 
 If you get a single linker error "Column.cpp: undefined reference to sqlite3_column_origin_name",
@@ -165,12 +195,12 @@ You can either recompile it yourself (seek help online) or you can comment out t
 #define SQLITE_ENABLE_COLUMN_METADATA
 ```
 
-### Continuous Integration
+### Continuous Integration
 
 This project is continuously tested under Ubuntu Linux with the gcc and clang compilers
 using the Travis CI community service with the above CMake building and testing procedure.
 It is also tested in the same way under Windows Server 2012 R2 with Visual Studio 2013 compiler
-using the AppVeyor countinuous integration service.
+using the AppVeyor continuous integration service.
 
 Detailed results can be seen online:
  - https://travis-ci.org/SRombauts/SQLiteCpp
@@ -287,6 +317,7 @@ The source code use the CamelCase naming style variant where:
 - function and variable names begin with a lower case letter
 - member variables begin with a 'm', function arguments begin with a 'a', booleans with a 'b', pointers with a 'p'
 - each file, class, method and member variable is documented using Doxygen tags
+- braces on their own line
 See also http://www.appinf.com/download/CppCodingStyleGuide.pdf for good guidelines
 
 ## See also - Some other simple C++ SQLite wrappers:
@@ -299,4 +330,4 @@ See bellow a short comparison of other wrappers done at the time of writing:
  - [CppSQLite](http://www.codeproject.com/Articles/6343/CppSQLite-C-Wrapper-for-SQLite/): famous Code Project but old design, BSD License 
  - [easySQLite](http://code.google.com/p/easysqlite/): manages table as structured objects, complex 
  - [sqlite_modern_cpp](https://github.com/keramer/sqlite_modern_cpp): modern C++11, all in one file, MIT license
- 
+ - [sqlite_orm](https://github.com/fnc12/sqlite_orm): modern C++14, header only all in one file, no raw string queries, BSD-3 license

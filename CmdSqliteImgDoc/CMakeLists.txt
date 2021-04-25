@@ -7,7 +7,7 @@
 add_executable(CmdSqliteImgDoc CmdSqliteImgDoc.cpp )
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(CmdSqliteImgDoc   SqliteImgDoc SQLiteCpp sqlite3)
+target_link_libraries(CmdSqliteImgDoc   SqliteImgDoc SQLiteCpp)
 
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)

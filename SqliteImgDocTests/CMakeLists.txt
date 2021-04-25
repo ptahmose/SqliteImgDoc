@@ -56,7 +56,7 @@ add_executable( SqliteImgDocTests
 target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp sqlite3)
+target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp)
 
 if(UNIX AND NOT APPLE)
    # Linux

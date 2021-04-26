@@ -301,9 +301,10 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
      }*/
 }
 
+#if 0
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
 {
-    stringstream ss;
+   /* stringstream ss;
     ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
 
     auto rangeDims = clause->GetTileDimsForClause();
@@ -392,9 +393,10 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     catch (SQLite::Exception& excp)
     {
         std::cout << excp.what();
-    }
+    }*/
+    this->Query(clause, nullptr, func);
 }
-
+#endif
 
 /*virtual*/void CDbRead::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
 {
@@ -416,146 +418,4 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     {
         std::cout << excp.what();
     }
-#if false
-    stringstream ss;
-    ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
-
-    int paramNo = 1;
-    // get the set of dimensions for which we have a clause
-    auto rangeDims = clause->GetTileDimsForClause();
-
-    bool firstClause = true;
-    for (const auto dim : rangeDims)
-    {
-        string dimColumnName;
-        this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, dimColumnName);
-
-        auto ranges = clause->GetRangeClause(dim);
-        auto list = clause->GetListClause(dim);
-
-        if (ranges != nullptr && list != nullptr)
-        {
-            throw invalid_argument("...TODO...");
-        }
-
-        if (!firstClause)
-        {
-            ss << " AND ";
-        }
-
-        ss << "(";
-        if (ranges != nullptr)
-        {
-            bool first = true;
-            for (const auto& r : *ranges)
-            {
-                if (!first)
-                {
-                    ss << " OR ";
-                }
-
-                if (r.start != numeric_limits<int>::min() && r.end != numeric_limits<int>::max())
-                {
-                    if (r.start == r.end)
-                    {
-                        ss << "(" << dimColumnName << "= ?" << paramNo++ << ")";
-                    }
-                    else
-                    {
-                        ss << "(" << dimColumnName << ">= ?" << paramNo << " AND " << dimColumnName << "<= ?" << paramNo + 1 << ")";
-                        paramNo += 2; // Note: do not use increment-operator in above statement, because the order of execution is indeterminate then
-                    }
-                }
-                else if (r.start != numeric_limits<int>::min())
-                {
-                    ss << "(" << dimColumnName << "<= ?" << paramNo++ << ")";
-                }
-                else if (r.end != numeric_limits<int>::max())
-                {
-                    ss << "(" << dimColumnName << ">= ?" << paramNo++ << ")";
-                }
-
-                first = false;
-            }
-        }
-
-        ss << ")";
-
-        firstClause = false;
-    }
-
-    if (tileInfoQuery != nullptr)
-    {
-        ConditionalOperator op;
-        if (tileInfoQuery->GetPyramidLevelCondition(&op, nullptr))
-        {
-            ss << " AND ";
-            ss << "(" << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << MiscUtils::ConditionalOperatorToString(op) << " ?" << paramNo++ << ")";
-        }
-    }
-
-    SQLite::Statement query(this->GetDb(), ss.str());
-    int bindingNo = 1;
-    for (const auto dim : rangeDims)
-    {
-        string dimColumnName;
-        this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, dimColumnName);
-
-        auto ranges = clause->GetRangeClause(dim);
-        auto list = clause->GetListClause(dim);
-
-        if (ranges != nullptr)
-        {
-            for (const auto& r : *ranges)
-            {
-                if (r.start != numeric_limits<int>::min() && r.end != numeric_limits<int>::max())
-                {
-                    if (r.start == r.end)
-                    {
-                        query.bind(bindingNo++, r.start);
-                    }
-                    else
-                    {
-                        query.bind(bindingNo++, r.start);
-                        query.bind(bindingNo++, r.end);
-                    }
-                }
-                else if (r.start != numeric_limits<int>::min())
-                {
-                    query.bind(bindingNo++, r.start);
-                }
-                else if (r.end != numeric_limits<int>::max())
-                {
-                    query.bind(bindingNo++, r.end);
-                }
-            }
-        }
-    }
-
-    if (tileInfoQuery != nullptr)
-    {
-        int value;
-        if (tileInfoQuery->GetPyramidLevelCondition(nullptr, &value))
-        {
-            query.bind(bindingNo++, value);
-        }
-    }
-
-    try
-    {
-        while (query.executeStep())
-        {
-            dbIndex idx = query.getColumn(0).getInt64();
-            bool b = func(idx);
-            if (!b)
-            {
-                break;
-            }
-        }
-    }
-    catch (SQLite::Exception& excp)
-    {
-        std::cout << excp.what();
-    }
-#endif
 }

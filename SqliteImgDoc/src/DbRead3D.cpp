@@ -6,6 +6,7 @@
 #include "CCustomQueries.h"
 #include <sqlite3.h>
 #include "dbutils.h"
+#include "QueryBuildUtils.h"
 
 using namespace std;
 using namespace SlImgDoc;
@@ -172,7 +173,7 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
         throw;
     }
 }
-
+#if 0
 /*virtual*/void CDbRead3D::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
 {
     stringstream ss;
@@ -267,10 +268,28 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
         std::cout << excp.what();
     }
 }
+#endif
 
 /*virtual*/void CDbRead3D::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
 {
-    
+    auto query = QueryBuildUtils::Build(this->GetDb(), this->GetDocInfo3D(), clause, tileInfoQuery);
+
+    try
+    {
+        while (query.executeStep())
+        {
+            const dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
+    }
+    catch (SQLite::Exception& excp)
+    {
+        std::cout << excp.what();
+    }
 }
 
 /*virtual*/void CDbRead3D::GetTilesIntersectingCuboid(const SlImgDoc::CuboidD& rect, std::function<bool(SlImgDoc::dbIndex)> func)

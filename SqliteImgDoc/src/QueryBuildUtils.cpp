@@ -9,8 +9,40 @@ using namespace SlImgDoc;
 
 /*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
 {
+    BuildInfo buildInfo
+    {
+        docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo),
+    docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk),
+    docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl),
+        [&](SlImgDoc::TileDim dim, std::string& columnName)->bool
+        {
+            return docInfo.GetTileInfoColumnNameForDimension(dim,columnName);
+        }
+    };
+
+    return QueryBuildUtils::Build(db, buildInfo, clause, tileInfoQuery);
+}
+
+/*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const IDbDocInfo3D& docInfo3D, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
+{
+    BuildInfo buildInfo
+    {
+        docInfo3D.GetTableName(IDbDocInfo3D::TableType::TilesInfo),
+            docInfo3D.GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::Pk),
+            docInfo3D.GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::PyrLvl),
+            [&](SlImgDoc::TileDim dim, std::string& columnName)->bool
+        {
+            return docInfo3D.GetTileInfoColumnNameForDimension(dim, columnName);
+        }
+    };
+
+    return QueryBuildUtils::Build(db, buildInfo, clause, tileInfoQuery);
+}
+
+/*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const BuildInfo& info, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
+{
     std::stringstream ss;
-    ss << "SELECT " << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo);
+    ss << "SELECT " << info.PkColumnName << " FROM " << info.TableName;
 
     int paramNo = 1;    // this is used to enumerate the parameters
     bool firstClause = true;
@@ -23,7 +55,7 @@ using namespace SlImgDoc;
         for (const auto dim : rangeDims)
         {
             string dimColumnName;
-            docInfo.GetTileInfoColumnNameForDimension(dim, dimColumnName);
+            info.GetColumnNameForDimension(dim, dimColumnName);
 
             auto ranges = clause->GetRangeClause(dim);
             auto list = clause->GetListClause(dim);
@@ -34,11 +66,11 @@ using namespace SlImgDoc;
             }
 
             ss << (firstClause ? " WHERE " : " AND ");
-
             ss << "(";
+
+            bool first = true;
             if (ranges != nullptr)
             {
-                bool first = true;
                 for (const auto& r : *ranges)
                 {
                     if (!first)
@@ -71,6 +103,34 @@ using namespace SlImgDoc;
                 }
             }
 
+            if (list != nullptr)
+            {
+                for (const auto& l : *list)
+                {
+                    if (!first)
+                    {
+                        ss << " OR ";
+                    }
+
+                    ss << "(" << dimColumnName << " IN (";
+
+                    bool firstInList = true;
+                    for (const auto& i : l.list)
+                    {
+                        if (!firstInList)
+                        {
+                            ss << ",";
+                        }
+
+                        ss << "?" << paramNo++;
+                        firstInList = false;
+                    }
+
+                    ss << "))";
+                    first = false;
+                }
+            }
+
             ss << ")";
 
             firstClause = false;
@@ -83,7 +143,7 @@ using namespace SlImgDoc;
         if (tileInfoQuery->GetPyramidLevelCondition(&op, nullptr))
         {
             ss << (firstClause ? " WHERE " : " AND ");
-            ss << "(" << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << MiscUtils::ConditionalOperatorToString(op) << " ?" << paramNo++ << ")";
+            ss << "(" << info.PyramidLevelColumnName << MiscUtils::ConditionalOperatorToString(op) << " ?" << paramNo++ << ")";
             firstClause = false;
         }
     }
@@ -96,7 +156,7 @@ using namespace SlImgDoc;
         for (const auto dim : clause->GetTileDimsForClause())
         {
             string dimColumnName;
-            docInfo.GetTileInfoColumnNameForDimension(dim, dimColumnName);
+            info.GetColumnNameForDimension(dim, dimColumnName);
 
             auto ranges = clause->GetRangeClause(dim);
             auto list = clause->GetListClause(dim);
@@ -124,6 +184,17 @@ using namespace SlImgDoc;
                     else if (r.end != numeric_limits<int>::max())
                     {
                         query.bind(bindingNo++, r.end);
+                    }
+                }
+            }
+
+            if (list != nullptr)
+            {
+                for (const auto& l : *list)
+                {
+                    for (const auto& i : l.list)
+                    {
+                        query.bind(bindingNo++, i);
                     }
                 }
             }

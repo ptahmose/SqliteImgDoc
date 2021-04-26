@@ -151,7 +151,7 @@ namespace SlImgDoc
         /// \param func    Functor which will be called reporting the requested data. The return value determines whether to continue to report data.
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
-        virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
         virtual void Query(const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery, std::function<bool(dbIndex)> func) = 0;
         virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
@@ -164,6 +164,11 @@ namespace SlImgDoc
             std::vector<ColumnDescription> colDescr;
             this->EnumPerTileColumns([&](const ColumnDescription& cd)->bool {colDescr.emplace_back(cd); return true; });
             return colDescr;
+        }
+
+        void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
+        {
+            this->Query(clause, nullptr, func);
         }
     };
 

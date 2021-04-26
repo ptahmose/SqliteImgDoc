@@ -10,7 +10,7 @@ namespace SlImgDoc
     private:
         std::map<TileDim, std::vector<RangeClause>> rangeClauses;
         std::map<TileDim, std::vector<ListClause>> listClauses;
-        std::unordered_set<TileDim> dims;
+        std::set<TileDim> dims;
     public:
         void AddRangeClause(TileDim d, const RangeClause& clause)
         {
@@ -24,7 +24,7 @@ namespace SlImgDoc
             this->dims.insert(d);
         }
 
-        const std::unordered_set<TileDim>& GetTileDimsForClause() const override
+        const std::set<TileDim>& GetTileDimsForClause() const override
         {
             return this->dims;
         }

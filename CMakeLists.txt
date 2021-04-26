@@ -5,7 +5,7 @@ cmake_minimum_required (VERSION 3.7)
 
 project ("SqliteImgDoc")
 
-message(STATUS "HELLO WORLD")
+#message(STATUS "HELLO WORLD")
 
 # Include sub-projects.
 #find_package(sqlite3 CONFIG REQUIRED)
@@ -20,20 +20,17 @@ message(STATUS "HELLO WORLD")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
 
 
-
-
 # add SQLite3 C++ wrapper arround sqlite3 library (and sqlite3 itself provided for ease of use)
-# NOTE: here you can set CMake variables to avoid building Example, as well as cpplint, cppcheck...
-# NOTE: or set them in the cmake commande line (see for instance provided build.bat/build.sh scripts)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
-set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "" FORCE)
+set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "" FORCE) # here we simply instruct it to use the "bundled" SQLite-version
 set(SQLITECPP_INCLUDE_SCRIPT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_USE_STATIC_RUNTIME OFF CACHE BOOL "" FORCE)
 set(SQLITE_ENABLE_RTREE ON CACHE BOOL "" FORCE)
 add_subdirectory(extlibs/SQLiteCpp)
+
 
 
 set(LIBCZI_BUILD_CZICMD OFF CACHE BOOL "" FORCE)

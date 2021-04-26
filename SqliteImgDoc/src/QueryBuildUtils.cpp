@@ -10,16 +10,16 @@ using namespace SlImgDoc;
 /*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
 {
     std::stringstream ss;
-    ss << "SELECT " << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE ";
+    ss << "SELECT " << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM " << docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo);
 
     int paramNo = 1;    // this is used to enumerate the parameters
+    bool firstClause = true;
 
     if (clause != nullptr)
     {
         // get the set of dimensions for which we have a clause
         auto rangeDims = clause->GetTileDimsForClause();
 
-        bool firstClause = true;
         for (const auto dim : rangeDims)
         {
             string dimColumnName;
@@ -33,10 +33,7 @@ using namespace SlImgDoc;
                 throw invalid_argument("...TODO...");
             }
 
-            if (!firstClause)
-            {
-                ss << " AND ";
-            }
+            ss << (firstClause ? " WHERE " : " AND ");
 
             ss << "(";
             if (ranges != nullptr)
@@ -63,11 +60,11 @@ using namespace SlImgDoc;
                     }
                     else if (r.start != numeric_limits<int>::min())
                     {
-                        ss << "(" << dimColumnName << "<= ?" << paramNo++ << ")";
+                        ss << "(" << dimColumnName << ">= ?" << paramNo++ << ")";
                     }
                     else if (r.end != numeric_limits<int>::max())
                     {
-                        ss << "(" << dimColumnName << ">= ?" << paramNo++ << ")";
+                        ss << "(" << dimColumnName << "<= ?" << paramNo++ << ")";
                     }
 
                     first = false;
@@ -78,21 +75,25 @@ using namespace SlImgDoc;
 
             firstClause = false;
         }
+    }
 
-        if (tileInfoQuery != nullptr)
+    if (tileInfoQuery != nullptr)
+    {
+        ConditionalOperator op;
+        if (tileInfoQuery->GetPyramidLevelCondition(&op, nullptr))
         {
-            ConditionalOperator op;
-            if (tileInfoQuery->GetPyramidLevelCondition(&op, nullptr))
-            {
-                ss << " AND ";
-                ss << "(" << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << MiscUtils::ConditionalOperatorToString(op) << " ?" << paramNo++ << ")";
-            }
+            ss << (firstClause ? " WHERE " : " AND ");
+            ss << "(" << docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl) << MiscUtils::ConditionalOperatorToString(op) << " ?" << paramNo++ << ")";
+            firstClause = false;
         }
+    }
 
-        SQLite::Statement query(db, ss.str());
+    SQLite::Statement query(db, ss.str());
 
-        int bindingNo = 1;
-        for (const auto dim : rangeDims)
+    int bindingNo = 1;
+    if (clause != nullptr)
+    {
+        for (const auto dim : clause->GetTileDimsForClause())
         {
             string dimColumnName;
             docInfo.GetTileInfoColumnNameForDimension(dim, dimColumnName);
@@ -127,16 +128,16 @@ using namespace SlImgDoc;
                 }
             }
         }
-
-        if (tileInfoQuery != nullptr)
-        {
-            int value;
-            if (tileInfoQuery->GetPyramidLevelCondition(nullptr, &value))
-            {
-                query.bind(bindingNo++, value);
-            }
-        }
-
-        return query;
     }
+
+    if (tileInfoQuery != nullptr)
+    {
+        int value;
+        if (tileInfoQuery->GetPyramidLevelCondition(nullptr, &value))
+        {
+            query.bind(bindingNo++, value);
+        }
+    }
+
+    return query;
 }

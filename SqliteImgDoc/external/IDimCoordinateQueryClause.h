@@ -1,11 +1,14 @@
 #pragma once
 
 #include <vector>
-//#include <optional>
+#include <set>
 #include "ITileCoordinate.h"
 
 namespace SlImgDoc
 {
+    /// This interface describes a query clause for the dimension-columns.
+    /// It is important that this object is idempotent - meaning if the methods are 
+    /// called multiple times, an implementation is required to give identical results.
     class IDimCoordinateQueryClause
     {
     public:
@@ -24,7 +27,11 @@ namespace SlImgDoc
             std::vector<int> list;
         };
 
-        virtual const std::unordered_set<TileDim>& GetTileDimsForClause() const = 0;
+        /// Gets the set of dimensions for which there is a clause present. It is important that the order
+        /// of elements is idempotent (as of course the content itself).
+        /// \returns The set of dimensions for which there are clauses.
+        virtual const std::set<TileDim>& GetTileDimsForClause() const = 0;
+
         virtual const std::vector<RangeClause>* GetRangeClause(TileDim d) const = 0;
         virtual const std::vector<ListClause>* GetListClause(TileDim d) const = 0;
 

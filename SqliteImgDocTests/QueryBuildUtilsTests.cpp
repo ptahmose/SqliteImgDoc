@@ -22,7 +22,7 @@ TEST(QueryBuildUtilsTests, UseDimCoordinateQueryCheckSql)
     queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 0,0 });
     auto query = QueryBuildUtils::Build(
         internalDb->GetDb(),
-        *docInfo.get(),
+        *docInfo,
         &queryClause,
         nullptr);
     auto sqlStatement = query.getExpandedSQL();

@@ -166,102 +166,6 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
         throw;
     }
 }
-#if 0
-/*virtual*/void CDbRead3D::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func)
-{
-    stringstream ss;
-    ss << "SELECT " << this->GetDocInfo3D().GetTileInfoColumnName(IDbDocInfo3D::TilesInfoColumn::Pk) << " FROM " << this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesInfo) << " WHERE ";
-
-    auto rangeDims = clause->GetTileDimsForClause();
-    bool firstDim = true;
-    for (const auto dim : rangeDims)
-    {
-        string dimColumnName;
-        this->GetDocInfo3D().GetTileInfoColumnNameForDimension(dim, dimColumnName);
-
-        auto ranges = clause->GetRangeClause(dim);
-        auto list = clause->GetListClause(dim);
-
-        //if (!ranges.has_value() && !list.has_value())
-        if (ranges != nullptr && list != nullptr)
-        {
-            throw invalid_argument("...TODO...");
-        }
-
-        if (!firstDim)
-        {
-            ss << " AND ";
-        }
-
-        ss << "(";
-        bool first = true;
-
-        if (ranges != nullptr)
-        {
-            for (const auto& r : *ranges)
-            {
-                if (!first)
-                {
-                    ss << " OR ";
-                }
-
-                ss << "(" << dimColumnName << ">=" << r.start << " AND " << dimColumnName << "<=" << r.end << ")";
-                first = false;
-            }
-        }
-
-        if (list != nullptr)
-        {
-            for (const auto& l : *list)
-            {
-                if (!first)
-                {
-                    ss << " OR ";
-                }
-
-                ss << "(" << dimColumnName << " IN (";
-
-                bool firstInList = true;
-                for (const auto& i : l.list)
-                {
-                    if (!firstInList)
-                    {
-                        ss << ",";
-                    }
-
-                    ss << i;
-                    firstInList = false;
-                }
-
-                ss << "))";
-                first = false;
-            }
-        }
-
-        ss << ")";
-
-        firstDim = false;
-    }
-
-    try
-    {
-        SQLite::Statement query(this->GetDb(), ss.str());
-        while (query.executeStep())
-        {
-            dbIndex idx = query.getColumn(0).getInt64();
-            bool b = func(idx);
-            if (!b)
-            {
-                break;
-            }
-        }
-    }
-    catch (SQLite::Exception & excp)
-    {
-        std::cout << excp.what();
-    }
-}
-#endif
 
 /*virtual*/void CDbRead3D::Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
 {
@@ -368,16 +272,4 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
 {
     const auto& perTileDataColumnInfo = this->GetDocInfo3D().GetCoordinateDataColumnInfo();
     this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);
-    /*
-    for (const auto i : perTileDataColumnInfo)
-    {
-        ColumnDescription cd;
-        cd.Name = i.columnName;
-        cd.DataType = DbUtils::ColumnTypeInfoToStringRepresentation(i);
-        bool b = func(cd);
-        if (!b)
-        {
-            break;
-        }
-    }*/
 }

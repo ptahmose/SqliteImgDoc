@@ -71,6 +71,9 @@ namespace SlImgDoc
     class OpenOptions
     {
     public:
+        /// The filename of the SQLite-database to open. Note that this parameter is passed directly to SQLite, allowing for 
+        /// additional functionality (like in-memory database) - cf. https://sqlite.org/inmemorydb.html, https://sqlite.org/uri.html.
+        /// The string is expected in UTF-8 encoding.
         std::string dbFilename;
     };
 

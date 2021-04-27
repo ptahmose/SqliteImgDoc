@@ -20,5 +20,6 @@ namespace SlImgDoc
     {
     public:
         virtual bool GetPyramidLevelCondition(ConditionalOperator* op, int* value) const = 0;
+        virtual ~ITileInfoQueryClause() = default;
     };
 }

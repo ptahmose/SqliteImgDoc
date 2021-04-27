@@ -23,21 +23,21 @@ using namespace SlImgDoc;
     {
         const void* ptrHdrData; size_t sizeHdrData;
         data->GetHeader(&ptrHdrData, &sizeHdrData);
-        auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, datatype, sizeHdrData, ptrHdrData, data);
+        const auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, datatype, sizeHdrData, ptrHdrData, data);
 
         const auto dims = this->GetDocInfo().GetTileDimensions();
 
         this->EnsureAddTilesInfoRowStatement();
         this->addTilesInfoRowStatement->reset();
 
-        for (int i = 1; i <= dims.size(); ++i)
+        for (int i = 1; i <= static_cast<int>(dims.size()); ++i)
         {
             int v;
             coord->TryGetCoordinate(dims[i - 1], &v);
             this->addTilesInfoRowStatement->bind(i, v);
         }
 
-        int i = dims.size() + 1;
+        int i = static_cast<int>(dims.size()) + 1;
         this->addTilesInfoRowStatement->bind(i++, info->posX);
         this->addTilesInfoRowStatement->bind(i++, info->posY);
         this->addTilesInfoRowStatement->bind(i++, info->width);

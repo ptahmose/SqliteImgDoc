@@ -151,8 +151,14 @@ namespace SlImgDoc
         /// \param func    Functor which will be called reporting the requested data. The return value determines whether to continue to report data.
         virtual void ReadPerTileData(dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func) = 0;
 
-        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
+        /// Query the tiles table. The 
+        /// \param clause        The query clause (dealing with dimension indexes).
+        /// \param tileInfoQuery The query clause (dealing with other "per tile data").
+        /// \param func          A functor which we will called, passing in the indexs of tiles matching the query. If the functor returns false, the enumeration is canceled, and no
+        ///                      more calls to the functor will occur any more.
         virtual void Query(const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery, std::function<bool(dbIndex)> func) = 0;
+
+
         virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
         virtual ~IDbReadCommon() = default;
@@ -190,7 +196,7 @@ namespace SlImgDoc
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
 
-        virtual ~IDbRead() = default;
+        ~IDbRead() override = default;
     };
 
     struct TilePixelInfo3D
@@ -210,16 +216,13 @@ namespace SlImgDoc
         virtual void ReadTileInfo(dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info) = 0;
         virtual void ReadTileData(dbIndex ix, TilePixelInfo3D* pixelInfo, IBlob* data) = 0;
 
-        //virtual void Query(const IDimCoordinateQueryClause* clause, std::function<bool(dbIndex)> func) = 0;
-
         virtual void GetTilesIntersectingCuboid(const CuboidD& rect, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane, std::function<bool(dbIndex)> func) = 0;
 
         std::vector<dbIndex> GetTilesIntersectingCuboid(const CuboidD& cuboid);
         std::vector<dbIndex> GetTilesIntersectingWithPlane(const Plane_NormalAndDistD& plane);
-        std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
 
-        virtual ~IDbRead3D() = default;
+        ~IDbRead3D() override = default;
     };
 
     /// A Db-object represents an attached database.

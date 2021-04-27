@@ -25,13 +25,6 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
     return result;
 }
 
-//std::vector<dbIndex> IDbRead3D::Query(const IDimCoordinateQueryClause* clause)
-//{
-//    std::vector<dbIndex> result;
-//    this->Query(clause, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
-//    return result;
-//}
-
 /*virtual*/void CDbRead3D::ReadTileInfo(SlImgDoc::dbIndex idx, SlImgDoc::TileCoordinate* coord, LogicalPositionInfo3D* info)
 {
     stringstream ss;

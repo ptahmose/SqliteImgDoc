@@ -20,7 +20,7 @@ namespace SlImgDoc
     public:
         TileCoordinate() : TileCoordinate(5) {}
 
-        TileCoordinate(int reservedCapacity)
+        TileCoordinate(size_t reservedCapacity)
         {
             this->coordinates.reserve(reservedCapacity);
         }

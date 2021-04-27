@@ -48,6 +48,9 @@ namespace SlImgDoc
         {
         }
 
+        /// The filename of the SQLite-database to create. Note that this parameter is passed directly to SQLite, allowing for 
+        /// additional functionality (like in-memory database) - cf. https://sqlite.org/inmemorydb.html, https://sqlite.org/uri.html.
+        /// The string is expected in UTF-8 encoding.
         std::string dbFilename;
 
         /// The set of "dimensions" (to be used as coordinate of a subblock). Allowed values are characters A-Z.
@@ -106,7 +109,7 @@ namespace SlImgDoc
     {
     public:
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
-    
+
         virtual ~IDbWrite() = default;
     };
 
@@ -122,7 +125,7 @@ namespace SlImgDoc
     {
     public:
         virtual dbIndex AddBrick(const ITileCoordinate* coord, const LogicalPositionInfo3D* info, const TileBaseInfo3D* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;
-    
+
         virtual ~IDbWrite3D() = default;
     };
 

@@ -1,0 +1,24 @@
+SELECT DISTINCT Dim_S FROM TILESINFO
+
+
+REM SELECT Min(Dim_M),Max(Dim_M)  FROM TILESINFO WHERE (Dim_M <> -2147483648) AND Dim_S=2
+
+CREATE INDEX IndexDim_S ON TILESINFO (Dim_S)
+
+
+
+Query the AABB per scene (and how many tiles there are):
+
+SELECT Dim_S,Count(*),Min(TilePosX),MAX(TilePosX+TileWidth),Min(TilePosY),MAX(TilePosY+TileHeight), MAX(Dim_M) FROM TILESINFO GROUP BY Dim_S
+
+
+
+
+Query the AABB per scene (and how many tiles there are) - only among tiles of layer-0:
+
+SELECT Dim_S,Count(*),Min(TilePosX),MAX(TilePosX+TileWidth),Min(TilePosY),MAX(TilePosY+TileHeight),MAX(Dim_M) 
+FROM TILESINFO
+WHERE PyramidLevel=0 
+GROUP BY Dim_S
+
+

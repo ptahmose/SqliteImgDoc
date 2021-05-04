@@ -250,7 +250,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
         adapter,
         idx,
         columns, func);
-  }
+}
 
 /*virtual*/void CDbRead::EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func) const
 {
@@ -278,4 +278,60 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     {
         std::cout << excp.what();
     }
+}
+
+/*virtual*/SlImgDoc::TileCoordinateBounds CDbRead::QueryDimensionBounds()
+{
+    auto query = QueryBuildUtils::QueryDimBounds(
+        this->GetDb(),
+        this->GetDocInfo());
+
+    const auto dims = this->GetDocInfo().GetTileDimensions();
+    try
+    {
+        bool b = query.executeStep();
+        TileCoordinateBounds tileCoordinateBounds;
+        size_t no = 0;
+        for each (auto d in dims)
+        {
+            MinMaxCoordinate minMax{
+                query.getColumn(no * 2).getInt(),
+                query.getColumn(no * 2 + 1).getInt() };
+            tileCoordinateBounds.dimBounds[d] = minMax;
+            ++no;
+        }
+
+        return tileCoordinateBounds;
+    }
+    catch (SQLite::Exception& excp)
+    {
+        std::cout << excp.what();
+    }
+}
+
+/*virtual*/bool CDbRead::IsDimensionIndexIndexed(TileDim dim)
+{
+    string indexName;
+    bool b = this->GetDocInfo().GetTileInfoIndexNameForDimension(dim, indexName);
+    if (!b)
+    {
+        throw invalid_argument("Invalid dimension specified");
+    }
+
+    bool indexWasFound = false;
+    DbUtils::EnumIndicesForTable(
+        this->GetDb(),
+        this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo),
+        [&](const string& name)->bool
+        {
+            if (name.compare(indexName) == 0)
+            {
+                indexWasFound = true;
+                return false;
+            }
+
+            return true;
+        });
+
+    return indexWasFound;
 }

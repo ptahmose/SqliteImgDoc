@@ -136,6 +136,19 @@ CDbDocInfo::CDbDocInfo() : CDbDocInfo(
     return true;
 }
 
+/*virtual*/bool CDbDocInfo::GetTileInfoIndexNameForDimension(SlImgDoc::TileDim d, std::string& indexName) const
+{
+    const auto& it = std::find(this->dimensions.cbegin(), this->dimensions.cend(), d);
+    if (it == this->dimensions.cend())
+    {
+        return false;
+    }
+
+    indexName = "IndexDim_";
+    indexName += d;
+    return true;
+}
+
 /*virtual*/const std::string& CDbDocInfo::GetTileDataColumnName(TilesDataColumn c) const
 {
     /*

@@ -104,6 +104,13 @@ namespace SlImgDoc
         virtual ~IDbWriteCommon() = default;
     };
 
+    class SQLITEIMGDOC_API IDbIndexManagement
+    {
+    public:
+        virtual void CreateIndexOnDimensionColumn();
+        virtual void DropIndexOnDimensionColumn();
+    };
+
     /// A sqliteimgdoc api. see https://stackoverflow.com/questions/11205230/virtual-inheritance-and-interfaces
     class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction
     {
@@ -147,6 +154,18 @@ namespace SlImgDoc
         IBlobData* dataBinHdr;
     };
 
+    class SQLITEIMGDOC_API IDbReadDbInfo
+    {
+    public:
+
+        /// Query if for the specified dimension there is an index available.
+        /// \param dim The dimension to check.
+        /// \returns True if dimension is indexed, false if not.
+        virtual bool IsDimensionIndexIndexed(TileDim dim) = 0;
+
+        virtual ~IDbReadDbInfo() = default;
+    };
+
     /// The "read interface" (the common part for both 2D and 3D documents).
     class SQLITEIMGDOC_API IDbReadCommon
     {
@@ -167,6 +186,8 @@ namespace SlImgDoc
 
         virtual void EnumPerTileColumns(const std::function<bool(const ColumnDescription&)>& func) const = 0;
 
+        virtual TileCoordinateBounds QueryDimensionBounds() = 0;
+
         virtual ~IDbReadCommon() = default;
 
         std::vector<dbIndex> Query(const IDimCoordinateQueryClause* clause);
@@ -185,7 +206,7 @@ namespace SlImgDoc
     };
 
     /// The interface for reading databases containing 2D-subblocks.
-    class SQLITEIMGDOC_API IDbRead : public IDbReadCommon
+    class SQLITEIMGDOC_API IDbRead : public IDbReadCommon, public IDbReadDbInfo
     {
     public:
         /// Reads the tile information for the specified index.

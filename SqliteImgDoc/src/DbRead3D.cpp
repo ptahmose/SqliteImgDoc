@@ -273,3 +273,8 @@ std::vector<dbIndex> IDbRead3D::GetTilesIntersectingWithPlane(const Plane_Normal
     const auto& perTileDataColumnInfo = this->GetDocInfo3D().GetCoordinateDataColumnInfo();
     this->EnumPerTilesColumns(perTileDataColumnInfo.cbegin(), perTileDataColumnInfo.cend(), func);
 }
+
+/*virtual*/SlImgDoc::TileCoordinateBounds CDbRead3D::QueryDimensionBounds()
+{
+    throw runtime_error("not implemented");
+}

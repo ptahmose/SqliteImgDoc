@@ -93,6 +93,14 @@ public:
 
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& columnName) const = 0;
 
+    /// Gets the name of the index used for the specified dimension. Note that only the canonical
+    /// name of the index is returned, it is not checked whether it exists. This method will only
+    /// fail if the dimension is unknown.
+    /// \param          d         The dimension.
+    /// \param [out]    indexName If successful, the name of the index is put here.
+    /// \returns True if it succeeds, false if it fails.
+    virtual bool GetTileInfoIndexNameForDimension(SlImgDoc::TileDim d, std::string& indexName) const = 0;
+
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const = 0;
 
     virtual const std::string& GetTilesSpatialIndexColumnName(TilesSpatialIndexColumn c) const = 0;
@@ -176,6 +184,12 @@ public:
     virtual const std::string& GetTileInfoColumnName(TilesInfoColumn c) const;
 
     virtual bool GetTileInfoColumnNameForDimension(SlImgDoc::TileDim d, std::string& tableName) const;
+
+    /// Gets the name of the index associated with the specified dimension.
+    /// \param       d            The dimension.
+    /// \param [out] indexName    The name of the index, associated with the specified dimension.
+    /// \returns True if it succeeds, false if it fails.
+    virtual bool GetTileInfoIndexNameForDimension(SlImgDoc::TileDim d, std::string& indexName) const;
 
     virtual const std::string& GetTileDataColumnName(TilesDataColumn c) const;
 

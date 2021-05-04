@@ -166,10 +166,14 @@ int main(int argc, char** argv)
     czireader->EnumerateSubBlocks(
         [&](int idx, const SubBlockInfo& info)->bool
         {
+            tc.Clear();
             ConvertDimCoordinate(info.coordinate, tc);
             if (includeMindex)
             {
-                tc.Set('M',info.mIndex);
+                //if (info.mIndex != numeric_limits<int>::min())
+                {
+                    tc.Set('M', info.mIndex);
+                }
             }
 
             logicalPosInfo.posX = info.logicalRect.x;

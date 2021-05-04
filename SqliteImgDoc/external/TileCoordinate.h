@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "ITileCoordinate.h"
+#include <map>
 
 namespace SlImgDoc
 {
@@ -12,6 +13,16 @@ namespace SlImgDoc
         int value;			///< The value (for this dimension).
     };
 
+    struct MinMaxCoordinate
+    {
+        int minValue;
+        int maxValue;
+    };
+
+    struct TileCoordinateBounds
+    {
+        std::map<TileDim, MinMaxCoordinate> dimBounds;
+    };
 
     class TileCoordinate : public ITileCoordinate
     {
@@ -46,8 +57,13 @@ namespace SlImgDoc
             }
         }
 
+        void Clear()
+        {
+            this->coordinates.clear();
+        }
+
     public:
-        virtual bool TryGetCoordinate(TileDim dim, int* coordVal) const
+        bool TryGetCoordinate(TileDim dim, int* coordVal) const override
         {
             const auto it = std::find_if(this->coordinates.cbegin(), this->coordinates.cend(), [=](const DimensionAndValue& s) { return s.dimension == dim; });
             if (it != this->coordinates.cend())
@@ -63,7 +79,7 @@ namespace SlImgDoc
             return false;
         }
 
-        virtual void EnumCoordinates(std::function<bool(TileDim, int)> f) const
+        void EnumCoordinates(std::function<bool(TileDim, int)> f) const override
         {
             for (auto it = this->coordinates.cbegin(); it != this->coordinates.cend(); ++it)
             {

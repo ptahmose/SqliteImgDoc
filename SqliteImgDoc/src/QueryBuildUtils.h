@@ -12,6 +12,8 @@ class QueryBuildUtils
 public:
     static SQLite::Statement Build(SQLite::Database& db,const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery);
     static SQLite::Statement Build(SQLite::Database& db, const IDbDocInfo3D& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery);
+
+    static SQLite::Statement QueryDimBounds(SQLite::Database& db, const IDbDocInfo& docInfo);
 private:
     struct BuildInfo
     {
@@ -25,4 +27,7 @@ private:
     };
 
     static SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const BuildInfo& info, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery);
+
+    static std::string GenerateQueryMinMaxSqlQuery(std::string tableName, size_t noOfDimensions, std::function<std::string(size_t)> getColumnName);
+    
 };

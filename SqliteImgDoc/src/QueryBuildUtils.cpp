@@ -12,8 +12,8 @@ using namespace SlImgDoc;
     BuildInfo buildInfo
     {
         docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo),
-    docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk),
-    docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl),
+        docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk),
+        docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl),
         [&](SlImgDoc::TileDim dim, std::string& columnName)->bool
         {
             return docInfo.GetTileInfoColumnNameForDimension(dim,columnName);
@@ -212,3 +212,40 @@ using namespace SlImgDoc;
 
     return query;
 }
+
+/*static*/SQLite::Statement QueryBuildUtils::QueryDimBounds(SQLite::Database& db, const IDbDocInfo& docInfo)
+{
+    const auto tileDims = docInfo.GetTileDimensions();
+    auto sqlString = GenerateQueryMinMaxSqlQuery(
+        docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo),
+        tileDims.size(),
+        [&](size_t idx)->string
+        {
+            string colName;
+            bool b = docInfo.GetTileInfoColumnNameForDimension(tileDims[idx], colName);
+            return colName;
+        });
+
+    return SQLite::Statement(db, sqlString);
+}
+
+/*static*/std::string QueryBuildUtils::GenerateQueryMinMaxSqlQuery(std::string tableName, size_t noOfDimensions, std::function<std::string(size_t)> getColumnName)
+{
+    std::stringstream ss;
+    ss << "SELECT ";
+
+    for (size_t i = 0; i < noOfDimensions; ++i)
+    {
+        const auto& colName = getColumnName(i);
+        if (i > 0)
+        {
+            ss << ",";
+        }
+
+        ss << "MIN(" << colName << "),MAX(" << colName << ")";
+    }
+
+    ss << " FROM " << tableName;
+    return ss.str();
+}
+

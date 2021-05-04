@@ -1,7 +1,9 @@
 #include "pch.h"
+#include <sstream>
 #include "dbutils.h"
 
 using namespace SlImgDoc;
+using namespace std;
 
 /*static*/void DbUtils::Bind(SQLite::Statement& statement, int idx, const SlImgDoc::VariadicData& data)
 {
@@ -138,4 +140,30 @@ using namespace SlImgDoc;
     }
 
     throw "unknown";
+}
+
+/*static*/void DbUtils::EnumIndicesForTable(SQLite::Database& db,const std::string& tablename, std::function<bool(const std::string& name)> enumIndices)
+{
+    stringstream sql;
+    sql << "PRAGMA index_list('" << tablename << "')";
+    try
+    {
+        SQLite::Statement query(db, sql.str());
+
+        while (query.executeStep())
+        {
+            int idxOfNameColumn = query.getColumnIndex("name");
+
+            auto name = string(query.getColumn(idxOfNameColumn).getText());
+            if (!enumIndices(name))
+            {
+                break;
+            }
+        }
+    }
+    catch (SQLite::Exception& excp)
+    {
+        //std::cout << excp.what();
+        throw;
+    }
 }

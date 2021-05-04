@@ -12,7 +12,7 @@ namespace SlImgDoc
     public:
         virtual bool TryGetCoordinate(TileDim dim, int* coordVal) const = 0;
         virtual void EnumCoordinates(std::function<bool(TileDim, int)> f) const = 0;
-        virtual ~ITileCoordinate() {}
+        virtual ~ITileCoordinate() = default;
 
         inline void EnumDimensions(std::function<bool(TileDim)> f) const
         {

@@ -17,8 +17,11 @@ public:
     virtual void GetTilesIntersectingRect(const SlImgDoc::RectangleD& rect, std::function<bool(SlImgDoc::dbIndex)> func);
     virtual void GetTilesIntersectingWithLine(const SlImgDoc::LineThruTwoPointsD& rect, std::function<bool(SlImgDoc::dbIndex)> func);
 public:
-    //virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, std::function<bool(SlImgDoc::dbIndex)> func);
+    virtual SlImgDoc::TileCoordinateBounds QueryDimensionBounds();
     virtual void Query(const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func);
     virtual void ReadPerTileData(SlImgDoc::dbIndex idx, const std::vector<std::string>& columns, std::function<bool(const SlImgDoc::KeyVariadicValuePair&)> func);
     virtual void EnumPerTileColumns(const std::function<bool(const SlImgDoc::ColumnDescription&)>& func) const;
+public:
+    // interface IDbReadDbInfo
+    virtual bool IsDimensionIndexIndexed(SlImgDoc::TileDim dim);
 };

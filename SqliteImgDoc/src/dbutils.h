@@ -12,4 +12,12 @@ public:
     static bool TryParse(const std::string& str, ColumnTypeInfo* colTypeInfo);
     static bool TryParsesSqliteTableInfo(const std::string& str, ColumnTypeInfo* colTypeInfo);
     static std::string ColumnTypeInfoToStringRepresentation(const ColumnTypeInfo& cti);
+
+    /// Enumerates all indices for the specified table. This is using the SQLite-specific command
+    /// 'pragma index_list' (https://www.sqlite.org/pragma.html#pragma_index_list).
+    /// \param [in,out] db          The database.
+    /// \param          tablename   The table name.
+    /// \param          enumIndices Functor which will be called for each index, passing in the name
+    ///                             of the index. If returning false, the enumeration will stop.
+    static void EnumIndicesForTable(SQLite::Database& db,const std::string& tablename, std::function<bool(const std::string& name)> enumIndices);
 };

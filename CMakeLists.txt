@@ -57,3 +57,5 @@ add_subdirectory ("SqliteImgDocTests")
 add_subdirectory("CmdSqliteImgDoc")
 
 add_subdirectory("ConvCZI")
+
+add_subdirectory("SqliteImgDocBenchmark")

@@ -180,7 +180,17 @@ static void CreateTileTable(SQLite::Database* db)
 #endif
 /*static*/std::shared_ptr<IDb> IDbFactory::OpenExisting(const OpenOptions& opts)
 {
-    SQLite::Database* db = new SQLite::Database(opts.dbFilename, SQLite::OPEN_READONLY | SQLite::OPEN_URI);
+    int aFlags = SQLite::OPEN_URI;
+    if (opts.readOnly == true)
+    {
+        aFlags |= SQLite::OPEN_READONLY;
+    }
+    else
+    {
+        aFlags |= SQLite::OPEN_READWRITE;
+    }
+
+    SQLite::Database* db = new SQLite::Database(opts.dbFilename, aFlags);
     CCustomQueries::SetupCustomQueries(db->getHandle());
 
     CDbDiscover discover(db);

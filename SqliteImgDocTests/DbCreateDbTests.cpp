@@ -103,8 +103,8 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
 {
     CreateOptions opts;
     opts.dbFilename = ":memory:";
-    opts.dimensions.emplace('C');
-    opts.dimensions.emplace('Z');
+    opts.dimensions.emplace('C');       // here we declase that a tile-coordinate is given by
+    opts.dimensions.emplace('Z');       // dimension 'C' and 'Z'
     opts.sizeOfDataBinHdrField = 4;
     auto db = IDbFactory::CreateNew(opts);
 
@@ -119,15 +119,20 @@ TEST(DbCreateDbTests, InsufficientCoordinate2)
     tileBaseInfo.pixelHeight = 100;
     tileBaseInfo.pixelType = PixelType::GRAY8;
 
+    // and now we add a coordinate which has dimension 'C' and 'X'
     TileCoordinate tc({ { 'C',0 },{'X',2} });
     CDataObjCustom dataCustom(19, 1);
 
+    // so we expect an exception
     EXPECT_THROW(dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom), SlImgDoc::SqliteImgDocInvalidArgumentException) << "An exception was expected here.";
 }
 
 TEST(DbCreateDbTests, CreateAndDiscover2D)
 {
     CreateOptions opts;
+
+    // Note: the syntax below allows to have multiple connections to the "in-memory-data database",
+    //        cf. https://sqlite.org/inmemorydb.html
     opts.dbFilename = "file:memdb1?mode=memory&cache=shared";
     opts.dimensions.emplace('C');
     opts.dimensions.emplace('Z');

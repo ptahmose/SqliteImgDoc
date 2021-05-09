@@ -288,9 +288,21 @@ static void TestRead3()
     TileInfoQueryClause tileInfoQuery(ConditionalOperator::Equal, 5);
     auto r = read->Query(&queryClause, &tileInfoQuery);
 
-    bool isIndex = read->IsDimensionIndexIndexed('S');
+    bool isSindexed = read->IsDimensionIndexIndexed('S');
 
     auto dimBounds = read->QueryDimensionBounds();
+
+    read.reset();
+
+    auto writeDb = readDb->GetWriter();
+    if (isSindexed)
+    {
+        writeDb->DropIndexOnCoordinate('S');
+    }
+    else
+    {
+        writeDb->CreateIndexOnCoordinate('S');
+    }
 }
 
 int main()

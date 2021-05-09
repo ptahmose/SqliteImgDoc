@@ -107,12 +107,14 @@ namespace SlImgDoc
     class SQLITEIMGDOC_API IDbIndexManagement
     {
     public:
-        virtual void CreateIndexOnDimensionColumn();
-        virtual void DropIndexOnDimensionColumn();
+        virtual void DropIndexOnCoordinate(TileDim dim) = 0;
+        virtual void CreateIndexOnCoordinate(TileDim dim) = 0;
+
+        virtual ~IDbIndexManagement() = default;
     };
 
     /// A sqliteimgdoc api. see https://stackoverflow.com/questions/11205230/virtual-inheritance-and-interfaces
-    class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction
+    class SQLITEIMGDOC_API IDbWrite : public IDbWriteCommon, public virtual IDbWriteTransaction, public virtual IDbIndexManagement
     {
     public:
         virtual dbIndex AddTile(const ITileCoordinate* coord, const LogicalPositionInfo* info, const TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data) = 0;

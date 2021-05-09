@@ -1,6 +1,7 @@
 #include "pch.h"
 #include <sstream>
 #include "dbutils.h"
+#include <iostream>
 
 using namespace SlImgDoc;
 using namespace std;
@@ -142,7 +143,7 @@ using namespace std;
     throw "unknown";
 }
 
-/*static*/void DbUtils::EnumIndicesForTable(SQLite::Database& db,const std::string& tablename, std::function<bool(const std::string& name)> enumIndices)
+/*static*/void DbUtils::EnumIndicesForTable(SQLite::Database& db, const std::string& tablename, std::function<bool(const std::string& name)> enumIndices)
 {
     stringstream sql;
     sql << "PRAGMA index_list('" << tablename << "')";
@@ -164,6 +165,48 @@ using namespace std;
     catch (SQLite::Exception& excp)
     {
         //std::cout << excp.what();
+        throw;
+    }
+}
+
+/*static*/void DbUtils::DropIndexForTable(SQLite::Database& db, const std::string& tablename)
+{
+    stringstream sql;
+    sql << "DROP INDEX IF EXISTS '" << tablename << "'";
+    try
+    {
+        SQLite::Statement query(db, sql.str());
+
+        while (query.executeStep())
+        {
+
+        }
+
+    }
+    catch (SQLite::Exception& excp)
+    {
+        std::cout << excp.what();
+        throw;
+    }
+}
+
+/*static*/void DbUtils::CreateIndexForTable(SQLite::Database& db, const std::string& indexName, const std::string& tableName, const std::string& columnName)
+{
+    stringstream sql;
+    sql << "CREATE INDEX  IF NOT EXISTS '" << indexName << "' ON '" << tableName << "' (" << columnName << ");";
+    try
+    {
+        SQLite::Statement query(db, sql.str());
+
+        while (query.executeStep())
+        {
+
+        }
+
+    }
+    catch (SQLite::Exception& excp)
+    {
+        std::cout << excp.what();
         throw;
     }
 }

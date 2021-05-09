@@ -20,6 +20,10 @@ public:
 
     virtual void AddPerTileData(SlImgDoc::dbIndex index, std::function<bool(int, SlImgDoc::KeyVariadicValuePair&)> funcGetData);
 
+    // IDbIndexManagement
+    virtual void DropIndexOnCoordinate(SlImgDoc::TileDim dim);
+    virtual void CreateIndexOnCoordinate(SlImgDoc::TileDim dim);
+
     virtual ~CDbWrite();
 
 private:

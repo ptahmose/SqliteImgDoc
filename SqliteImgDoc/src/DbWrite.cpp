@@ -415,6 +415,31 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
     statement.exec();
 }
 
+/*virtual*/void CDbWrite::DropIndexOnCoordinate(TileDim dim)
+{
+    string indexName;
+    bool b = this->GetDocInfo().GetTileInfoIndexNameForDimension(dim, indexName);
+    if (!b)
+    {
+        throw runtime_error("Invalid dimension");
+    }
+
+    DbUtils::DropIndexForTable(this->GetDb(), indexName);
+}
+
+/*virtual*/void CDbWrite::CreateIndexOnCoordinate(TileDim dim)
+{
+    string indexName,columnName;
+    bool b = this->GetDocInfo().GetTileInfoIndexNameForDimension(dim, indexName);
+    b = this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, columnName);
+
+    DbUtils::CreateIndexForTable(
+        this->GetDb(),
+        indexName,
+        this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo),
+        columnName);
+}
+
 #if false
 /*virtual*/void CDbWrite::AddCoordinateData(const SlImgDoc::ITileCoordinate* coord, std::function<bool(int, SlImgDoc::CoordinateData&)> funcGetData)
 {

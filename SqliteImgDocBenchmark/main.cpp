@@ -19,4 +19,6 @@ int main(int argc, char** argv)
     cout << item.benchmarkName << ": " << (item.executionTime.count()) << "s" << endl;
     item = testcase1.RunTest5();
     cout << item.benchmarkName << ": " << (item.executionTime.count()) << "s" << endl;
+    item = testcase1.RunTest6();
+    cout << item.benchmarkName << ": " << (item.executionTime.count()) << "s" << endl;
 }

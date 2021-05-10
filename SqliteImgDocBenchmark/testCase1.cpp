@@ -62,6 +62,25 @@ BenchmarkItem TestCase1::RunTest3()
 
 BenchmarkItem TestCase1::RunTest4()
 {
+    // Get starting timepoint
+    auto start = high_resolution_clock::now();
+
+    auto db = this->CreateDb(true, false);
+
+    db->GetWriter()->CreateIndexOnCoordinate('Z');
+    db->GetWriter()->CreateIndexOnCoordinate('T');
+
+    // Get ending timepoint
+    auto stop = high_resolution_clock::now();
+
+    BenchmarkItem item;
+    item.benchmarkName = "add 1000T x 1000Z tiles (w/ transaction, indices created after adding)";
+    item.executionTime = stop - start;
+    return item;
+}
+
+BenchmarkItem TestCase1::RunTest5()
+{
     auto db = this->CreateDb(true, true);
 
     auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(1000);
@@ -87,7 +106,7 @@ BenchmarkItem TestCase1::RunTest4()
     return item;
 }
 
-BenchmarkItem TestCase1::RunTest5()
+BenchmarkItem TestCase1::RunTest6()
 {
     auto db = this->CreateDb(true, false);
 

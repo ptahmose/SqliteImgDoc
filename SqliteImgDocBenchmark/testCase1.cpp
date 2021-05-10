@@ -1,6 +1,7 @@
 #include "testCase1.h"
 #include "inc_sqliteimgdoc.h"
 #include <chrono>
+#include <random>
 
 using namespace std;
 using namespace std::chrono;
@@ -22,7 +23,7 @@ BenchmarkItem TestCase1::RunTest1()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "add 1000T x 1000Z tiles (w/o transaction)"; 
+    item.benchmarkName = "add 1000T x 1000Z tiles (w/o transaction)";
     item.executionTime = (stop - start);
     return item;
 }
@@ -48,7 +49,7 @@ BenchmarkItem TestCase1::RunTest3()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    auto db = this->CreateDb(true,true);
+    auto db = this->CreateDb(true, true);
 
     // Get ending timepoint
     auto stop = high_resolution_clock::now();
@@ -61,18 +62,20 @@ BenchmarkItem TestCase1::RunTest3()
 
 BenchmarkItem TestCase1::RunTest4()
 {
-    auto db= this->CreateDb(true, true);
+    auto db = this->CreateDb(true, true);
 
-    CDimCoordinateQueryClause queryClause;
-    queryClause.AddRangeClause('Z', IDimCoordinateQueryClause::RangeClause{ 43,43 });
-    queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 443,443 });
+    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(1000);
 
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    for (int i = 0; i < 1000; ++i)
+    for (const CDimCoordinateQueryClause& clause : randomCoordinateQueryClauses)
     {
-        auto r = db->GetReader()->Query(&queryClause);
+        auto r = db->GetReader()->Query(&clause);
+        if (r.size() != 1)
+        {
+            throw logic_error("Expect to fine exactly one tile");
+        }
     }
 
     // Get ending timepoint
@@ -88,16 +91,18 @@ BenchmarkItem TestCase1::RunTest5()
 {
     auto db = this->CreateDb(true, false);
 
-    CDimCoordinateQueryClause queryClause;
-    queryClause.AddRangeClause('Z', IDimCoordinateQueryClause::RangeClause{ 43,43 });
-    queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 443,443 });
+    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(1000);
 
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    for (int i = 0; i < 1000; ++i)
+    for (const CDimCoordinateQueryClause& clause : randomCoordinateQueryClauses)
     {
-        auto r = db->GetReader()->Query(&queryClause);
+        auto r = db->GetReader()->Query(&clause);
+        if (r.size() != 1)
+        {
+            throw logic_error("Expect to fine exactly one tile");
+        }
     }
 
     // Get ending timepoint
@@ -109,7 +114,29 @@ BenchmarkItem TestCase1::RunTest5()
     return item;
 }
 
-std::shared_ptr<SlImgDoc::IDb> TestCase1::CreateDb(bool withTransaction, bool createIndices)
+/*private*/std::vector<SlImgDoc::CDimCoordinateQueryClause> TestCase1::GenerateRandomSingeCoordinateQueryClauses(int count)
+{
+    vector<CDimCoordinateQueryClause> clauses;
+    clauses.reserve(count);
+
+    random_device rd;
+    mt19937 mt(rd());
+    uniform_int_distribution<int> distT(0, this->tCount-1);
+    uniform_int_distribution<int> distZ(0, this->zCount-1);
+    for (int i = 0; i < count; ++i)
+    {
+        CDimCoordinateQueryClause queryClause;
+        int z = distZ(mt);
+        queryClause.AddRangeClause('Z', IDimCoordinateQueryClause::RangeClause{ z, z });
+        int t = distT(mt);
+        queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ t, t });
+        clauses.emplace_back(queryClause);
+    }
+
+    return clauses;
+}
+
+/*private*/std::shared_ptr<SlImgDoc::IDb> TestCase1::CreateDb(bool withTransaction, bool createIndices)
 {
     CreateOptions opts;
     opts.dbFilename = ":memory:";

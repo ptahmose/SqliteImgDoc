@@ -19,4 +19,5 @@ public:
     BenchmarkItem RunTest5();
 private:
     std::shared_ptr<SlImgDoc::IDb> CreateDb(bool withTransaction,bool createIndices);
+    std::vector<SlImgDoc::CDimCoordinateQueryClause> GenerateRandomSingeCoordinateQueryClauses(int count);
 };

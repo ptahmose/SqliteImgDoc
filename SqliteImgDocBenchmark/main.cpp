@@ -7,7 +7,9 @@ using namespace std::chrono;
 int main(int argc, char** argv)
 {
     TestCase1 testcase1(1000, 1000);
-    auto item = testcase1.RunTest1();
+    
+    BenchmarkItem item;
+    item = testcase1.RunTest1();
     cout << item.benchmarkName << ": " << (item.executionTime.count()) << "s" << endl;
     item = testcase1.RunTest2();
     cout << item.benchmarkName << ": " << (item.executionTime.count()) << "s" << endl;

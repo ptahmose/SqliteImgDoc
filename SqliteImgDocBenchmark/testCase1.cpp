@@ -1,11 +1,17 @@
 #include "testCase1.h"
 #include "inc_sqliteimgdoc.h"
 #include <chrono>
+#include <sstream>
 #include <random>
 
 using namespace std;
 using namespace std::chrono;
 using namespace SlImgDoc;
+
+TestCase1::TestCase1(const ParametersTestCase1& params)
+    : TestCase1(params.zCount, params.tCount)
+{
+}
 
 TestCase1::TestCase1(int zCount, int tCount)
     : zCount(zCount), tCount(tCount)
@@ -23,7 +29,16 @@ BenchmarkItem TestCase1::RunTest1()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "add 1000T x 1000Z tiles (w/o transaction)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/o transaction)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "a transaction for every add.";
+    item.explanation = ss.str();
     item.executionTime = (stop - start);
     return item;
 }
@@ -39,7 +54,17 @@ BenchmarkItem TestCase1::RunTest2()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "add 1000T x 1000Z tiles (w/ transaction)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss<< "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds.";
+    item.explanation = ss.str();
+
     item.executionTime = (stop - start);
     return item;
 }
@@ -55,7 +80,17 @@ BenchmarkItem TestCase1::RunTest3()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "add 1000T x 1000Z tiles (w/ transaction & indices)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles  (w/ transaction & indices)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z' and indices for 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds.";
+    item.explanation = ss.str();
+
     item.executionTime = stop - start;
     return item;
 }
@@ -74,16 +109,28 @@ BenchmarkItem TestCase1::RunTest4()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "add 1000T x 1000Z tiles (w/ transaction, indices created after adding)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, indices created after adding)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds. After the add-operation, indices for 'T' and 'Z' are created.";
+    item.explanation = ss.str();
+
     item.executionTime = stop - start;
     return item;
 }
 
 BenchmarkItem TestCase1::RunTest5()
 {
+    const int QUERY_COUNT = 1000;
+
     auto db = this->CreateDb(true, true);
 
-    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(1000);
+    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(QUERY_COUNT);
 
     // Get starting timepoint
     auto start = high_resolution_clock::now();
@@ -101,16 +148,27 @@ BenchmarkItem TestCase1::RunTest5()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "read constant T/constant Z (w/ indices)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "read constant T/constant Z (w/ indices)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "From a database of " << this->tCount << " T's and " << this->zCount << " Z's with indices for T and Z, run " << QUERY_COUNT << " queries, " <<
+        "where we query for a random T and random Z. The timing is for all the queries, not including the database construction.";
+    item.explanation = ss.str();
+
     item.executionTime = stop - start;
     return item;
 }
 
 BenchmarkItem TestCase1::RunTest6()
 {
+    const int QUERY_COUNT = 1000;
+
     auto db = this->CreateDb(true, false);
 
-    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(1000);
+    auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(QUERY_COUNT);
 
     // Get starting timepoint
     auto start = high_resolution_clock::now();
@@ -128,7 +186,17 @@ BenchmarkItem TestCase1::RunTest6()
     auto stop = high_resolution_clock::now();
 
     BenchmarkItem item;
-    item.benchmarkName = "read constant T/constant Z (w/o indices)";
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "read constant T/constant Z (w/o indices)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "From a database of " << this->tCount << " T's and " << this->zCount << " Z's, run " << QUERY_COUNT << " queries, " <<
+        "where we query for a random T and random Z. The timing is for all the queries, not including the database construction. "<<
+        "Note that T and Z are not indexed.";
+    item.explanation = ss.str();
+
     item.executionTime = stop - start;
     return item;
 }
@@ -140,8 +208,8 @@ BenchmarkItem TestCase1::RunTest6()
 
     random_device rd;
     mt19937 mt(rd());
-    uniform_int_distribution<int> distT(0, this->tCount-1);
-    uniform_int_distribution<int> distZ(0, this->zCount-1);
+    uniform_int_distribution<int> distT(0, this->tCount - 1);
+    uniform_int_distribution<int> distZ(0, this->zCount - 1);
     for (int i = 0; i < count; ++i)
     {
         CDimCoordinateQueryClause queryClause;

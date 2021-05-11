@@ -5,7 +5,7 @@ add_executable(SqliteImgDocBenchmark
                   commandlineoptions.h
                   commandlineoptions.cpp  
                   "testCase1.h" 
-                  "testCase1.cpp" "main.cpp" "inc_sqliteimgdoc.h")
+                  "testCase1.cpp" "main.cpp" "inc_sqliteimgdoc.h" "utils.cpp" "utils.h")
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocBenchmark SqliteImgDoc SQLiteCpp)

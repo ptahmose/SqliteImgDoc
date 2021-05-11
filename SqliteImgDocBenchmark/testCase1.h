@@ -2,6 +2,7 @@
 #include "benchmarkitem.h"
 #include <memory>
 #include "inc_sqliteimgdoc.h"
+#include "commandlineoptions.h"
 
 class TestCase1
 {
@@ -9,6 +10,7 @@ private:
     int zCount;
     int tCount;
 public:
+    TestCase1(const ParametersTestCase1& params);
     TestCase1(int zCount, int tCount);
 
     BenchmarkItem RunTest1();

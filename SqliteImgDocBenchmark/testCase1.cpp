@@ -31,7 +31,7 @@ BenchmarkItem TestCase1::RunTest1()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/o transaction)";
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/o transaction, w/ spatial index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
@@ -56,7 +56,7 @@ BenchmarkItem TestCase1::RunTest2()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss<< "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction)";
+    ss<< "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, w/ spatial index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
@@ -82,7 +82,7 @@ BenchmarkItem TestCase1::RunTest3()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles  (w/ transaction & indices)";
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles  (w/ transaction & indices, w/ spatial index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
@@ -111,7 +111,7 @@ BenchmarkItem TestCase1::RunTest4()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, indices created after adding)";
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, indices created after adding, w/ spatial index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
@@ -201,6 +201,122 @@ BenchmarkItem TestCase1::RunTest6()
     item.executionTime = stop - start;
     return item;
 }
+
+//----
+BenchmarkItem TestCase1::RunTest7()
+{
+    // same as Test1, but without spatial index
+    
+    // Get starting timepoint
+    auto start = high_resolution_clock::now();
+
+    auto db = this->CreateDb(false, false, false);
+
+    // Get ending timepoint
+    auto stop = high_resolution_clock::now();
+
+    BenchmarkItem item;
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/o transaction, w/o spatial index)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "a transaction for every add. Spatial indexing is note active.";
+    item.explanation = ss.str();
+    item.executionTime = (stop - start);
+    return item;
+}
+
+BenchmarkItem TestCase1::RunTest8()
+{
+    // same as Test2, but without spatial index
+
+    // Get starting timepoint
+    auto start = high_resolution_clock::now();
+
+    auto db = this->CreateDb(true, false, false);
+
+    // Get ending timepoint
+    auto stop = high_resolution_clock::now();
+
+    BenchmarkItem item;
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, w/o spatial index)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds. Spatial indexing is not active.";
+    item.explanation = ss.str();
+
+    item.executionTime = (stop - start);
+    return item;
+}
+
+BenchmarkItem TestCase1::RunTest9()
+{
+    // same as Test3, but without spatial index
+
+    // Get starting timepoint
+    auto start = high_resolution_clock::now();
+
+    auto db = this->CreateDb(true, true, false);
+
+    // Get ending timepoint
+    auto stop = high_resolution_clock::now();
+
+    BenchmarkItem item;
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles  (w/ transaction & indices, w/o spatial index)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z' and indices for 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds. Spatial indexing is not active.";
+    item.explanation = ss.str();
+
+    item.executionTime = stop - start;
+    return item;
+}
+
+BenchmarkItem TestCase1::RunTest10()
+{
+    // same as Test4, but without spatial index
+
+    // Get starting timepoint
+    auto start = high_resolution_clock::now();
+
+    auto db = this->CreateDb(true, false, false);
+
+    db->GetWriter()->CreateIndexOnCoordinate('Z');
+    db->GetWriter()->CreateIndexOnCoordinate('T');
+
+    // Get ending timepoint
+    auto stop = high_resolution_clock::now();
+
+    BenchmarkItem item;
+    stringstream ss;
+    ss.imbue(std::locale(""));
+    ss << "add " << this->tCount << "T x " << this->zCount << "Z tiles (w/ transaction, indices created after adding, w/o spatial index)";
+    item.benchmarkName = ss.str();
+    ss = stringstream();
+    ss.imbue(std::locale(""));
+    ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
+        "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
+        "one transaction for all the adds. After the add-operation, indices for 'T' and 'Z' are created. Spatial indexing is note active.";
+    item.explanation = ss.str();
+
+    item.executionTime = stop - start;
+    return item;
+}
+//----
 
 /*private*/std::vector<SlImgDoc::CDimCoordinateQueryClause> TestCase1::GenerateRandomSingeCoordinateQueryClauses(int count)
 {

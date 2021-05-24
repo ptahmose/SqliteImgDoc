@@ -20,6 +20,11 @@ public:
 
     BenchmarkItem RunTest5();
     BenchmarkItem RunTest6();
+
+    BenchmarkItem RunTest7();
+    BenchmarkItem RunTest8();
+    BenchmarkItem RunTest9();
+    BenchmarkItem RunTest10();
 private:
     std::shared_ptr<SlImgDoc::IDb> CreateDb(bool withTransaction,bool createIndices, bool withSpatialIndex);
     std::vector<SlImgDoc::CDimCoordinateQueryClause> GenerateRandomSingeCoordinateQueryClauses(int count);

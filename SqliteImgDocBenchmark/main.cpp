@@ -50,4 +50,13 @@ static void PrintBenchmarkItem(const BenchmarkItem& item)
     cout << endl;
     PrintBenchmarkItem(testcase1.RunTest6());
     cout << endl;
+
+    PrintBenchmarkItem(testcase1.RunTest7());
+    cout << endl;
+    PrintBenchmarkItem(testcase1.RunTest8());
+    cout << endl;
+    PrintBenchmarkItem(testcase1.RunTest9());
+    cout << endl;
+    PrintBenchmarkItem(testcase1.RunTest10());
+    cout << endl;
 }

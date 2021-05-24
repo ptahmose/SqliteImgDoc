@@ -11,6 +11,8 @@
 class CDb : public SlImgDoc::IDb, public IInternalDb, public std::enable_shared_from_this<CDb>
 {
 private:
+    bool spatialIndexActive;
+
     std::unique_ptr<SQLite::Database> db;
     std::shared_ptr<IDbDocInfo> docInfo;
 
@@ -31,6 +33,10 @@ public:
     virtual std::shared_ptr<SlImgDoc::IDbRead> GetReader();
     virtual std::shared_ptr<SlImgDoc::IDbWrite3D> GetWriter3D();
     virtual std::shared_ptr<SlImgDoc::IDbRead3D> GetReader3D();
+
+    bool IsSpatialIndexActive() const;
+
+    void UpdateSpatialIndexActive();
 public:
     virtual SQLite::Database& GetDb() { return *this->db.get(); }
     const IDbDocInfo& GetDocInfo() { return *this->docInfo.get(); }

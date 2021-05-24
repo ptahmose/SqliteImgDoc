@@ -44,7 +44,7 @@ namespace SlImgDoc
         const int DefaultSizeOfDataBinHdrField = 32;
     public:
         /// Initializes a new instance of the CreateOptions class with default parameters.
-        CreateOptions() : sizeOfDataBinHdrField(DefaultSizeOfDataBinHdrField)
+        CreateOptions() : sizeOfDataBinHdrField(DefaultSizeOfDataBinHdrField), createSpatialIndex(true)
         {
         }
 
@@ -64,9 +64,13 @@ namespace SlImgDoc
         /// give custom data for each subblock.
         PerTileDataCreateOptions perTileData;
 
+        /// Boolean indicating whether a spatial index (for the tile-positions) is to be created.
+        bool createSpatialIndex;
+
         void SetDefaultValues()
         {
             this->sizeOfDataBinHdrField = DefaultSizeOfDataBinHdrField;
+            this->createSpatialIndex = true;
         }
     };
 
@@ -118,6 +122,9 @@ namespace SlImgDoc
     public:
         virtual void DropIndexOnCoordinate(TileDim dim) = 0;
         virtual void CreateIndexOnCoordinate(TileDim dim) = 0;
+
+        virtual void DropSpatialIndex() = 0;
+        virtual void CreateSpatialIndex() = 0;
 
         virtual ~IDbIndexManagement() = default;
     };
@@ -173,6 +180,10 @@ namespace SlImgDoc
         /// \param dim The dimension to check.
         /// \returns True if dimension is indexed, false if not.
         virtual bool IsDimensionIndexIndexed(TileDim dim) = 0;
+
+        /// Query if a spatial index for the tile positions and extent exists.
+        /// \returns True if there is a spatial index (for the tile position and extent).
+        virtual bool IsTilePositionExtentIndexed() = 0;
 
         virtual ~IDbReadDbInfo() = default;
     };

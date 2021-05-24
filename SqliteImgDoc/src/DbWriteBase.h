@@ -14,5 +14,11 @@ public:
     virtual void CommitTransaction();
     virtual void RollbackTransaction();
     virtual ~CDbWriteBase();
+
+protected:
+    bool GetIsTransactionPending() const
+    {
+        return this->transactionPending;
+    }
 };
 

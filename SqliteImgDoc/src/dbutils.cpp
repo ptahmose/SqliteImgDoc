@@ -210,3 +210,27 @@ using namespace std;
         throw;
     }
 }
+
+/*static*/bool DbUtils::DoesTableExists(SQLite::Database& db, const std::string& tableName)
+{
+    stringstream sql;
+    sql << "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '" << tableName << "'";
+
+    SQLite::Statement query(db, sql.str());
+
+    query.executeStep();
+
+    int r = query.getColumn(0).getInt();
+
+    return r != 0 ? true : false;
+}
+
+/*static*/void DbUtils::DropSpatialIndexTableIfExists(SQLite::Database& db, const std::string& tableName)
+{
+    stringstream sql;
+    sql << "DROP TABLE IF EXISTS '" << tableName << "'";
+
+    SQLite::Statement query(db, sql.str());
+
+    int r = query.exec();
+}

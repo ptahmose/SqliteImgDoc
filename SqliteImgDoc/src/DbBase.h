@@ -12,7 +12,7 @@ private:
 public:
     CDbBase(std::shared_ptr<CDb> db):db(db){}
 
-     virtual ~CDbBase()
+    virtual ~CDbBase()
     {}
 
 protected:
@@ -22,6 +22,9 @@ protected:
 
     void CheckSizeOfBinHdrAndThrow(size_t s, std::uint32_t maxSize);
     void CheckIfAllDimensionGivenAndThrow(const std::vector<SlImgDoc::TileDim>&, const SlImgDoc::ITileCoordinate* coord);
+
+    bool IsSpatialIndexActive() const { return this->db->IsSpatialIndexActive(); }
+    void UpdateSpatialIndexAvailability() { this->db->UpdateSpatialIndexActive(); }
 public:
  /*   /// The name of the table with the "technical document info"
     static const char* TableName_DocumentInfo;

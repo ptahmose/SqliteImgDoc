@@ -15,12 +15,43 @@ using namespace SlImgDoc;
 {
 }
 
-/*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype,const IDataObjBase* data)
+/*
+static unique_ptr<SQLite::Statement> spatialIndexQuery;
+
+static bool HasSpatialIndex(SQLite::Database& db, const std::string& tableName)
+{
+    if (!spatialIndexQuery)
+    {
+        stringstream sql;
+        sql << "SELECT count(*) FROM sqlite_master WHERE type = 'table' AND name = '" << tableName << "'";
+        spatialIndexQuery = make_unique<SQLite::Statement>(db,sql.str());
+    }
+
+    spatialIndexQuery->reset();
+
+    spatialIndexQuery->executeStep();
+
+    int r = spatialIndexQuery->getColumn(0).getInt();
+
+    return r != 0 ? true : false;
+}
+*/
+
+/*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, SlImgDoc::DataTypes datatype, const IDataObjBase* data)
 {
     this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
 
     try
     {
+        bool transactionInitiated = false;
+
+        // TODO: if there isn't a transaction, we need to enclose all INSERTS into one transaction
+        if (!this->GetIsTransactionPending())
+        {
+            this->BeginTransaction();
+            transactionInitiated = true;
+        }
+
         const void* ptrHdrData; size_t sizeHdrData;
         data->GetHeader(&ptrHdrData, &sizeHdrData);
         const auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, datatype, sizeHdrData, ptrHdrData, data);
@@ -48,182 +79,32 @@ using namespace SlImgDoc;
         this->addTilesInfoRowStatement->exec();
 
         auto id = this->GetDb().getLastInsertRowid();
-        this->AddToSpatialIndexTable(id, info);
+
+        // TODO: is there a better way instead of querying the database here?
+        //if (DbUtils::DoesTableExists(this->GetDb(), this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex)))
+        if (this->IsSpatialIndexActive())
+            // if (HasSpatialIndex(this->GetDb(), this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex)))
+        {
+            this->AddToSpatialIndexTable(id, info);
+        }
+
+        if (transactionInitiated)
+        {
+            // TODO: this must be "exception-safe"
+            this->CommitTransaction();
+        }
+
         return id;
     }
-    catch (SQLite::Exception & excp)
+    catch (SQLite::Exception& excp)
     {
         std::cout << excp.what();
         throw;
     }
 }
-/*
-dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const IDataObjUncompressedBitmap* data)
-{
-    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
-
-    try
-    {
-        auto idSbBlk = this->AddTileUncompressed(data);
-
-        const auto dims = this->GetDocInfo().GetTileDimensions();
-
-        this->EnsureAddTilesInfoRowStatement();
-        this->addTilesInfoRowStatement->reset();
-
-        for (int i = 1; i <= dims.size(); ++i)
-        {
-            int v;
-            coord->TryGetCoordinate(dims[i - 1], &v);
-            this->addTilesInfoRowStatement->bind(i, v);
-        }
-
-        int i = dims.size() + 1;
-        this->addTilesInfoRowStatement->bind(i++, info->posX);
-        this->addTilesInfoRowStatement->bind(i++, info->posY);
-        this->addTilesInfoRowStatement->bind(i++, info->width);
-        this->addTilesInfoRowStatement->bind(i++, info->height);
-        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
-        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
-
-        this->addTilesInfoRowStatement->exec();
-
-        auto id = this->GetDb().getLastInsertRowid();
-        this->AddToSpatialIndexTable(id, info);
-        return id;
-    }
-    catch (SQLite::Exception & excp)
-    {
-        std::cout << excp.what();
-        throw;
-    }
-}*/
-
-///*virtual*/dbIndex CDbWrite::AddTile(const SlImgDoc::ITileCoordinate* coord, const SlImgDoc::LogicalPositionInfo* info, const SlImgDoc::TileBaseInfo* tileInfo, const IDataObjCustom* data)
-//{
-//    this->CheckIfAllDimensionGivenAndThrow(this->GetDocInfo().GetTileDimensions(), coord);
-//
-//    try
-//    {
-//        const void* ptrHdrData; size_t sizeHdrData;
-//        data->GetHeader(&ptrHdrData, &sizeHdrData);
-//        auto idSbBlk = this->AddTileData(tileInfo->pixelWidth, tileInfo->pixelHeight, tileInfo->pixelType, SlImgDoc::DataTypes::CUSTOM, sizeHdrData, ptrHdrData, data);
-//
-//        const auto dims = this->GetDocInfo().GetTileDimensions();
-//
-//        this->EnsureAddTilesInfoRowStatement();
-//        this->addTilesInfoRowStatement->reset();
-//
-//        for (int i = 1; i <= dims.size(); ++i)
-//        {
-//            int v;
-//            coord->TryGetCoordinate(dims[i - 1], &v);
-//            this->addTilesInfoRowStatement->bind(i, v);
-//        }
-//
-//        int i = dims.size() + 1;
-//        this->addTilesInfoRowStatement->bind(i++, info->posX);
-//        this->addTilesInfoRowStatement->bind(i++, info->posY);
-//        this->addTilesInfoRowStatement->bind(i++, info->width);
-//        this->addTilesInfoRowStatement->bind(i++, info->height);
-//        this->addTilesInfoRowStatement->bind(i++, info->pyrLvl);
-//        this->addTilesInfoRowStatement->bind(i++, idSbBlk);
-//
-//        this->addTilesInfoRowStatement->exec();
-//
-//        auto id = this->GetDb().getLastInsertRowid();
-//        this->AddToSpatialIndexTable(id, info);
-//        return id;
-//    }
-//    catch (SQLite::Exception & excp)
-//    {
-//        std::cout << excp.what();
-//        throw;
-//    }
-//}
-
-///*virtual*/void CDbWrite::BeginTransaction()
-//{
-//    if (this->transactionPending != false)
-//    {
-//        throw runtime_error("A transaction was already pending.");
-//    }
-//
-//    this->GetDb().exec("BEGIN");
-//    this->transactionPending = true;
-//}
-//
-///*virtual*/void CDbWrite::CommitTransaction()
-//{
-//    if (this->transactionPending != true)
-//    {
-//        throw runtime_error("There is no pending transaction.");
-//    }
-//
-//    this->GetDb().exec("COMMIT");
-//    this->transactionPending = false;
-//}
-//
-///*virtual*/void CDbWrite::RollbackTransaction()
-//{
-//    if (this->transactionPending != true)
-//    {
-//        throw runtime_error("There is no pending transaction.");
-//    }
-//
-//    try
-//    {
-//        this->GetDb().exec("ROLLBACK");
-//    }
-//    catch (SQLite::Exception&)
-//    {
-//        // TODO: deal with error, see https://www.sqlite.org/lang_transaction.html for the rules...
-//    }
-//
-//    this->transactionPending = false;
-//}
-
-//std::int64_t CDbWrite::AddTileUncompressed(const IDataObjUncompressedBitmap* data)
-//{
-//    try
-//    {
-//        this->EnsureAddTilesDataRowStatement();
-//        this->addTilesDataRowStatement->reset();
-//
-//        const auto hdr = data->GetBinHdr();
-//
-//        std::uint8_t binhdr[32];
-//        for (int i = 0; i < sizeof(binhdr); ++i) { binhdr[i] = (uint8_t)i; }
-//
-//        this->addTilesDataRowStatement->bind(1, hdr.width);
-//        this->addTilesDataRowStatement->bind(2, hdr.height);
-//        this->addTilesDataRowStatement->bind(3, hdr.pixeltype);
-//        this->addTilesDataRowStatement->bind(4, SlImgDoc::DataTypes::UNCOMPRESSED_BITMAP);
-//        this->addTilesDataRowStatement->bind(5, binhdr, sizeof(binhdr));
-//        const void* p; size_t s;
-//        data->GetData(&p, &s);
-//        this->addTilesDataRowStatement->bindNoCopy(6, p, (int)s);
-//
-//        this->addTilesDataRowStatement->exec();
-//
-//        return this->GetDb().getLastInsertRowid();
-//    }
-//    catch (SQLite::Exception & excp)
-//    {
-//        std::cout << excp.what();
-//        throw;
-//    }
-//}
 
 std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, std::uint8_t pixeltype, SlImgDoc::DataTypes datatype, size_t sizeBinHdr, const void* binHdr, const IDataObjBase* data)
 {
-    //auto dataBinHDrSize = this->GetDocInfo().GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize);
-    //if (sizeBinHdr > dataBinHDrSize)
-    //{
-    //    stringstream ss;
-    //    ss << "Size of 'BinHdr'-field is limited to " << dataBinHDrSize << " bytes, and " << sizeBinHdr << " bytes was requested.";
-    //    throw SqliteImgDocInvalidArgumentException(ss.str());
-    //}
     this->CheckSizeOfBinHdrAndThrow(sizeBinHdr, this->GetDocInfo().GetDbParameter(IDbDocInfo::DbParameter::DataBinHdrSize));
 
     try
@@ -243,7 +124,7 @@ std::int64_t CDbWrite::AddTileData(std::uint32_t width, std::uint32_t height, st
 
         return this->GetDb().getLastInsertRowid();
     }
-    catch (SQLite::Exception & excp)
+    catch (SQLite::Exception& excp)
     {
         std::cout << excp.what();
         throw;
@@ -263,7 +144,7 @@ void CDbWrite::AddToSpatialIndexTable(std::int64_t id, const SlImgDoc::LogicalPo
         this->addTilesSpatialIndexRowStatement->bind(5, info->posY + info->height);
         this->addTilesSpatialIndexRowStatement->exec();
     }
-    catch (SQLite::Exception & excp)
+    catch (SQLite::Exception& excp)
     {
         std::cout << excp.what();
     }
@@ -429,7 +310,7 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
 
 /*virtual*/void CDbWrite::CreateIndexOnCoordinate(TileDim dim)
 {
-    string indexName,columnName;
+    string indexName, columnName;
     bool b = this->GetDocInfo().GetTileInfoIndexNameForDimension(dim, indexName);
     b = this->GetDocInfo().GetTileInfoColumnNameForDimension(dim, columnName);
 
@@ -438,6 +319,56 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
         indexName,
         this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo),
         columnName);
+}
+
+/*virtual*/void CDbWrite::CreateSpatialIndex()
+{
+    // ok, what we need to do is:
+    // - create the Virtual Table
+    // - put all the information into it
+    // - done
+
+    auto sql = stringstream();
+    sql << "CREATE VIRTUAL TABLE " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " USING rtree(" <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<         // Integer primary key
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<       // Minimum X coordinate"
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<       // Maximum X coordinate"
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<       // Minimum Y coordinate"
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ");";        // Maximum Y coordinate"
+
+    sql << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<
+        this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ") " <<
+        "SELECT " <<
+        this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << "," <<
+        this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
+        this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "+" << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
+        this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
+        this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "+" << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << " " <<
+        "FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << ";";
+
+    /*
+       "INSERT INTO TILESPATIAL_index ( id,minX,maxX,minY,maxY)
+        SELECT Pk, TilePosX, TilePosX + TileWidth, TilePosY, TilePosY + TileHeight
+        FROM TILESINFO"
+    */
+
+    SQLite::Statement query(this->GetDb(), sql.str());
+
+    int r = query.exec();
+
+    this->UpdateSpatialIndexAvailability();
+}
+
+/*virtual*/void CDbWrite::DropSpatialIndex()
+{
+    DbUtils::DropSpatialIndexTableIfExists(this->GetDb(), this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex));
+
+    // TODO: take note that there is no spatial index
+    this->UpdateSpatialIndexAvailability();
 }
 
 #if false

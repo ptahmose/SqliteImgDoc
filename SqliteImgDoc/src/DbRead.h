@@ -24,4 +24,5 @@ public:
 public:
     // interface IDbReadDbInfo
     virtual bool IsDimensionIndexIndexed(SlImgDoc::TileDim dim);
+    virtual bool IsTilePositionExtentIndexed();
 };

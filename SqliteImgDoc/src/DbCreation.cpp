@@ -235,8 +235,12 @@ SQLite::Database* CDbCreation::DoCreate()
         db->exec(sqlStatement);
         sqlStatement = this->GetTilesDataCreateSqlStatement();
         db->exec(sqlStatement);
-        sqlStatement = this->GetTilesSpatialIndexCreateSqlStatement();
-        db->exec(sqlStatement);
+
+        if (this->opts.createSpatialIndex)
+        {
+            sqlStatement = this->GetTilesSpatialIndexCreateSqlStatement();
+            db->exec(sqlStatement);
+        }
 
         sqlStatement = this->GetPerTileDataTableSqlStatement();
         if (!sqlStatement.empty())
@@ -251,8 +255,6 @@ SQLite::Database* CDbCreation::DoCreate()
         std::cout << excp.what();
         throw;
     }
-
-    return nullptr;
 }
 
 std::string CDbCreation::GetTilesInfoCreateSqlStatement() const

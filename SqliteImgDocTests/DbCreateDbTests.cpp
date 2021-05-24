@@ -279,3 +279,67 @@ TEST(DbCreateDbTests, CreateAndDiscover3D_2)
         ASSERT_TRUE(it->DataType == i.DataType);
     }
 }
+
+
+TEST(DbCreateDbTests, CreateWithSpatialIndexAndCheckWhetherSpatialIndexExists)
+{
+    CreateOptions opts;
+    // Note: the syntax below allows to have multiple connections to the "in-memory-data database",
+    //        cf. https://sqlite.org/inmemorydb.html
+    opts.dbFilename = "file:memdb7?mode=memory&cache=shared";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.sizeOfDataBinHdrField = 4;
+    auto db = IDbFactory::CreateNew(opts);
+    auto dbWrite = db->GetWriter();
+
+    LogicalPositionInfo posInfo;
+    posInfo.width = 100;
+    posInfo.height = 100;
+    posInfo.pyrLvl = 0;
+    TileBaseInfo tileBaseInfo;
+    tileBaseInfo.pixelWidth = 100;
+    tileBaseInfo.pixelHeight = 100;
+    tileBaseInfo.pixelType = PixelType::GRAY8;
+    TileCoordinate tc({ { 'C',0 },{'Z',2} });
+    CDataObjCustom dataCustom(4, 1);
+    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
+
+    OpenOptions openOpts;
+    openOpts.dbFilename = "file:memdb7?mode=memory&cache=shared";
+    auto db2 = IDbFactory::OpenExisting(openOpts);
+    auto dbRead = db2->GetReader();
+    bool isIndexed = dbRead->IsTilePositionExtentIndexed();
+    ASSERT_TRUE(isIndexed) << "Expected to have a spatial index";
+}
+
+TEST(DbCreateDbTests, CreateWithoutSpatialIndexAndCheckWhetherSpatialIndexDoesNotExist)
+{
+    CreateOptions opts;
+    opts.dbFilename = "file:memdb8?mode=memory&cache=shared";
+    opts.dimensions.emplace('C');
+    opts.dimensions.emplace('Z');
+    opts.sizeOfDataBinHdrField = 4;
+    opts.createSpatialIndex = false;
+    auto db = IDbFactory::CreateNew(opts);
+    auto dbWrite = db->GetWriter();
+
+    LogicalPositionInfo posInfo;
+    posInfo.width = 100;
+    posInfo.height = 100;
+    posInfo.pyrLvl = 0;
+    TileBaseInfo tileBaseInfo;
+    tileBaseInfo.pixelWidth = 100;
+    tileBaseInfo.pixelHeight = 100;
+    tileBaseInfo.pixelType = PixelType::GRAY8;
+    TileCoordinate tc({ { 'C',0 },{'Z',2} });
+    CDataObjCustom dataCustom(4, 1);
+    dbWrite->AddTile(&tc, &posInfo, &tileBaseInfo, DataTypes::CUSTOM, &dataCustom);
+
+    OpenOptions openOpts;
+    openOpts.dbFilename = "file:memdb8?mode=memory&cache=shared";
+    auto db2 = IDbFactory::OpenExisting(openOpts);
+    auto dbRead = db2->GetReader();
+    bool isIndexed = dbRead->IsTilePositionExtentIndexed();
+    ASSERT_FALSE(isIndexed) << "Expected to not find a spatial index";
+}

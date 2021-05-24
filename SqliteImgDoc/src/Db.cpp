@@ -18,6 +18,8 @@ using namespace std;
         return shared_ptr<SlImgDoc::IDbWrite>();
     }
 
+    this->UpdateSpatialIndexActive();
+
     auto w = this->writer.lock();
     if (w)
     {
@@ -35,6 +37,8 @@ using namespace std;
     {
         return shared_ptr<SlImgDoc::IDbRead>();
     }
+
+    this->UpdateSpatialIndexActive();
 
     auto r = this->reader.lock();
     if (r)
@@ -54,6 +58,8 @@ using namespace std;
         return shared_ptr<SlImgDoc::IDbWrite3D>();
     }
 
+    this->UpdateSpatialIndexActive();
+
     auto w = this->writer3D.lock();
     if (w)
     {
@@ -72,6 +78,8 @@ using namespace std;
         return shared_ptr<SlImgDoc::IDbRead3D>();
     }
 
+    this->UpdateSpatialIndexActive();
+
     auto r = this->reader3D.lock();
     if (r)
     {
@@ -81,4 +89,28 @@ using namespace std;
     r = std::make_shared<CDbRead3D>(this->shared_from_this());
     this->reader3D = r;
     return r;
+}
+
+bool CDb::IsSpatialIndexActive() const
+{
+    return this->spatialIndexActive;
+}
+
+void CDb::UpdateSpatialIndexActive()
+{
+    bool doesSpatialIndexExist=false;
+    if (this->Is2D())
+    {
+        doesSpatialIndexExist = DbUtils::DoesTableExists(
+            this->GetDb(),
+            this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex));
+    }
+    else if (this->Is3D())
+    {
+        doesSpatialIndexExist = DbUtils::DoesTableExists(
+            this->GetDb(),
+            this->GetDocInfo3D().GetTableName(IDbDocInfo3D::TableType::TilesSpatialIndex));
+    }
+
+    this->spatialIndexActive = doesSpatialIndexExist;
 }

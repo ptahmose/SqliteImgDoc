@@ -324,7 +324,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
         this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo),
         [&](const string& name)->bool
         {
-            if (name.compare(indexName) == 0)
+            if (name == indexName)
             {
                 indexWasFound = true;
                 return false;
@@ -334,4 +334,14 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
         });
 
     return indexWasFound;
+}
+
+/*virtual*/bool CDbRead::IsTilePositionExtentIndexed()
+{
+    return this->CDbBase::IsSpatialIndexActive();
+    /*const auto spatialIndexTableName = this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex);
+
+    bool spatialIndexVirtualTableExists = DbUtils::DoesTableExists(this->GetDb(), spatialIndexTableName);
+
+    return spatialIndexVirtualTableExists;*/
 }

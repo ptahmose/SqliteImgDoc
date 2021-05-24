@@ -280,7 +280,6 @@ TEST(DbCreateDbTests, CreateAndDiscover3D_2)
     }
 }
 
-
 TEST(DbCreateDbTests, CreateWithSpatialIndexAndCheckWhetherSpatialIndexExists)
 {
     CreateOptions opts;

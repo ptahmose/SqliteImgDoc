@@ -23,7 +23,7 @@ BenchmarkItem TestCase1::RunTest1()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    auto db = this->CreateDb(false, false);
+    auto db = this->CreateDb(false, false, true);
 
     // Get ending timepoint
     auto stop = high_resolution_clock::now();
@@ -37,7 +37,7 @@ BenchmarkItem TestCase1::RunTest1()
     ss.imbue(std::locale(""));
     ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
         "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
-        "a transaction for every add.";
+        "a transaction for every add. Spatial indexing is active throughout the operation.";
     item.explanation = ss.str();
     item.executionTime = (stop - start);
     return item;
@@ -48,7 +48,7 @@ BenchmarkItem TestCase1::RunTest2()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    auto db = this->CreateDb(true, false);
+    auto db = this->CreateDb(true, false, true);
 
     // Get ending timepoint
     auto stop = high_resolution_clock::now();
@@ -62,7 +62,7 @@ BenchmarkItem TestCase1::RunTest2()
     ss.imbue(std::locale(""));
     ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
         "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
-        "one transaction for all the adds.";
+        "one transaction for all the adds. Spatial indexing is active throughout the operation.";
     item.explanation = ss.str();
 
     item.executionTime = (stop - start);
@@ -74,7 +74,7 @@ BenchmarkItem TestCase1::RunTest3()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    auto db = this->CreateDb(true, true);
+    auto db = this->CreateDb(true, true, true);
 
     // Get ending timepoint
     auto stop = high_resolution_clock::now();
@@ -88,7 +88,7 @@ BenchmarkItem TestCase1::RunTest3()
     ss.imbue(std::locale(""));
     ss << "Create a database (in memory) with dimension 'T' and 'Z' and indices for 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
         "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
-        "one transaction for all the adds.";
+        "one transaction for all the adds. Spatial indexing is active throughout the operation.";
     item.explanation = ss.str();
 
     item.executionTime = stop - start;
@@ -100,7 +100,7 @@ BenchmarkItem TestCase1::RunTest4()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    auto db = this->CreateDb(true, false);
+    auto db = this->CreateDb(true, false, true);
 
     db->GetWriter()->CreateIndexOnCoordinate('Z');
     db->GetWriter()->CreateIndexOnCoordinate('T');
@@ -117,7 +117,8 @@ BenchmarkItem TestCase1::RunTest4()
     ss.imbue(std::locale(""));
     ss << "Create a database (in memory) with dimension 'T' and 'Z', add " << this->zCount * this->tCount << " tiles with "
         "T in the range [0," << this->tCount - 1 << "] and Z in the range [0," << this->zCount - 1 << "]. The tiles are added with "
-        "one transaction for all the adds. After the add-operation, indices for 'T' and 'Z' are created.";
+        "one transaction for all the adds. After the add-operation, indices for 'T' and 'Z' are created. Spatial indexing is active "
+        "throughout the operation.";
     item.explanation = ss.str();
 
     item.executionTime = stop - start;
@@ -128,7 +129,7 @@ BenchmarkItem TestCase1::RunTest5()
 {
     const int QUERY_COUNT = 1000;
 
-    auto db = this->CreateDb(true, true);
+    auto db = this->CreateDb(true, true, true);
 
     auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(QUERY_COUNT);
 
@@ -166,7 +167,7 @@ BenchmarkItem TestCase1::RunTest6()
 {
     const int QUERY_COUNT = 1000;
 
-    auto db = this->CreateDb(true, false);
+    auto db = this->CreateDb(true, false, true);
 
     auto randomCoordinateQueryClauses = this->GenerateRandomSingeCoordinateQueryClauses(QUERY_COUNT);
 
@@ -223,13 +224,14 @@ BenchmarkItem TestCase1::RunTest6()
     return clauses;
 }
 
-/*private*/std::shared_ptr<SlImgDoc::IDb> TestCase1::CreateDb(bool withTransaction, bool createIndices)
+/*private*/std::shared_ptr<SlImgDoc::IDb> TestCase1::CreateDb(bool withTransaction, bool createIndices, bool withSpatialIndex)
 {
     CreateOptions opts;
     opts.dbFilename = ":memory:";
     opts.dimensions.emplace('T');
     opts.dimensions.emplace('Z');
     opts.sizeOfDataBinHdrField = 4;
+    opts.createSpatialIndex = withSpatialIndex;
     auto db = IDbFactory::CreateNew(opts);
     auto dbWrite = db->GetWriter();
 

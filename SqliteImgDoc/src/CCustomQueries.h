@@ -12,11 +12,13 @@ private:
     friend class CustomQueriesTest;
     static const std::string queryFunctionName_rtree_linesegment2d;
     static const std::string queryFunctionName_rtree_plane3d;
+    static const std::string queryFunctionName_scalar_doesintersectwithline;
 public:
     enum class Query
     {
         RTree_LineSegment2D,
-        RTree_PlaneAabb3D
+        RTree_PlaneAabb3D,
+        Scalar_DoesIntersectWithLine
     };
 
     static void SetupCustomQueries(sqlite3* db);
@@ -31,4 +33,5 @@ private:
 
     static bool DoLinesIntersect(const SlImgDoc::PointD& a1, const SlImgDoc::PointD& a2, const SlImgDoc::PointD& b1, const SlImgDoc::PointD& b2);
     static bool DoAabbAndPlaneIntersect(const SlImgDoc::CuboidD& aabb, const SlImgDoc::Plane_NormalAndDistD& plane);
+    static void ScalarFunctionDoesIntersectWithLine(sqlite3_context* context, int argc, sqlite3_value** argv);
 };

@@ -7,6 +7,7 @@ using namespace SlImgDoc;
 
 /*static*/const std::string CCustomQueries::queryFunctionName_rtree_linesegment2d = "LineThroughPoints2d";
 /*static*/const std::string CCustomQueries::queryFunctionName_rtree_plane3d = "PlaneNormalDistance3d";
+/*static*/const std::string CCustomQueries::queryFunctionName_scalar_doesintersectwithline = "IntersectsWithLine";
 
 /*static*/const std::string& CCustomQueries::GetQueryFunctionName(Query q)
 {
@@ -16,6 +17,8 @@ using namespace SlImgDoc;
         return CCustomQueries::queryFunctionName_rtree_linesegment2d;
     case Query::RTree_PlaneAabb3D:
         return CCustomQueries::queryFunctionName_rtree_plane3d;
+    case Query::Scalar_DoesIntersectWithLine:
+        return CCustomQueries::queryFunctionName_scalar_doesintersectwithline;
     }
 
     throw std::invalid_argument("Unknown enumeration");
@@ -34,6 +37,16 @@ using namespace SlImgDoc;
         db,
         CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_PlaneAabb3D).c_str(),
         CCustomQueries::Plane3d_Query,
+        nullptr,
+        nullptr);
+    rc = sqlite3_create_function_v2(
+        db,
+        CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::Scalar_DoesIntersectWithLine).c_str(),
+        8,
+        SQLITE_UTF8 | SQLITE_DETERMINISTIC | SQLITE_DIRECTONLY,
+        nullptr,
+        CCustomQueries::ScalarFunctionDoesIntersectWithLine,
+        nullptr,
         nullptr,
         nullptr);
 }
@@ -147,7 +160,7 @@ using namespace SlImgDoc;
     }
 
     CuboidD aabb(info->aCoord[0], info->aCoord[2], info->aCoord[4],
-                 info->aCoord[1] - info->aCoord[0], info->aCoord[3] - info->aCoord[2], info->aCoord[5] - info->aCoord[4]);
+        info->aCoord[1] - info->aCoord[0], info->aCoord[3] - info->aCoord[2], info->aCoord[5] - info->aCoord[4]);
     const bool doIntersect = CCustomQueries::DoAabbAndPlaneIntersect(aabb, *pPlane);
     if (doIntersect)
     {
@@ -174,8 +187,8 @@ using namespace SlImgDoc;
 
 /*static*/bool CCustomQueries::DoLinesIntersect(const SlImgDoc::PointD& a1, const SlImgDoc::PointD& a2, const SlImgDoc::PointD& b1, const SlImgDoc::PointD& b2)
 {
-    const PointD b( a2.x - a1.x,a2.y - a1.y );
-    const PointD d( b2.x - b1.x,b2.y - b1.y );
+    const PointD b(a2.x - a1.x, a2.y - a1.y);
+    const PointD d(b2.x - b1.x, b2.y - b1.y);
 
     const double bDotDPerp = b.x * d.y - b.y * d.x;
 
@@ -183,7 +196,7 @@ using namespace SlImgDoc;
     if (bDotDPerp == 0)
         return false;
 
-    const PointD c( b1.x - a1.x ,b1.y - a1.y );// = b1 - a1;
+    const PointD c(b1.x - a1.x, b1.y - a1.y);// = b1 - a1;
     const double t = (c.x * d.y - c.y * d.x) / bDotDPerp;
     if (t < 0 || t > 1)
     {
@@ -216,4 +229,48 @@ using namespace SlImgDoc;
     // Intersection occurs when distance s falls within [-r,+r] interval
     return fabs(s) <= r;
     */
+}
+
+/*static*/void CCustomQueries::ScalarFunctionDoesIntersectWithLine(sqlite3_context* context, int argc, sqlite3_value** argv)
+{
+    if (argc != 8)
+    {
+        return  sqlite3_result_null(context);
+    }
+
+    double x = sqlite3_value_double(argv[0]);
+    double y = sqlite3_value_double(argv[1]);
+    double w = sqlite3_value_double(argv[2]);
+    double h = sqlite3_value_double(argv[3]);
+    double p1x = sqlite3_value_double(argv[4]);
+    double p1y = sqlite3_value_double(argv[5]);
+    double p2x = sqlite3_value_double(argv[6]);
+    double p2y = sqlite3_value_double(argv[7]);
+
+    RectangleD rect(x, y, w, h);
+    LineThruTwoPointsD twoPoints;
+    twoPoints.a.x = p1x;
+    twoPoints.a.y = p1y;
+    twoPoints.b.x = p2x;
+    twoPoints.b.y = p2y;
+
+    bool doesIntersect = false;
+
+    // check whether the start-/end-point is inside the rectangle
+    if (rect.IsPointInside(twoPoints.a) || rect.IsPointInside(twoPoints.b))
+    {
+        // if both are inside, we report "fully within"
+        doesIntersect = true;
+    }
+    else
+    {
+        // now we determine whether the line-segment "pLine" intersects with the diagonals
+        if (CCustomQueries::DoLinesIntersect(twoPoints.a, twoPoints.b, PointD(rect.x, rect.y), PointD(rect.x + rect.w, rect.y + rect.h)) ||
+            CCustomQueries::DoLinesIntersect(twoPoints.a, twoPoints.b, PointD(rect.x, rect.y + rect.h), PointD(rect.x + rect.w, rect.y)))
+        {
+            doesIntersect = true;
+        }
+    }
+
+    return sqlite3_result_int(context, doesIntersect ? 1 : 0);
 }

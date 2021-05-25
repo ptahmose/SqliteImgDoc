@@ -235,31 +235,71 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
 
 /*virtual*/void CDbRead::GetTilesIntersectingWithLine(const LineThruTwoPointsD& rect, std::function<bool(dbIndex)> func)
 {
-    stringstream ss;
-    //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
-    ss << "SELECT id FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
-    SQLite::Statement query(this->GetDb(), ss.str());
-    query.bind(1, rect.a.x);
-    query.bind(2, rect.a.y);
-    query.bind(3, rect.b.x);
-    query.bind(4, rect.b.y);
-
-    try
+    if (this->CDbBase::IsSpatialIndexActive())
     {
-        while (query.executeStep())
+        stringstream ss;
+        //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
+        ss << "SELECT id FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
+        SQLite::Statement query(this->GetDb(), ss.str());
+        query.bind(1, rect.a.x);
+        query.bind(2, rect.a.y);
+        query.bind(3, rect.b.x);
+        query.bind(4, rect.b.y);
+
+        try
         {
-            dbIndex idx = query.getColumn(0).getInt64();
-            bool b = func(idx);
-            if (!b)
+            while (query.executeStep())
             {
-                break;
+                dbIndex idx = query.getColumn(0).getInt64();
+                bool b = func(idx);
+                if (!b)
+                {
+                    break;
+                }
             }
         }
+        catch (SQLite::Exception& excp)
+        {
+            std::cout << excp.what();
+            throw;
+        }
     }
-    catch (SQLite::Exception& excp)
+    else
     {
-        std::cout << excp.what();
-        throw;
+        stringstream ss;
+        //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
+        ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << 
+            " FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE " <<
+            CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::Scalar_DoesIntersectWithLine) <<
+            "(" << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << "," <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
+            "?1,?2,?3,?4)";
+
+        try
+        {
+            SQLite::Statement query(this->GetDb(), ss.str());
+            query.bind(1, rect.a.x);
+            query.bind(2, rect.a.y);
+            query.bind(3, rect.b.x);
+            query.bind(4, rect.b.y);
+
+            while (query.executeStep())
+            {
+                dbIndex idx = query.getColumn(0).getInt64();
+                bool b = func(idx);
+                if (!b)
+                {
+                    break;
+                }
+            }
+        }
+        catch (SQLite::Exception& excp)
+        {
+            std::cout << excp.what();
+            throw;
+        }
     }
 }
 

@@ -239,7 +239,10 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     {
         stringstream ss;
         //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
-        ss << "SELECT id FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " WHERE id MATCH " << CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
+        ss << "SELECT " << this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " FROM " <<
+            this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) <<
+            " WHERE " << this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " MATCH " <<
+            CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::RTree_LineSegment2D) << "(?1,?2,?3,?4)";
         SQLite::Statement query(this->GetDb(), ss.str());
         query.bind(1, rect.a.x);
         query.bind(2, rect.a.y);
@@ -267,8 +270,8 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     else
     {
         stringstream ss;
-        //ss << "SELECT id FROM TILESPATIAL_index WHERE id MATCH LineThroughPoints(?1,?2,?3,?4)";
-        ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << 
+        // SELECT Pk FROM TILESINFO WHERE IntersectsWithLine(TilePosX,TilePosY,TileWidth,TileHeight,?1,?2,?3,?4)
+        ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) <<
             " FROM " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE " <<
             CCustomQueries::GetQueryFunctionName(CCustomQueries::Query::Scalar_DoesIntersectWithLine) <<
             "(" << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "," <<
@@ -277,14 +280,15 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
             this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << "," <<
             "?1,?2,?3,?4)";
 
+
+        SQLite::Statement query(this->GetDb(), ss.str());
+        query.bind(1, rect.a.x);
+        query.bind(2, rect.a.y);
+        query.bind(3, rect.b.x);
+        query.bind(4, rect.b.y);
+
         try
         {
-            SQLite::Statement query(this->GetDb(), ss.str());
-            query.bind(1, rect.a.x);
-            query.bind(2, rect.a.y);
-            query.bind(3, rect.b.x);
-            query.bind(4, rect.b.y);
-
             while (query.executeStep())
             {
                 dbIndex idx = query.getColumn(0).getInt64();

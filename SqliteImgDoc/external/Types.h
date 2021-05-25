@@ -70,7 +70,7 @@ namespace SlImgDoc
         t w;
         t h;
 
-        bool IsPointInside(const PointD& p)
+        inline bool IsPointInside(const PointD& p) const
         {
             if (this->x <= p.x && (this->x + this->w) >= p.x && this->y <= p.y && (this->y + this->h) >= p.y)
             {

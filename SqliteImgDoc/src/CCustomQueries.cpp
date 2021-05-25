@@ -238,33 +238,29 @@ using namespace SlImgDoc;
         return  sqlite3_result_null(context);
     }
 
-    double x = sqlite3_value_double(argv[0]);
-    double y = sqlite3_value_double(argv[1]);
-    double w = sqlite3_value_double(argv[2]);
-    double h = sqlite3_value_double(argv[3]);
-    double p1x = sqlite3_value_double(argv[4]);
-    double p1y = sqlite3_value_double(argv[5]);
-    double p2x = sqlite3_value_double(argv[6]);
-    double p2y = sqlite3_value_double(argv[7]);
+    const double x = sqlite3_value_double(argv[0]);
+    const double y = sqlite3_value_double(argv[1]);
+    const double w = sqlite3_value_double(argv[2]);
+    const double h = sqlite3_value_double(argv[3]);
+    const double p1x = sqlite3_value_double(argv[4]);
+    const double p1y = sqlite3_value_double(argv[5]);
+    const double p2x = sqlite3_value_double(argv[6]);
+    const double p2y = sqlite3_value_double(argv[7]);
 
-    RectangleD rect(x, y, w, h);
-    LineThruTwoPointsD twoPoints;
-    twoPoints.a.x = p1x;
-    twoPoints.a.y = p1y;
-    twoPoints.b.x = p2x;
-    twoPoints.b.y = p2y;
+    const RectangleD rect(x, y, w, h);
+    const LineThruTwoPointsD twoPoints{ {p1x,p1y},{p2x,p2y} };
 
     bool doesIntersect = false;
 
     // check whether the start-/end-point is inside the rectangle
     if (rect.IsPointInside(twoPoints.a) || rect.IsPointInside(twoPoints.b))
     {
-        // if both are inside, we report "fully within"
+        // if at least one point is inside the rectangle, then we are done
         doesIntersect = true;
     }
     else
     {
-        // now we determine whether the line-segment "pLine" intersects with the diagonals
+        // now we determine whether the line-segment "twoPoints" intersects with the diagonals
         if (CCustomQueries::DoLinesIntersect(twoPoints.a, twoPoints.b, PointD(rect.x, rect.y), PointD(rect.x + rect.w, rect.y + rect.h)) ||
             CCustomQueries::DoLinesIntersect(twoPoints.a, twoPoints.b, PointD(rect.x, rect.y + rect.h), PointD(rect.x + rect.w, rect.y)))
         {

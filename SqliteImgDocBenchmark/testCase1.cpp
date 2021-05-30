@@ -357,9 +357,6 @@ BenchmarkItem TestCase1::RunTest10()
         dbWrite->CreateIndexOnCoordinate('Z');
     }
 
-    // Get starting timepoint
-    auto start = high_resolution_clock::now();
-
     if (withTransaction)
     {
         dbWrite->BeginTransaction();
@@ -370,6 +367,7 @@ BenchmarkItem TestCase1::RunTest10()
         for (int z = 0; z < this->zCount; ++z)
         {
             LogicalPositionInfo posInfo;
+            posInfo.posX = posInfo.posY = 0;
             posInfo.width = 100;
             posInfo.height = 100;
             posInfo.pyrLvl = 0;
@@ -378,7 +376,7 @@ BenchmarkItem TestCase1::RunTest10()
             tileBaseInfo.pixelHeight = 100;
             tileBaseInfo.pixelType = PixelType::GRAY8;
 
-            // and now we add a coordinate which has dimension 'T'
+            // and now we add a coordinate which has dimension 'T' and 'Z'
             TileCoordinate tc({ { 'T', t },{ 'Z', z } });
             CDataObjCustom dataCustom(4, 1);
 

@@ -2,10 +2,16 @@ cmake_minimum_required (VERSION 3.8)
 
 # Add source to this project's executable.
 add_executable(SqliteImgDocBenchmark 
-                  commandlineoptions.h
-                  commandlineoptions.cpp  
+                  "commandlineoptions.h"
+                  "commandlineoptions.cpp"  
                   "testCase1.h" 
-                  "testCase1.cpp" "main.cpp" "inc_sqliteimgdoc.h" "utils.cpp" "utils.h")
+                  "testCase1.cpp" 
+                  "main.cpp" 
+                  "inc_sqliteimgdoc.h" 
+                  "utils.cpp" 
+                  "utils.h" 
+                  "testCase2.h" 
+                  "testCase2.cpp")
 
 # Link test executable against gtest & gtest_main
 target_link_libraries(SqliteImgDocBenchmark SqliteImgDoc SQLiteCpp)

@@ -4,10 +4,13 @@
 #include <iostream>
 #include <windows.h>
 
+#include "testCase2.h"
+
 using namespace std;
 using namespace std::chrono;
 
 static void RunTestCase1(const CommandLineOptions& cmdLineOptions);
+static void RunTestCase2(const CommandLineOptions& cmdLineOptions);
 
 int main(int argc, char** argv)
 {
@@ -15,7 +18,8 @@ int main(int argc, char** argv)
 
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);
-    RunTestCase1(cmdlineopts);
+    //RunTestCase1(cmdlineopts);
+    RunTestCase2(cmdlineopts);
 
     cout << u8"µäöüß";
 }
@@ -58,5 +62,22 @@ static void PrintBenchmarkItem(const BenchmarkItem& item)
     PrintBenchmarkItem(testcase1.RunTest9());
     cout << endl;
     PrintBenchmarkItem(testcase1.RunTest10());
+    cout << endl;
+}
+
+/*static*/void RunTestCase2(const CommandLineOptions& cmdLineOptions)
+{
+    TestCase2 testcase2(cmdLineOptions.GetParamsTestCase2());
+
+    PrintBenchmarkItem(testcase2.RunTest1());
+    cout << endl;
+
+    PrintBenchmarkItem(testcase2.RunTest2());
+    cout << endl;
+
+    PrintBenchmarkItem(testcase2.RunTest3());
+    cout << endl;
+
+    PrintBenchmarkItem(testcase2.RunTest4());
     cout << endl;
 }

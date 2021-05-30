@@ -5,6 +5,15 @@ namespace SlImgDoc
 {
     struct LogicalPositionInfo
     {
+        LogicalPositionInfo() : posX(0), posY(0), width(0), height(0), pyrLvl(0)
+        {}
+
+        LogicalPositionInfo(double x, double y, double w, double h) : posX(x), posY(y), width(w), height(h), pyrLvl(0)
+        {}
+
+        LogicalPositionInfo(double x, double y, double w, double h, int pyrLvl) : posX(x), posY(y), width(w), height(h), pyrLvl(pyrLvl)
+        {}
+
         double posX;
         double posY;
         double width;

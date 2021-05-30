@@ -18,7 +18,7 @@ int main(int argc, char** argv)
 
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);
-    //RunTestCase1(cmdlineopts);
+    RunTestCase1(cmdlineopts);
     RunTestCase2(cmdlineopts);
 
     cout << u8"µäöüß";

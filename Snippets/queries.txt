@@ -22,3 +22,13 @@ WHERE PyramidLevel=0
 GROUP BY Dim_S
 
 
+
+
+Query all tiles within the query-rect AND which have C=1
+
+SELECT spatialindex.id  FROM TILESPATIAL_index spatialindex 
+INNER JOIN TILESINFO info ON
+       spatialindex.id = info.Pk
+WHERE (maxX>=30000 AND minX<=40000 AND maxY>=50000 AND minY<=60000)    
+       AND info.Dim_C=1    
+ 

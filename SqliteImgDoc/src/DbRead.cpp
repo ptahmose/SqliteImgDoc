@@ -380,6 +380,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
     catch (SQLite::Exception& excp)
     {
         std::cout << excp.what();
+        throw;
     }
 }
 

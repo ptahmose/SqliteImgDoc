@@ -19,6 +19,13 @@ std::vector<dbIndex> IDbRead::GetTilesIntersectingRect(const RectangleD& rect)
     return result;
 }
 
+std::vector<dbIndex> IDbRead::GetTilesIntersectingRect(const RectangleD& rect, const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery)
+{
+    std::vector<dbIndex> result;
+    this->GetTilesIntersectingRect(rect, clause, tileInfoQuery, [&](dbIndex idx)->bool {result.push_back(idx); return true; });
+    return result;
+}
+
 std::vector<dbIndex> IDbRead::GetTilesIntersectingWithLine(const LineThruTwoPointsD& line)
 {
     std::vector<dbIndex> result;
@@ -230,6 +237,48 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
             }
         }
 
+    }
+}
+
+/*virtual*/void CDbRead::GetTilesIntersectingRect(const SlImgDoc::RectangleD& rect, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery, std::function<bool(SlImgDoc::dbIndex)> func)
+{
+    if (clause == nullptr && tileInfoQuery == nullptr)
+    {
+        this->GetTilesIntersectingRect(rect, func);
+        return;
+    }
+
+    if (this->CDbBase::IsSpatialIndexActive())
+    {
+        stringstream ss;    //ss << "SELECT Pixelwidth,Pixelheight,Pixeltype,Datatype,Data_BinHdr,Data FROM TILESDATA WHERE rowId=(SELECT TileDataId FROM TILESINFO WHERE Pk=?1);";
+        ss << "SELECT spatialindex." << this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " FROM "
+            << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " spatialindex "
+            << "INNER JOIN " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " info ON "
+            << "spatialindex." << this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " = info." << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk)
+            << " WHERE (" <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << ">=?1 AND " <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "<=?2 AND " <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ">=?3 AND " <<
+            this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "<=?4) ";
+        QueryBuildUtils::AddSqlStatement(this->GetDb(), ss, 5, "AND", this->GetDocInfo(), clause, tileInfoQuery);
+
+        SQLite::Statement query(this->GetDb(), ss.str());
+        query.bind(1, rect.x);
+        query.bind(2, rect.x + rect.w);
+        query.bind(3, rect.y);
+        query.bind(4, rect.y + rect.h);
+
+        query.bind(5, 2);
+
+        while (query.executeStep())
+        {
+            dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
     }
 }
 

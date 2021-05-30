@@ -1,16 +1,17 @@
 #include "commandlineoptions.h"
 #include "testCase1.h"
+#include "testCase2.h"
+#include "testCase3.h"
 #include "utils.h"
 #include <iostream>
 #include <windows.h>
-
-#include "testCase2.h"
 
 using namespace std;
 using namespace std::chrono;
 
 static void RunTestCase1(const CommandLineOptions& cmdLineOptions);
 static void RunTestCase2(const CommandLineOptions& cmdLineOptions);
+static void RunTestCase3(const CommandLineOptions& cmdLineOptions);
 
 int main(int argc, char** argv)
 {
@@ -18,8 +19,9 @@ int main(int argc, char** argv)
 
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);
-    RunTestCase1(cmdlineopts);
-    RunTestCase2(cmdlineopts);
+    //RunTestCase1(cmdlineopts);
+    //RunTestCase2(cmdlineopts);
+    RunTestCase3(cmdlineopts);
 
     cout << u8"µäöüß";
 }
@@ -80,4 +82,21 @@ static void PrintBenchmarkItem(const BenchmarkItem& item)
 
     PrintBenchmarkItem(testcase2.RunTest4());
     cout << endl;
+}
+
+/*static*/ void RunTestCase3(const CommandLineOptions & cmdLineOptions)
+{
+    TestCase3 testcase3(cmdLineOptions.GetParamsTestCase3());
+
+  /*  PrintBenchmarkItem(testcase3.RunTest1());
+    cout << endl;
+
+    PrintBenchmarkItem(testcase3.RunTest2());
+    cout << endl;*/
+
+    PrintBenchmarkItem(testcase3.RunTest3());
+    cout << endl;
+
+    /*PrintBenchmarkItem(testcase3.RunTest4());
+    cout << endl;*/
 }

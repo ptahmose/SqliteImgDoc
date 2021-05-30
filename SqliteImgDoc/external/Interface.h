@@ -240,9 +240,11 @@ namespace SlImgDoc
         virtual void ReadTileData(dbIndex idx, TilePixelInfo* pixelInfo, IBlob* data) = 0;
 
         virtual void GetTilesIntersectingRect(const RectangleD& rect, std::function<bool(dbIndex)> func) = 0;
+        virtual void GetTilesIntersectingRect(const RectangleD& rect, const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery, std::function<bool(dbIndex)> func) = 0;
         virtual void GetTilesIntersectingWithLine(const LineThruTwoPointsD& line, std::function<bool(dbIndex)> func) = 0;
 
         std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect);
+        std::vector<dbIndex> GetTilesIntersectingRect(const RectangleD& rect, const IDimCoordinateQueryClause* clause, const ITileInfoQueryClause* tileInfoQuery);
         std::vector<dbIndex> GetTilesIntersectingWithLine(const LineThruTwoPointsD& line);
 
         ~IDbRead() override = default;

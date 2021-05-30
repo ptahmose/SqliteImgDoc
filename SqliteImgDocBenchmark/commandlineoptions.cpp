@@ -17,6 +17,12 @@ void CommandLineOptions::SetDefaults()
     this->paramsTestCase2.columnCount = 600;
     this->paramsTestCase2.tileWidth = 1024;
     this->paramsTestCase2.tileHeight = 1024;
+
+    this->paramsTestCase3.rowCount = 60;
+    this->paramsTestCase3.columnCount = 60;
+    this->paramsTestCase3.tileWidth = 1024;
+    this->paramsTestCase3.tileHeight = 1024;
+    this->paramsTestCase3.tCount = 20;
 }
 
 bool CommandLineOptions::ParseArguments(int argc, char** argv)
@@ -32,4 +38,9 @@ const ParametersTestCase1& CommandLineOptions::GetParamsTestCase1() const
 const ParametersTestCase2& CommandLineOptions::GetParamsTestCase2() const
 {
     return this->paramsTestCase2;
+}
+
+const ParametersTestCase3& CommandLineOptions::GetParamsTestCase3() const
+{
+    return this->paramsTestCase3;
 }

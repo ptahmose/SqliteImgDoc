@@ -366,7 +366,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
         bool b = query.executeStep();
         TileCoordinateBounds tileCoordinateBounds;
         size_t no = 0;
-        for each (auto d in dims)
+        for (auto d : dims)
         {
             MinMaxCoordinate minMax{
                 query.getColumn(no * 2).getInt(),

@@ -76,11 +76,16 @@ BenchmarkItem TestCase3::RunTest3()
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
-    CDimCoordinateQueryClause queryClause;
-    queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 2, 2 });
+    //CDimCoordinateQueryClause queryClause;
+    uniform_int_distribution<int> tDistribution(0, this->tCount - 1);
+    default_random_engine generator;
+    //queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 2, 2 });
 
     for (auto& queryRect : queryRectangles)
     {
+        CDimCoordinateQueryClause queryClause;
+        const int t = tDistribution(generator);
+        queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ t, t });
         auto result = read->GetTilesIntersectingRect(queryRect, &queryClause, nullptr);
     }
 
@@ -90,12 +95,13 @@ BenchmarkItem TestCase3::RunTest3()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss << "query " << this->columnCount << " x " << this->rowCount << " tiles in regular grid (w/ spatial index)";
+    ss << "query " << this->columnCount << " x " << this->rowCount << " tiles in regular grid (w/ spatial index, w/index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
-    ss << "Using a database (in memory) with " << this->columnCount << "x" << this->rowCount << " = " << this->columnCount * this->rowCount << " tiles and a spatial index, " <<
-        NumberOfQueries << " random queries for a rect are run.";
+    ss << "Using a database (in memory) with " << this->columnCount << "x" << this->rowCount << " = " << this->columnCount * this->rowCount << " tiles, " <<
+        this->tCount << " T's and a spatial index, " <<
+        NumberOfQueries << " random queries for a rect and a random T-coordinate are run.";
     item.explanation = ss.str();
     item.executionTime = (stop - start);
     return item;
@@ -109,12 +115,19 @@ BenchmarkItem TestCase3::RunTest4()
 
     auto queryRectangles = this->GenerateRandomQueryRects(NumberOfQueries, this->tileWidth * 1.5, this->tileHeight * 1.5);
 
+    uniform_int_distribution<int> tDistribution(0, this->tCount - 1);
+    default_random_engine generator;
+
     // Get starting timepoint
     auto start = high_resolution_clock::now();
 
     for (auto& queryRect : queryRectangles)
     {
-        auto result = read->GetTilesIntersectingRect(queryRect);
+        CDimCoordinateQueryClause queryClause;
+        const int t = tDistribution(generator);
+        queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ t, t });
+        //auto result = read->GetTilesIntersectingRect(queryRect);
+        auto result = read->GetTilesIntersectingRect(queryRect, &queryClause, nullptr);
     }
 
     // Get ending timepoint
@@ -123,12 +136,13 @@ BenchmarkItem TestCase3::RunTest4()
     BenchmarkItem item;
     stringstream ss;
     ss.imbue(std::locale(""));
-    ss << "query " << this->columnCount << " x " << this->rowCount << " tiles in regular grid (w/o spatial index)";
+    ss << "query " << this->columnCount << " x " << this->rowCount << " tiles in regular grid, " << this->tCount << " T's (w/o spatial index, w/ index)";
     item.benchmarkName = ss.str();
     ss = stringstream();
     ss.imbue(std::locale(""));
-    ss << "Using a database (in memory) with " << this->columnCount << "x" << this->rowCount << " = " << this->columnCount * this->rowCount << " tiles and without a spatial index, " <<
-        NumberOfQueries << " random queries for a rect are run.";
+    ss << "Using a database (in memory) with " << this->columnCount << "x" << this->rowCount << " = " << this->columnCount * this->rowCount << " tiles, " <<
+        this->tCount << " T's and without a spatial index, " <<
+        NumberOfQueries << " random queries for a rect and a random T-coordinate are run.";
     item.explanation = ss.str();
     item.executionTime = (stop - start);
     return item;

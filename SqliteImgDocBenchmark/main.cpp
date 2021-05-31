@@ -19,8 +19,8 @@ int main(int argc, char** argv)
 
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);
-    //RunTestCase1(cmdlineopts);
-    //RunTestCase2(cmdlineopts);
+    RunTestCase1(cmdlineopts);
+    RunTestCase2(cmdlineopts);
     RunTestCase3(cmdlineopts);
 
     cout << u8"µäöüß";
@@ -97,6 +97,6 @@ static void PrintBenchmarkItem(const BenchmarkItem& item)
     PrintBenchmarkItem(testcase3.RunTest3());
     cout << endl;
 
-    /*PrintBenchmarkItem(testcase3.RunTest4());
-    cout << endl;*/
+    PrintBenchmarkItem(testcase3.RunTest4());
+    cout << endl;
 }

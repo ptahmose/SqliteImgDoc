@@ -39,6 +39,22 @@ using namespace SlImgDoc;
     QueryBuildUtils::CreateQueryClause(ss, startParamNo, firstClauseStatement, buildInfo, clause, tileInfoQuery);
 }
 
+/*static*/void QueryBuildUtils::BindData(SQLite::Database& db, SQLite::Statement& sqlStatement, int startParamNo, const IDbDocInfo& docInfo, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
+{
+    BuildInfo buildInfo
+    {
+        docInfo.GetTableName(IDbDocInfo::TableType::TilesInfo),
+        docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk),
+        docInfo.GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::PyrLvl),
+        [&](SlImgDoc::TileDim dim, std::string& columnName)->bool
+        {
+            return docInfo.GetTileInfoColumnNameForDimension(dim,columnName);
+        }
+    };
+
+    QueryBuildUtils::BindDataForSqlStatement(sqlStatement, startParamNo, buildInfo, clause, tileInfoQuery);
+}
+
 /*static*/SQLite::Statement QueryBuildUtils::Build(SQLite::Database& db, const IDbDocInfo3D& docInfo3D, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
 {
     BuildInfo buildInfo
@@ -167,7 +183,7 @@ using namespace SlImgDoc;
 
     SQLite::Statement query(db, ss.str());
 
-    int bindingNo = 1;
+    /*int bindingNo = 1;
     if (clause != nullptr)
     {
         for (const auto dim : clause->GetTileDimsForClause())
@@ -225,9 +241,73 @@ using namespace SlImgDoc;
         {
             query.bind(bindingNo++, value);
         }
-    }
+    }*/
+    QueryBuildUtils::BindDataForSqlStatement(query, 1, info, clause, tileInfoQuery);
 
     return query;
+}
+
+/*static*/void QueryBuildUtils::BindDataForSqlStatement(SQLite::Statement& sqlStatement, int startParamNo, const BuildInfo& info, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)
+{
+    int bindingNo = startParamNo;
+    if (clause != nullptr)
+    {
+        for (const auto dim : clause->GetTileDimsForClause())
+        {
+            string dimColumnName;
+            info.GetColumnNameForDimension(dim, dimColumnName);
+
+            auto ranges = clause->GetRangeClause(dim);
+            auto list = clause->GetListClause(dim);
+
+            if (ranges != nullptr)
+            {
+                for (const auto& r : *ranges)
+                {
+                    if (r.start != numeric_limits<int>::min() && r.end != numeric_limits<int>::max())
+                    {
+                        if (r.start == r.end)
+                        {
+                            sqlStatement.bind(bindingNo++, r.start);
+                        }
+                        else
+                        {
+                            sqlStatement.bind(bindingNo++, r.start);
+                            sqlStatement.bind(bindingNo++, r.end);
+                        }
+                    }
+                    else if (r.start != numeric_limits<int>::min())
+                    {
+                        sqlStatement.bind(bindingNo++, r.start);
+                    }
+                    else if (r.end != numeric_limits<int>::max())
+                    {
+                        sqlStatement.bind(bindingNo++, r.end);
+                    }
+                }
+            }
+
+            if (list != nullptr)
+            {
+                for (const auto& l : *list)
+                {
+                    for (const auto& i : l.list)
+                    {
+                        sqlStatement.bind(bindingNo++, i);
+                    }
+                }
+            }
+        }
+    }
+
+    if (tileInfoQuery != nullptr)
+    {
+        int value;
+        if (tileInfoQuery->GetPyramidLevelCondition(nullptr, &value))
+        {
+            sqlStatement.bind(bindingNo++, value);
+        }
+    }
 }
 
 /*static*/void QueryBuildUtils::CreateQueryClause(std::stringstream& ss, int startParamNo, const char* firstClauseStatement, const BuildInfo& info, const SlImgDoc::IDimCoordinateQueryClause* clause, const SlImgDoc::ITileInfoQueryClause* tileInfoQuery)

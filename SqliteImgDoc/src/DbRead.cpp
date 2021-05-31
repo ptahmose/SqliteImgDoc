@@ -236,7 +236,6 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
                 break;
             }
         }
-
     }
 }
 
@@ -250,7 +249,7 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
 
     if (this->CDbBase::IsSpatialIndexActive())
     {
-        stringstream ss;    //ss << "SELECT Pixelwidth,Pixelheight,Pixeltype,Datatype,Data_BinHdr,Data FROM TILESDATA WHERE rowId=(SELECT TileDataId FROM TILESINFO WHERE Pk=?1);";
+        stringstream ss;   
         ss << "SELECT spatialindex." << this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << " FROM "
             << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << " spatialindex "
             << "INNER JOIN " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " info ON "
@@ -268,7 +267,36 @@ std::vector<dbIndex> IDbReadCommon::Query(const IDimCoordinateQueryClause* claus
         query.bind(3, rect.y);
         query.bind(4, rect.y + rect.h);
 
-        query.bind(5, 2);
+        QueryBuildUtils::BindData(this->GetDb(), query,5, this->GetDocInfo(), clause, tileInfoQuery);
+
+        while (query.executeStep())
+        {
+            dbIndex idx = query.getColumn(0).getInt64();
+            bool b = func(idx);
+            if (!b)
+            {
+                break;
+            }
+        }
+    }
+    else
+    {
+        stringstream ss;
+        ss << "SELECT " << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::Pk) << " FROM "
+            << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesInfo) << " WHERE (" <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << '+' << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileWidth) << ">=?1 AND " <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileX) << "<=?2 AND " <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << '+' << this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileHeight) << ">=?3 AND " <<
+            this->GetDocInfo().GetTileInfoColumnName(IDbDocInfo::TilesInfoColumn::TileY) << "<=?4)";
+        QueryBuildUtils::AddSqlStatement(this->GetDb(), ss, 5, "AND", this->GetDocInfo(), clause, tileInfoQuery);
+
+        SQLite::Statement query(this->GetDb(), ss.str());
+        query.bind(1, rect.x);
+        query.bind(2, rect.x + rect.w);
+        query.bind(3, rect.y);
+        query.bind(4, rect.y + rect.h);
+
+        QueryBuildUtils::BindData(this->GetDb(), query, 5, this->GetDocInfo(), clause, tileInfoQuery);
 
         while (query.executeStep())
         {

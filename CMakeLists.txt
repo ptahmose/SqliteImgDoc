@@ -11,19 +11,24 @@ project ("SqliteImgDoc")
 #find_package(sqlite3 CONFIG REQUIRED)
 #find_package(SQLiteCpp REQUIRED)
 
-#add_subdirectory(extlibs/SQLite3.30.1)
+add_subdirectory(extlibs/sqlite3)
 
 
 
 #message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLite3.30.1)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLite3.30.1)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
 
+set(SQLite3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/sqlite3)
+#get_property(SQLite3_LIBRARY  TARGET sqlite3 PROPERTY LOCATION)
+get_target_property(_baseName sqlite3 OUTPUT_NAME)
+message(STATUS ***** ${SQLite3_LIBRARY} ********)
+set(SQLite3_LIBRARY sqlite3)
 
 # add SQLite3 C++ wrapper arround sqlite3 library (and sqlite3 itself provided for ease of use)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
-set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "" FORCE) # here we simply instruct it to use the "bundled" SQLite-version
+set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "" FORCE) # here we simply instruct it to use the "bundled" SQLite-version
 set(SQLITECPP_INCLUDE_SCRIPT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)

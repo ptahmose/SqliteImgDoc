@@ -335,7 +335,10 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
         this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxX) << "," <<       // Maximum X coordinate"
         this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinY) << "," <<       // Minimum Y coordinate"
         this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MaxY) << ");";        // Maximum Y coordinate"
+    SQLite::Statement query1(this->GetDb(), sql.str());
+    int r = query1.exec();
 
+    sql = stringstream();
     sql << "INSERT INTO " << this->GetDocInfo().GetTableName(IDbDocInfo::TableType::TilesSpatialIndex) << "(" <<
         this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::Pk) << "," <<
         this->GetDocInfo().GetTilesSpatialIndexColumnName(IDbDocInfo::TilesSpatialIndexColumn::MinX) << "," <<
@@ -356,9 +359,8 @@ void CDbWrite::EnsureAddTilesSpatialIndexRowStatement()
         FROM TILESINFO"
     */
 
-    SQLite::Statement query(this->GetDb(), sql.str());
-
-    int r = query.exec();
+    SQLite::Statement query2(this->GetDb(), sql.str());
+    r = query2.exec();
 
     this->UpdateSpatialIndexAvailability();
 }

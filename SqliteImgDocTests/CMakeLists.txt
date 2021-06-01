@@ -56,7 +56,8 @@ add_executable( SqliteImgDocTests
                     "IndexTests.cpp"
                     "SpatialQueryNoSpatialIndex.cpp"
                     testUtilities.h
-                    testUtilities.cpp)
+                    testUtilities.cpp
+                    ReadSpatialAndOtherClausesTests.cpp)
 
 target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
 

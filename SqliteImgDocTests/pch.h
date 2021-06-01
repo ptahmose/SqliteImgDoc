@@ -5,6 +5,8 @@
 
 #pragma once
 
+#define  _SQLITEIMGDOCSTATICLIB 1
+
 #include <gtest/gtest.h>
 
 #include "../SqliteImgDoc/external/Interface.h"

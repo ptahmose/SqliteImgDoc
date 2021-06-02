@@ -59,8 +59,8 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseAllIndexed)
 }
 
 /**
-*Create a document with 10 T's and 10x10 tiles (with overlap) without and index, then query for T=3 and
-* for overlap with a query - rectangle.
+* Create a document with 10 T's and 10x10 tiles (with overlap) without and index, then query for T=3 and
+* for overlap with a query-rectangle.
 */
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseNoneIndexed)
 {
@@ -109,8 +109,8 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseNoneIndexed)
 }
 
 /**
-*Create a document with 10 T's and 10x10 tiles (with overlap) with only a spatial index, then query for T=3 and
-* for overlap with a query - rectangle.
+* Create a document with 10 T's and 10x10 tiles (with overlap) with only a spatial index, then query for T=3 and
+* for overlap with a query-rectangle.
 */
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseSpatialIndexedDimensionNotIndexed)
 {
@@ -159,8 +159,8 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseSpatialIndexedD
 }
 
 /**
-*Create a document with 10 T's and 10x10 tiles (with overlap) with only an index for T (and no spatial index),
-*  then query for T=3 and for overlap with a query-rectangle.
+* Create a document with 10 T's and 10x10 tiles (with overlap) with only an index for T (and no spatial index),
+* then query for T=3 and for overlap with a query-rectangle.
 */
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseDimensionIndexedSpatialNotIndexed)
 {

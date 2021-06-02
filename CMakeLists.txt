@@ -11,19 +11,27 @@ project ("SqliteImgDoc")
 #find_package(sqlite3 CONFIG REQUIRED)
 #find_package(SQLiteCpp REQUIRED)
 
-#add_subdirectory(extlibs/SQLite3.30.1)
+add_subdirectory(extlibs/sqlite3)
 
 
 
 #message(STATUS ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLite3.30.1)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLite3.30.1)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
+#include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
 
+# We instruct SQLiteCpp to use "external sqlite", so we have to provide it with the path for
+#  see sqlite-headers and the library. SQLiteCpp will use a find_library-call and pick up those
+# variables. I couldn't figure out how to get the "destination .lib/.a-library filename in a proper
+# way, and using a generator-expression ("$<TARGET_FILE:sqlite3>") did not work for me here, so
+# we put together the filename here by hand.
+set(SQLite3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/sqlite3)
+set(SQLite3_LIBRARY    ${PROJECT_BINARY_DIR}/extlibs/sqlite3/${CMAKE_SHARED_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX} )
+#message(STATUS ***** ${SQLite3_LIBRARY} ********)
 
 # add SQLite3 C++ wrapper arround sqlite3 library (and sqlite3 itself provided for ease of use)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
-set(SQLITECPP_INTERNAL_SQLITE ON CACHE BOOL "" FORCE) # here we simply instruct it to use the "bundled" SQLite-version
+set(SQLITECPP_INTERNAL_SQLITE OFF CACHE BOOL "" FORCE) # here we instruct it to NOT use the "bundled" SQLite-version
 set(SQLITECPP_INCLUDE_SCRIPT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPLINT OFF CACHE BOOL "" FORCE)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)

@@ -66,12 +66,12 @@ target_include_directories(SqliteImgDocTests PRIVATE ${GTEST_INCLUDE_DIRS})
 if(UNIX AND NOT APPLE)
    # Linux
    message(STATUS "****** UNIX AND NOT APPLE ******")
-   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp sqlite3 ${CMAKE_THREAD_LIBS_INIT}  ${CMAKE_DL_LIBS})
+   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp  ${CMAKE_THREAD_LIBS_INIT}  ${CMAKE_DL_LIBS})
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp sqlite3 pthread)
+   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp  pthread)
 else()
-   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp sqlite3)
+   target_link_libraries(SqliteImgDocTests PRIVATE gtest gmock gtest_main SqliteImgDoc SQLiteCpp )
 endif()
 
 # Cygwin seems to need some special treatment -> https://stackoverflow.com/questions/18784112/googletest-1-6-with-cygwin-1-7-compile-error-fileno-was-not-declared-in-this

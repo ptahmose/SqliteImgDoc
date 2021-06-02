@@ -20,10 +20,22 @@ add_subdirectory(extlibs/sqlite3)
 #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/extlibs/SQLiteCpp/sqlite3)
 
 set(SQLite3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/sqlite3)
-#get_property(SQLite3_LIBRARY  TARGET sqlite3 PROPERTY LOCATION)
-get_target_property(_baseName sqlite3 OUTPUT_NAME)
+set(SQLite3_LIBRARY    ${PROJECT_BINARY_DIR}/extlibs/sqlite3/${CMAKE_SHARED_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX} )
+#get_property(SQLITE_LOCATION  TARGET sqlite3 PROPERTY LOCATION)
+#get_property(PROJ2_LOC TARGET sqlite3 PROPERTY LOCATION)
+#get_target_property(_baseName sqlite3 OUTPUT_NAME)
 message(STATUS ***** ${SQLite3_LIBRARY} ********)
-set(SQLite3_LIBRARY sqlite3)
+
+#get_cmake_property(_variableNames VARIABLES)
+#list (SORT _variableNames)
+#foreach (_variableName ${_variableNames})
+#    message(STATUS "${_variableName}=${${_variableName}}")
+#endforeach()
+
+
+#set(SQLite3_LIBRARY sqlite3)
+#set(SQLite3_LIBRARY "$<TARGET_FILE:sqlite3>")
+#set(SQLite3_LIBRARY    /home/jbohl/WinDev/Github/SqliteImgDoc/linuxbuild/extlibs/sqlite3/libsqlite3.a)
 
 # add SQLite3 C++ wrapper arround sqlite3 library (and sqlite3 itself provided for ease of use)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)

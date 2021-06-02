@@ -347,3 +347,4 @@ build/
 cmake-build-debug/
 SqliteImgDoc/doc
 doxygen/
+linuxbuild/

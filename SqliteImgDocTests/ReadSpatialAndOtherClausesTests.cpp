@@ -4,8 +4,14 @@
 using namespace std;
 using namespace SlImgDoc;
 
+/**
+ * Create a document with 10 T's and 10x10 tiles (with overlap) with T indexed and a spatial index, then query for T=3 and
+ * for overlap with a query-rectangle.
+ */
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseAllIndexed)
 {
+    // create a document with T in the range from 0 to 9, on each plane 10x10 tiles of 
+    // extent 1024x1024 with 10% overlap.
     CTestUtilities::MosaicTestDataBaseOptions testDbCreateOptions;
     testDbCreateOptions.withSpatialIndex = true;
     testDbCreateOptions.withDimensionIndex = true;
@@ -20,6 +26,8 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseAllIndexed)
 
     auto reader = db->GetReader();
 
+    // query for all tiles with T=3 which overlap with the query-rectangle (0,0)-(1024,1024). We expect to find
+    // 4 tiles.
     CDimCoordinateQueryClause queryClause;
     queryClause.AddRangeClause('T', IDimCoordinateQueryClause::RangeClause{ 3, 3 });
     RectangleD queryRect{ 0,0,1024,1024 };
@@ -50,6 +58,10 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseAllIndexed)
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
 
+/**
+*Create a document with 10 T's and 10x10 tiles (with overlap) without and index, then query for T=3 and
+* for overlap with a query - rectangle.
+*/
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseNoneIndexed)
 {
     CTestUtilities::MosaicTestDataBaseOptions testDbCreateOptions;
@@ -96,6 +108,10 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseNoneIndexed)
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
 
+/**
+*Create a document with 10 T's and 10x10 tiles (with overlap) with only a spatial index, then query for T=3 and
+* for overlap with a query - rectangle.
+*/
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseSpatialIndexedDimensionNotIndexed)
 {
     CTestUtilities::MosaicTestDataBaseOptions testDbCreateOptions;
@@ -142,6 +158,10 @@ TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseSpatialIndexedD
     EXPECT_TRUE(correct) << "did not get the expected tiles";
 }
 
+/**
+*Create a document with 10 T's and 10x10 tiles (with overlap) with only an index for T (and no spatial index),
+*  then query for T=3 and for overlap with a query-rectangle.
+*/
 TEST(ReadSpatialAndOtherClausesTests, QueryRectAndDimensionClauseDimensionIndexedSpatialNotIndexed)
 {
     CTestUtilities::MosaicTestDataBaseOptions testDbCreateOptions;

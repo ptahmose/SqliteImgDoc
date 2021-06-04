@@ -25,8 +25,13 @@ add_subdirectory(extlibs/sqlite3)
 # way, and using a generator-expression ("$<TARGET_FILE:sqlite3>") did not work for me here, so
 # we put together the filename here by hand.
 set(SQLite3_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/extlibs/sqlite3)
-set(SQLite3_LIBRARY    ${PROJECT_BINARY_DIR}/extlibs/sqlite3/${CMAKE_SHARED_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX} )
-#message(STATUS ***** ${SQLite3_LIBRARY} ********)
+get_target_property(SQLITE3BINARYDIR sqlite3 BINARY_DIR)
+set(SQLite3_LIBRARY    ${SQLITE3BINARYDIR}/${CMAKE_SHARED_LIBRARY_PREFIX}sqlite3${CMAKE_STATIC_LIBRARY_SUFFIX} )
+message(STATUS ***** ${SQLite3_LIBRARY} ********)
+
+#get_target_property(TESTVAR sqlite3 BINARY_DIR)
+#message(STATUS XXX***** ${TESTVAR} ********XXX)
+
 
 # add SQLite3 C++ wrapper arround sqlite3 library (and sqlite3 itself provided for ease of use)
 set(SQLITECPP_RUN_CPPCHECK OFF CACHE BOOL "" FORCE)

@@ -14,7 +14,7 @@ add_executable(SqliteImgDocBenchmark
                   "testCase2.cpp" "testCase3.h" "testCase3.cpp")
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(SqliteImgDocBenchmark SqliteImgDoc SQLiteCpp)
+target_link_libraries(SqliteImgDocBenchmark SqliteImgDoc sqlite3 SQLiteCpp)
 
 target_include_directories(SqliteImgDocBenchmark PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../extlibs/cxxopts/>)
 

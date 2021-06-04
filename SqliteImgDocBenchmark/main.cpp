@@ -4,7 +4,9 @@
 #include "testCase3.h"
 #include "utils.h"
 #include <iostream>
+#if _WIN32
 #include <windows.h>
+#endif
 
 using namespace std;
 using namespace std::chrono;
@@ -15,8 +17,9 @@ static void RunTestCase3(const CommandLineOptions& cmdLineOptions);
 
 int main(int argc, char** argv)
 {
+#if _WIN32
     SetConsoleOutputCP(CP_UTF8);
-
+#endif
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);
     RunTestCase1(cmdlineopts);

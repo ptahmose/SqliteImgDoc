@@ -14,17 +14,17 @@ add_executable(ConvCZI
                 inc_libczi.h)
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(ConvCZI  SqliteImgDoc SQLiteCpp libCZIStatic JxrDecodeStatic)
+target_link_libraries(ConvCZI  SqliteImgDoc sqlite3 SQLiteCpp libCZIStatic JxrDecodeStatic)
 
 target_include_directories(ConvCZI PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../extlibs/cxxopts/>)
 
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)
    # Linux
-   target_link_libraries(ConvCZI SQLiteCpp pthread dl)
+   target_link_libraries(ConvCZI  pthread dl)
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(ConvCZI SQLiteCpp pthread)
+   target_link_libraries(ConvCZI  pthread)
 endif()
 
 set_target_properties(ConvCZI  PROPERTIES

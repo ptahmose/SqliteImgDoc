@@ -1,6 +1,8 @@
 #include "utils.h"
 #include <sstream>
+#include <locale>
 #include <codecvt>
+#include <cstdlib>
 
 using namespace std;
 

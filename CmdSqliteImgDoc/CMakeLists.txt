@@ -7,15 +7,15 @@
 add_executable(CmdSqliteImgDoc CmdSqliteImgDoc.cpp )
 
 # Link test executable against gtest & gtest_main
-target_link_libraries(CmdSqliteImgDoc   SqliteImgDoc SQLiteCpp)
+target_link_libraries(CmdSqliteImgDoc   SqliteImgDoc sqlite3 SQLiteCpp)
 
 ##target_link_libraries(SqliteImgDocTests PRIVATE SQLiteCpp)
 if(UNIX AND NOT APPLE)
    # Linux
-   target_link_libraries(CmdSqliteImgDoc SQLiteCpp pthread dl)
+   target_link_libraries(CmdSqliteImgDoc SQLiteCpp sqlite3 pthread dl)
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(CmdSqliteImgDoc SQLiteCpp pthread)
+   target_link_libraries(CmdSqliteImgDoc SQLiteCpp sqlite3 pthread)
 endif()
 
 set_target_properties(CmdSqliteImgDoc  PROPERTIES

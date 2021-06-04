@@ -4,8 +4,11 @@
 #include "testCase3.h"
 #include "utils.h"
 #include <iostream>
-#if _WIN32
+#if _WINDOWSENV
 #include <windows.h>
+#endif
+#if _LINUXENV
+#include <clocale>l
 #endif
 
 using namespace std;
@@ -17,8 +20,11 @@ static void RunTestCase3(const CommandLineOptions& cmdLineOptions);
 
 int main(int argc, char** argv)
 {
-#if _WIN32
+#if _WINDOWSENV
     SetConsoleOutputCP(CP_UTF8);
+#endif
+#if _LINUXENV
+    setlocale(LC_CTYPE, "");
 #endif
     CommandLineOptions cmdlineopts;
     cmdlineopts.ParseArguments(argc, argv);

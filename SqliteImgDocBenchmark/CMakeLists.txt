@@ -20,10 +20,18 @@ target_include_directories(SqliteImgDocBenchmark PUBLIC $<BUILD_INTERFACE:${CMAK
 
 if(UNIX AND NOT APPLE)
    # Linux
-   target_link_libraries(SqliteImgDocBenchmark SQLiteCpp pthread dl)
+   target_link_libraries(SqliteImgDocBenchmark pthread dl)
 elseif(UNIX AND APPLE)
    # Mac OS
-   target_link_libraries(SqliteImgDocBenchmark SQLiteCpp pthread)
+   target_link_libraries(SqliteImgDocBenchmark pthread)
+endif()
+
+if(WINDOWS)
+ target_compile_definitions(SqliteImgDocBenchmark PRIVATE _WINDOWSENV)
+endif()
+
+if(UNIX)
+ target_compile_definitions(SqliteImgDocBenchmark PRIVATE _UNIXENV)
 endif()
 
 set_target_properties(SqliteImgDocBenchmark  PROPERTIES

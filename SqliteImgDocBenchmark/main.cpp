@@ -32,7 +32,7 @@ int main(int argc, char** argv)
     RunTestCase2(cmdlineopts);
     RunTestCase3(cmdlineopts);
 
-    cout << u8"µäöüß";
+    cout << u8"Ã¤Ã¶Ã¼ÃŸ" << endl;
 }
 
 static void PrintBenchmarkItem(const BenchmarkItem& item)

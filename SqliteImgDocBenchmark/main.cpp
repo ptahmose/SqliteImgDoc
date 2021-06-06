@@ -8,7 +8,7 @@
 #include <windows.h>
 #endif
 #if _LINUXENV
-#include <clocale>l
+#include <clocale>
 #endif
 
 using namespace std;

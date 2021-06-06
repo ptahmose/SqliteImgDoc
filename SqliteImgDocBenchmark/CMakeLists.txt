@@ -26,11 +26,11 @@ elseif(UNIX AND APPLE)
    target_link_libraries(SqliteImgDocBenchmark pthread)
 endif()
 
-if(WINDOWS)
+if (WIN32)
  target_compile_definitions(SqliteImgDocBenchmark PRIVATE _WINDOWSENV)
 endif()
 
-if(UNIX)
+if (UNIX)
  target_compile_definitions(SqliteImgDocBenchmark PRIVATE _UNIXENV)
 endif()
 
